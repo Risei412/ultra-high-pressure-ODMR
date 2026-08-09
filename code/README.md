@@ -27,6 +27,17 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
 - `fig5_background.py` — green-vs-blue re-assessment as a function of the
   background level ρ₀ → `background_green_blue_<P>GPa.png`.
 - `tests/test_bg.py` — ρ₀=0 ↔ baseline equivalence, monotonicity, regressions.
+- `anvil_orientation.py` — spin-stress Hamiltonian (Barson constants) for the four
+  NV families under DAC loading; D, E and dν/dt per family for a chosen culet
+  orientation, and the resulting η comparison.
+- `fig6_anvil_orientation.py` — [111] vs [100] culet decision
+  → `anvil_orientation_<P>GPa.png`.
+- `lockin_sim.py` — time-domain simulation of DC / MW on-off / FM detection under
+  1/f + shot noise; Monte-Carlo σ_D of the fitted line centre.
+- `fig7_lockin.py` — break-even noise knee for modulated detection
+  → `lockin_decision.png`.
+- `tests/test_anvil.py`, `tests/test_lockin.py` — symmetry identities, estimator
+  bias, noise-PSD normalisation, and the headline regressions.
 
 ## Requirements
 Python ≥ 3.9 with `numpy`, `scipy`, `matplotlib` (see `requirements.txt`).
@@ -41,6 +52,8 @@ python fig1_green_blue_mix.py                     # green/blue/mix vs pressure
 python fig2_blue_wavelength_sweep.py              # blue sweep @120 GPa (compare 100,140)
 python fig2_blue_wavelength_sweep.py 100 75 125   # blue sweep @100 GPa (compare 75,125)
 python fig5_background.py                         # background re-assessment @120 GPa
+python fig6_anvil_orientation.py                  # [111] vs [100] culet @120 GPa
+python fig7_lockin.py                             # lock-in break-even knee
 python -m pytest tests/ -q                        # regressions
 ```
 
@@ -63,6 +76,27 @@ python -m pytest tests/ -q                        # regressions
 
 λ_opt moves ≲6 nm to the red and stays inside the zero-background 5% band;
 the green/blue decision **never flips at 120 GPa** for any background level.
+
+### Culet orientation (`fig6_anvil_orientation.py`, 120 GPa, Δν₀ = 5 MHz)
+| Quantity | [111] | [100] |
+|---|---|---|
+| lines (E splitting) | 3 (axial E=0 + 3 off-axis) | 2 (all 4 families) |
+| best-line contrast | 0.312 | 0.500 |
+| best-line \|dν/dt\| | 2.20 MHz/GPa | 4.60 MHz/GPa |
+| axial E=0 line \|dν/dt\| | **7.40 MHz/GPa** (worst) | — |
+| dD/dt | ≠0 (mixes P and t) | 0 exactly (clean P/t split) |
+
+η([111])/η([100]) = 1.33 at δt=0 → crossover at **δt = 0.42·Δν₀** (GPa per MHz)
+→ 0.78 at large δt. The axial E=0 line **never** wins (1.33–2.14× worse).
+
+### Modulated detection (`fig7_lockin.py`)
+| Quantity | Value |
+|---|---|
+| break-even noise knee, FM | f_knee ≈ 13 Hz |
+| break-even noise knee, MW on-off | f_knee ≈ 30 Hz |
+| σ_D gain at f_knee = 1 kHz | 13.7× (DC → FM) |
+| optimal FM dither depth | 0.5 × linewidth |
+| σ_D at f_knee = 0 (DC / on-off / FM) | 0.113 / 0.223 / 0.170 MHz |
 
 ## Model summary
 ```
