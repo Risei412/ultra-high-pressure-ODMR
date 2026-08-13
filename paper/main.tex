@@ -296,6 +296,22 @@ state~\cite{Occelli2003}, so Eqs.~\eqref{eq:zpl}--\eqref{eq:ipe} describe
 hydrostatic compression. Table~\ref{tab:anchors}
 collects the values at the two pressures of interest.
 
+Two features of Ref.~\cite{Ho2026} make these stronger anchors than a purely
+computational set would be. First, the absorption cross section is not only
+computed but checked against measurement at the two wavelengths that matter here:
+the integrated PL yield recorded under \SI{532}{\nano\meter} and
+\SI{457}{\nano\meter} excitation from ambient to \SI{120}{\giga\pascal}
+traces two broad domes that follow the calculated $\sabs$ sampled at those same
+wavelengths. Since $\lopt$ turns out to be fixed by $\sabs(\lambda,P)$ alone
+(Sec.~\ref{sec:resultsA}), the quantity our answer depends on is precisely the
+one that has been validated experimentally across the full pressure range.
+Second, because the excitation power and integration time were held constant in
+that comparison, the agreement also establishes that the NV radiative quantum
+efficiency is stable to \SI{120}{\giga\pascal}, consistent with a computed
+radiative lifetime that varies by less than \SI{1}{\nano\second} over the same
+range. We therefore write $R \propto \fm\,\sabs$ with no additional
+pressure-dependent radiative factor.
+
 \begin{table}[t]
   \caption{Anchored optical inputs, from Ref.~\cite{Ho2026}. These carry no
   fitted freedom; the wavelength equivalents are $hc/E$.}
@@ -307,6 +323,9 @@ collects the values at the two pressures of interest.
     \quad equivalent (nm)        & 637   & 540   & 529   \\
     $S_{\mathrm{abs}}$           & 3.08  & 4.36  & 4.61  \\
     DWF$_{\mathrm{abs}}$         & 2.2\% & 0.5\% & 0.36\% \\
+    $K^2$ (JT-active)            & 0.58  & ---   & 0.97  \\
+    $S_{\mathrm{em}}$            & 3.39  & ---   & 5.25  \\
+    DWF$_{\mathrm{em}}$          & 4.9\% & ---   & $<1\%$ \\
     $\mathrm{IP}(\gsA)$ (eV)     & 2.68  & 3.00  & 3.06  \\
     \quad equivalent (nm)        & 463   & 414   & 405   \\
     $\mathrm{IP}(\esE)$ (eV)     & 1.16  & 1.55  & 1.63  \\
@@ -349,7 +368,10 @@ Sec.~\ref{sec:resultsA} and must not be conflated with a physical detuning.
 Under illumination \NVm{} is not stable: it can be ionized to \NVz{} either by a
 one-photon process out of \gsA{}, which requires $E_\gamma > \mathrm{IP}(\gsA)$,
 or by a two-step process in which the center is first promoted to \esE{} and then
-ionized by a second photon~\cite{Aslam2013,Razinkovas2021}. Recombination
+ionized by a second photon~\cite{Aslam2013,Razinkovas2021}. The two channels do
+not share a final state: ionization from \gsA{} leaves \NVz{} in its $^{2}E$
+ground state, whereas ionization from \esE{} leaves it in the metastable
+$^{4}\!A_{2}$ state. Recombination
 proceeds through excitation of \NVz{}, plus a dark channel. In steady state,
 \begin{equation}
   \fm = \frac{G_{\mathrm{rec}}}{G_{\mathrm{rec}} + G_{\mathrm{ion}}},
@@ -575,6 +597,16 @@ different and more absolute: it forbids the region blueward of
 \SI{405.2}{\nano\meter}, where the ReLU term of Eq.~\eqref{eq:gion} grows
 linearly with detuning and drives $\fm$ down without bound.
 
+This flatness is reached independently in Ref.~\cite{Ho2026}, by a different
+argument. Plotting the ionization thresholds relative to the ZPL, that work
+observes that $\mathrm{IP}(\gsA)$ tracks the ZPL closely while the deformation
+potential of $\mathrm{IP}(\esE)$ is only somewhat smaller, and concludes that if
+the excitation wavelength is adjusted to follow the pressure-induced shift of the
+ZPL, the charge-state stability of \NVm{} should remain comparable to ambient
+conditions. Our $\fm$ result is the quantitative form of that statement, and the
+agreement indicates that the cancellation reflects the photophysics rather than
+an artifact of our parameterization.
+
 \subsection{Commercial laser lines and tolerance}
 
 \begin{table}[t]
@@ -608,6 +640,16 @@ because it lies far out on the blue flank, where $\sabs = 0.085$; there the
 ground-state ionization term contributes only $9\%$ of the total ionization rate,
 because \SI{405}{\nano\meter} sits barely above threshold. Its real significance
 is the absence of room to move further blue.
+
+The practical failure of green excitation is already visible in existing
+measurements. In Ref.~\cite{Ho2026} the PL spectra were recorded with
+\SI{532}{\nano\meter} up to \SI{41.4}{\giga\pascal} in one cell and with
+\SI{457}{\nano\meter} from \SI{55.2}{\giga\pascal} to
+\SI{113.8}{\giga\pascal} in the other; the switch to blue at intermediate
+pressure was an operational necessity rather than a preference. The present
+analysis quantifies that necessity and extends it, since at
+\SI{120}{\giga\pascal} even \SI{457}{\nano\meter} leaves $12\%$ of the
+sensitivity unclaimed.
 
 The tolerance windows are \SIrange{463.2}{486.1}{\nano\meter} at the $5\%$ level
 and \SIrange{458.5}{490.6}{\nano\meter} at the $10\%$ level. The commercial
@@ -774,7 +816,8 @@ condition under which the near-hydrostatic anchors of Table~\ref{tab:anchors}
 apply directly. A (111)-oriented anvil~\cite{Bhattacharyya2024} instead selects a
 single NV orientation aligned with the compression axis; it reaches higher
 pressure but the ZPL splitting and the modified intersystem
-crossing~\cite{Huang2025ISC} would require the anchors to be re-derived. Argon is
+crossing~\cite{Huang2025ISC} would require the anchors to be re-derived. Silver-coating the tip of the NV-implanted anvil suppresses interference from the
+opposing anvil and improves collection efficiency~\cite{Ho2026}. Argon is
 the pressure-transmitting medium~\cite{Klotz2009}; pressure is read from
 SrB$_4$O$_7$:Sm$^{2+}$ at low pressure and from the first-order diamond Raman
 edge above~\cite{Akahama2004}.
@@ -867,15 +910,34 @@ Eq.~\eqref{eq:sigma} reproduces the envelope but not the residual structure of
 the first replica; at \SI{120}{\giga\pascal} this is benign, because
 Ref.~\cite{Ho2026} reports that the structure has washed out, but it would be a
 poor approximation below \SI{50}{\giga\pascal}. The dynamical Jahn-Teller
-contribution to absorption is absorbed into the effective $S_{\mathrm{abs}}$
-rather than treated explicitly through the vibronic coupling constants $K^2$,
-which nearly double under compression; since $\lopt$ depends on the envelope
-maximum, and $K^2$ affects primarily the width and the fine structure, this is
-expected to shift $\lopt$ less than the $S_{\mathrm{abs}}$ uncertainty already
-tabulated, but it has not been verified. Finally, sample heating is not modelled
-at all: at fixed power the neglect is harmless, but the moment power dependence
-is addressed, the absorbed power at the culet shifts the local ZPL and hence
-$\lopt$ itself, which is a feedback the present model does not contain.
+contribution to absorption is folded into the effective $S_{\mathrm{abs}}$ rather
+than treated explicitly through the squared vibronic coupling constants $K^2$,
+which rise from $0.58$ to $0.97$ under compression; since $\lopt$ depends on the
+envelope maximum, and $K^2$ affects primarily the width and the fine structure,
+this is expected to shift $\lopt$ less than the $S_{\mathrm{abs}}$ uncertainty
+already tabulated, but it has not been verified.
+
+Two further caveats follow from the conditions under which the anchors were
+obtained. The lineshapes of Ref.~\cite{Ho2026} are low-temperature: the
+measurements were made at \SI{30}{\kelvin} and $\simeq\SI{90}{\kelvin}$, and
+the calculated envelopes are correspondingly low-temperature. Our Franck-Condon
+envelope inherits that assumption, so a room-temperature high-pressure ODMR
+experiment would see a thermally broadened absorption band, and a correspondingly
+broader---though not obviously displaced---tolerance window. Separately, even in
+the near-hydrostatic micropillar geometry with $\alpha \simeq 0.95$ the \esE{}
+degeneracy is lifted at high pressure and the ZPL splits, with only the lower
+branch reproduced by the calculation. We use a single hydrostatic ZPL. Given
+$\partial\lopt/\partial E_{\mathrm{ZPL}} \simeq
+\SI{-182}{\nano\meter\per\electronvolt}$, a splitting of
+\SIrange{20}{40}{\milli\electronvolt} corresponds to
+\SIrange{4}{7}{\nano\meter} of ambiguity in $\lopt$---comparable to the $5\%$
+tolerance window, and a reason to prefer a source near the center of that window
+rather than at its edge.
+
+Finally, sample heating is not modelled at all: at fixed power the neglect is
+harmless, but the moment power dependence is addressed, the absorbed power at the
+culet shifts the local ZPL and hence $\lopt$ itself, which is a feedback the
+present model does not contain.
 
 \subsection{Relation to existing practice}
 
