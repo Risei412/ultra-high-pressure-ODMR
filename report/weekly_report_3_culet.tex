@@ -14,10 +14,32 @@
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{geometry}
+\usepackage{caption}
 
 \geometry{margin=22mm}
 \setcounter{tocdepth}{3}
 \setlength{\parskip}{0.6mm}
+
+% =========================
+% Colour system (presentaion/slide_style_v3.md, sec. 3)
+%   Science Blue  : the main scientific subject / structural headings
+%   Deep Indigo   : exceptional or critical structure (used sparingly)
+%   Mist Lavender : low-salience support field
+%   Midnight Ink  : text, rules, neutral geometry (replaces pure black)
+% Colour encodes argumentative role, not category.
+% =========================
+\definecolor{scienceblue}{HTML}{1C3177}
+\definecolor{deepindigo}{HTML}{4B0082}
+\definecolor{mistlavender}{HTML}{E8EAF1}
+\definecolor{midnightink}{HTML}{101426}
+
+\color{midnightink}
+\hypersetup{colorlinks=true, linkcolor=scienceblue, urlcolor=scienceblue,
+            citecolor=scienceblue}
+
+% figures are evidence: neutral, restrained captions
+\captionsetup{font=small, labelfont={bf,color=scienceblue},
+              textfont={color=midnightink}, justification=justified}
 
 % =========================
 % User information
@@ -29,17 +51,37 @@
 % =========================
 % Custom commands
 % =========================
+% Section heading: Science Blue label over a thin Midnight Ink rule.
 \newcommand{\sectionblock}[1]{%
-  \vspace{2mm}
-  {\large\textbf{#1}}
-  \vspace{1mm}
-
+  \par\vspace{2.6mm}%
+  \noindent{\large\bfseries\color{scienceblue}#1}\par\nobreak
+  \vspace{0.4mm}%
+  \noindent{\color{midnightink}\rule{\linewidth}{0.4pt}}\par\nobreak
+  \vspace{-1.8mm}%
 }
 
-\newcommand{\todo}[1]{\textcolor{red}{#1}}
+% Reserved for structure that has acquired special meaning in the argument.
+\newcommand{\critical}[1]{\textcolor{deepindigo}{#1}}
+
+\newcommand{\todo}[1]{\textcolor{deepindigo}{#1}}
 
 \begin{document}
 
+% title block in the deck palette
+\makeatletter
+\renewcommand{\maketitle}{%
+  \begin{center}
+    {\LARGE\bfseries\color{scienceblue}\@title\par}
+    \vspace{2.5mm}
+    {\normalsize\color{midnightink}\@author\par}
+    \vspace{1mm}
+    {\small\color{midnightink}\@date\par}
+  \end{center}
+  \vspace{1mm}
+  {\color{scienceblue}\rule{\linewidth}{0.8pt}}
+  \vspace{2mm}
+}
+\makeatother
 \maketitle
 
 % =========================================================
@@ -48,7 +90,8 @@
 \sectionblock{Question}
 
 \begin{quote}
-A [111] culet puts one NV family exactly along the load axis, so that family keeps its $C_{3v}$ symmetry and its transverse-strain splitting $E$ vanishes; does that argument actually make [111] the better choice for ODMR sensitivity at 120\,GPa, compared with a [100] culet where all four families are equivalent?
+\colorbox{mistlavender}{\parbox{\dimexpr\linewidth-2\fboxsep}{%
+A [111] culet puts one NV family exactly along the load axis, so that family keeps its $C_{3v}$ symmetry and its transverse-strain splitting $E$ vanishes; does that argument actually make [111] the better choice for ODMR sensitivity at 120\,GPa, compared with a [100] culet where all four families are equivalent?}}
 \end{quote}
 
 % =========================================================

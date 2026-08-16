@@ -38,6 +38,12 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   → `lockin_decision.png`.
 - `tests/test_anvil.py`, `tests/test_lockin.py` — symmetry identities, estimator
   bias, noise-PSD normalisation, and the headline regressions.
+- `style_v3.py` — figure palette and typography shared by all plots; implements
+  the colour grammar of `presentaion/slide_style_v3.md` (colour encodes the
+  argumentative role of an object, not its category).
+- `report_figures.py` — the two figures embedded in the weekly reports
+  → `report/image/anvil_culet_decision.png`,
+  `report/image/lockin_decision_curve.png`.
 
 ## Requirements
 Python ≥ 3.9 with `numpy`, `scipy`, `matplotlib` (see `requirements.txt`).

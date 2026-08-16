@@ -14,10 +14,32 @@
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{geometry}
+\usepackage{caption}
 
 \geometry{margin=22mm}
 \setcounter{tocdepth}{3}
 \setlength{\parskip}{0.6mm}
+
+% =========================
+% Colour system (presentaion/slide_style_v3.md, sec. 3)
+%   Science Blue  : the main scientific subject / structural headings
+%   Deep Indigo   : exceptional or critical structure (used sparingly)
+%   Mist Lavender : low-salience support field
+%   Midnight Ink  : text, rules, neutral geometry (replaces pure black)
+% Colour encodes argumentative role, not category.
+% =========================
+\definecolor{scienceblue}{HTML}{1C3177}
+\definecolor{deepindigo}{HTML}{4B0082}
+\definecolor{mistlavender}{HTML}{E8EAF1}
+\definecolor{midnightink}{HTML}{101426}
+
+\color{midnightink}
+\hypersetup{colorlinks=true, linkcolor=scienceblue, urlcolor=scienceblue,
+            citecolor=scienceblue}
+
+% figures are evidence: neutral, restrained captions
+\captionsetup{font=small, labelfont={bf,color=scienceblue},
+              textfont={color=midnightink}, justification=justified}
 
 % =========================
 % User information
@@ -29,17 +51,37 @@
 % =========================
 % Custom commands
 % =========================
+% Section heading: Science Blue label over a thin Midnight Ink rule.
 \newcommand{\sectionblock}[1]{%
-  \vspace{2mm}
-  {\large\textbf{#1}}
-  \vspace{1mm}
-
+  \par\vspace{2.6mm}%
+  \noindent{\large\bfseries\color{scienceblue}#1}\par\nobreak
+  \vspace{0.4mm}%
+  \noindent{\color{midnightink}\rule{\linewidth}{0.4pt}}\par\nobreak
+  \vspace{-1.8mm}%
 }
 
-\newcommand{\todo}[1]{\textcolor{red}{#1}}
+% Reserved for structure that has acquired special meaning in the argument.
+\newcommand{\critical}[1]{\textcolor{deepindigo}{#1}}
+
+\newcommand{\todo}[1]{\textcolor{deepindigo}{#1}}
 
 \begin{document}
 
+% title block in the deck palette
+\makeatletter
+\renewcommand{\maketitle}{%
+  \begin{center}
+    {\LARGE\bfseries\color{scienceblue}\@title\par}
+    \vspace{2.5mm}
+    {\normalsize\color{midnightink}\@author\par}
+    \vspace{1mm}
+    {\small\color{midnightink}\@date\par}
+  \end{center}
+  \vspace{1mm}
+  {\color{scienceblue}\rule{\linewidth}{0.8pt}}
+  \vspace{2mm}
+}
+\makeatother
 \maketitle
 
 % =========================================================
@@ -48,7 +90,8 @@
 \sectionblock{Question}
 
 \begin{quote}
-A lock-in cannot beat shot noise, it can only move the measurement above the technical $1/f$ noise, so at what detector noise knee $f_{knee}$ does modulated detection actually start to improve the precision $\sigma_D$ of the fitted ODMR line centre, and which modulation scheme should we use?
+\colorbox{mistlavender}{\parbox{\dimexpr\linewidth-2\fboxsep}{%
+A lock-in cannot beat shot noise, it can only move the measurement above the technical $1/f$ noise, so at what detector noise knee $f_{knee}$ does modulated detection actually start to improve the precision $\sigma_D$ of the fitted ODMR line centre, and which modulation scheme should we use?}}
 \end{quote}
 
 % =========================================================
@@ -65,7 +108,7 @@ If the technical noise has relative PSD $S(f) = S_0(1 + f_{knee}/f)$ with $S_0$ 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.60\linewidth]{image/lockin_decision_curve.png}
+  \includegraphics[width=0.88\linewidth]{image/lockin_decision_curve.png}
   \vspace{-1mm}
   \caption{Monte-Carlo $\sigma_D$ (200 realisations, identical total measurement time and identical noise realisation per trial) for a DC sweep, MW on-off chopping and FM lock-in, as a function of the technical-noise knee. Triangles mark the break-even knees.}
   \label{fig:lockin}
