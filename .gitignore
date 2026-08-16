@@ -1,3 +1,14 @@
+__pycache__/
+slides/intro_deck.standalone.html
+
+# LaTeX build output
+paper/out/
 *.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
 *.log
 *.out
+*.synctex.gz
+*.toc
