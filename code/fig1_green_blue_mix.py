@@ -15,7 +15,15 @@ rcParams.update({'font.size': 11, 'font.family': 'DejaVu Sans',
                  'axes.linewidth': 0.9, 'mathtext.fontset': 'dejavusans'})
 
 P = np.linspace(0, 140, 561)
-m = NVModel()
+
+# collection=False on purpose.  eta_col (C-7) is WAVELENGTH INDEPENDENT, so it
+# is a factor common to all three excitation schemes and cancels exactly from
+# every ratio this figure shows -- including the green/blue crossover pressure.
+# Carrying it here would only fold the pressure dependence of the DETECTION
+# band into a figure about the EXCITATION choice; it is treated on its own in
+# Sec. IV E.  (It is also ~10^3 times more expensive than the rest of the
+# model, which made the Monte Carlo bands unusable.)
+m = NVModel(collection=False)
 
 green = [(532, 1.0)]
 blue  = [(457, 1.0)]
@@ -29,7 +37,11 @@ etaG, etaB, etaM = etaG / ref, etaB / ref, etaM / ref
 
 # Monte-Carlo 16-84% bands
 def band(beams):
-    return mc_band(default_randomiser,
+    def rnd(rng):
+        mm = default_randomiser(rng)
+        mm.collection = False
+        return mm
+    return mc_band(rnd,
                    lambda mm: mm.eta(beams, P)[0] / np.min(mm.eta(green, P)[0]),
                    n=300, seed=1)
 gL, gH = band(green); bL, bH = band(blue); mL, mH = band(mix)

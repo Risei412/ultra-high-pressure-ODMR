@@ -41,28 +41,52 @@ class NVModelPower(NVModel):
     """NVModel + explicit, saturating intensity dependence u = I/I_ref."""
 
     def __init__(self,
-                 Gamma_d=1.0,      # 3E decay rate (sets excited-state saturation scale)
-                 Gamma_d0=1.0,     # NV0 excited-state decay rate
+                 s_d=1.0,          # 3E decay rate, in units of the saturation reference
+                 s_d0=1.0,         # NV0 excited-state decay rate, same units
                  a_es2=0.9,        # two-photon (ES) ionisation rate constant
                  dZPL_NV0=0.21,    # ambient NV0-NV- ZPL gap (eV), Doherty et al.
                  Gamma_c=0.6,      # linewidth power-broadening scale
                  Gamma_satC=1.2,   # contrast-saturation scale
+                 sat_ref_P=120.0,  # pressure defining the saturation reference
+                 Gamma_d=None, Gamma_d0=None,   # legacy absolute override
                  **kw):
         super().__init__(**kw)
-        self.Gamma_d, self.Gamma_d0 = Gamma_d, Gamma_d0
         self.a_es2 = a_es2
         self.dZPL_NV0 = dZPL_NV0
         self.Gamma_c, self.Gamma_satC = Gamma_c, Gamma_satC
+        self.sat_ref_P = sat_ref_P
+
+        # ---- FIXING THE INTENSITY UNIT (the Sec. V bug) --------------------
+        # sigma_abs is normalised to green absorption at ambient pressure, an
+        # arbitrary unit; setting Gamma_d = 1 in that unit made n_E = 0.77 at
+        # u = 1 on the cross-section peak at 120 GPa while leaving the wings
+        # unsaturated, so n_E was a *decreasing* function of sigma in relative
+        # terms and the eta(lambda,u) ridge ran the wrong way.
+        #
+        # u is now defined against a stated saturation condition: u = 1 is the
+        # intensity that half-saturates the NV- transition AT lambda_opt AND AT
+        # sat_ref_P.  Then n_E = sigma u / (sigma u + Gamma_d) with
+        # Gamma_d = s_d * sigma_abs(lambda_opt(P_ref), P_ref), and the low-power
+        # limit n_E -> sigma u / Gamma_d restores R ~ f- sigma, i.e. the
+        # fixed-power model.  s_d, s_d0 are dimensionless residual knobs.
+        lam_ref = self.lambda_opt(sat_ref_P)
+        E_ref = nm2eV(lam_ref)
+        self.lam_sat_ref = lam_ref
+        self.Gamma_d = (s_d * self.sigma_abs(E_ref, sat_ref_P)
+                        if Gamma_d is None else Gamma_d)
+        self.Gamma_d0 = (s_d0 * self.sigma_NV0(E_ref, sat_ref_P)
+                         if Gamma_d0 is None else Gamma_d0)
+        self.s_d, self.s_d0 = s_d, s_d0
 
     def sigma_NV0(self, E, P):
-        """NV0 absorption envelope: same Franck-Condon machinery, shifted ZPL."""
+        """
+        NV0 absorption envelope: same Franck-Condon machinery, shifted ZPL.
+        Uses the shared finite-temperature envelope NVModel._fc (C-1), so the NV0
+        and NV- cross sections are always evaluated at the same temperature.
+        """
         z = self.ZPL(P) + self.dZPL_NV0
-        S = self.Sabs(P)
         x = np.asarray(E, float) - z
-        n = np.clip(x / HW, 0, None)
-        from scipy.special import gammaln
-        psb = np.exp(-S + n * np.log(S) - gammaln(n + 1.0)) * (x >= 0)
-        return psb / self._norm
+        return self._fc(x, self.Sabs(P)) / self._norm
 
     def f_minus_u(self, beams, P, u):
         """beams: list of (wavelength_nm, relative_spectral_weight); u: scalar or array."""
@@ -86,7 +110,7 @@ class NVModelPower(NVModel):
         f, nE, nE0 = self.f_minus_u(beams, P, u)
         R = np.clip(f * nE, 1e-12, None)                       # saturating photon rate
         Gamma_p = R                                            # optical pumping-rate proxy
-        C0 = f / (f + self.w0 * (1 - f))
+        C0 = self.C0(P) * f / (f + self.w0 * (1 - f))           # ISC prefactor x NV0 dilution
         C = C0 / (1.0 + Gamma_p / self.Gamma_satC)              # power-diluted contrast
         dnu = self.linewidth(P) * np.sqrt(1.0 + Gamma_p / self.Gamma_c)  # power-broadened line
         eta = dnu / (C * np.sqrt(R))
@@ -101,7 +125,8 @@ def default_randomiser_power(rng):
     from nv_model import default_randomiser
     base = default_randomiser(rng)
     return NVModelPower(
-        Emax=base.Emax, P0=base.P0, S_slope=base.S_slope,
+        Emax=base.Emax, P0=base.P0, S_slope=base.S_slope, T=base.T,
+        zpl_width=base.zpl_width,
         a_gs=base.a_gs, r0=base.r0, rbg=base.rbg, w0=base.w0,
         Gamma_d=1.0  * rng.uniform(0.6, 1.6),
         Gamma_d0=1.0 * rng.uniform(0.6, 1.6),

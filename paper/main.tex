@@ -8,16 +8,28 @@
 %    I    Introduction ................ FROZEN. Do not restructure without
 %                                       re-deciding the argument chain in
 %                                       docs/introduction_rationale.md
-%    II   Theory and model ............ complete (fixed-power + intensity-explicit)
+%    II   Theory and model ............ complete. Envelope is finite-T (C-1);
+%                                       ZPL parameterised by the two measured
+%                                       quantities (C-2); ISC contrast prefactor
+%                                       explicit (C-3); stress anisotropy alpha
+%                                       calibrated to Hilberer 2023 (C-4).
 %    III  Numerical methods ........... complete
 %    IV   Numerical results, fixed P .. complete; every number reproducible
-%    V    Power dependence ............ OPEN. Implementation is inconsistent
-%                                       with its own low-power limit; the section
-%                                       states the problem instead of a result.
+%    V    Power dependence ............ RESOLVED. Intensity unit fixed against a
+%                                       stated saturation condition; low-power
+%                                       limit verified as a regression test;
+%                                       ridge runs BLUE (the NV0 envelope is
+%                                       blue of NV-, not red as once written).
 %    VI   Planned experiment .......... complete as a plan
 %    VII  Experimental results ........ PLACEHOLDER. Figure/table slots and the
 %                                       predictions to test are listed in place.
-%    VIII Discussion .................. complete
+%    VIII Discussion .................. complete. Scope now leads with the
+%                                       quasi-hydrostatic precondition (C-4/C-5)
+%                                       and the blue-delivery problem (C-6).
+%
+%    Model freeze: code/tests/test_freeze.py (54 tests) locks backward
+%    compatibility at T=0 and the structural claims; code/repro_literature.py
+%    reproduces 23 published observations.
 %    IX   Summary and outlook ......... complete
 %    App. A  Reproduction ............. complete
 % =====================================================================
@@ -62,31 +74,57 @@ become the reference local probe of magnetism in the megabar regime, where they
 provide the diamagnetic and flux-trapping signatures that establish
 superconductivity in hydrogen-rich compounds. Their usefulness there is limited
 not by whether optically detected magnetic resonance (ODMR) survives compression,
-but by how fast a given magnetic sensitivity can be reached. We show that at
-\SI{120}{\giga\pascal} this sensitivity is controlled almost entirely by a single
-experimental choice that is usually inherited from ambient-pressure practice: the
-excitation wavelength. Using a rate-equation model of the lock-in ODMR
-sensitivity $\eta \propto \Delta\nu/(C\sqrt{R})$ whose optical and charge-transfer
-inputs are anchored to first-principles and experimental photophysics of the NV
-center up to \SI{120}{\giga\pascal}, we find that the pressure-induced blue shift
-of the zero-phonon line and the strengthening of the electron-phonon coupling
-displace the optimal excitation into a narrow window centered at
-$\lambda_{\mathrm{opt}} = \SI{475}{\nano\meter}$, while the concurrent rise of
-the ground-state photoionization threshold to
-$\mathrm{IP}(^{3}\!A_{2}) = \SI{3.06}{\electronvolt}$ imposes a hard blue
-boundary at \SI{405}{\nano\meter}. Both conventional choices fall outside the
-window, for different reasons: \SI{532}{\nano\meter} is degraded by a factor
-$5.2$ because the absorption onset has moved past it, and \SI{405}{\nano\meter}
-by a factor $4.2$ because it sits on the far blue flank of the absorption
-envelope, with direct ground-state ionization switching on immediately beyond
-it. Inside the window the steady-state charge state is nearly wavelength
-independent---excited-state ionization and recombination both scale with the
-absorption cross section and largely cancel from the \NVm{} fraction---so the
-fixed-power optimum coincides with the maximum of the Franck-Condon absorption
-envelope, a specific prediction that the proposed two-beam calibration is
-designed to test. The $5\%$ tolerance window,
-\SIrange{463}{486}{\nano\meter}, contains the commercial \SI{473}{\nano\meter}
-line, which is therefore predicted to be operationally optimal.
+but by how fast a given magnetic sensitivity can be reached. Once the anvil
+geometry is fixed, that speed is controlled largely by a single experimental
+choice usually inherited from ambient-pressure practice: the excitation
+wavelength. Using a rate-equation model of the lock-in ODMR sensitivity $\eta
+\propto \Delta\nu/(C\sqrt{R})$ whose optical and charge-transfer inputs are
+anchored to first-principles and experimental photophysics of the NV center up
+to \SI{120}{\giga\pascal}, and whose absorption envelope is evaluated at the
+temperature of the experiment, we find that the pressure-induced blue shift of
+the zero-phonon line and the strengthening of the electron-phonon coupling
+displace the optimum to $\lambda_{\mathrm{opt}} = \SI{474}{\nano\meter}$ at room
+temperature, while the concurrent rise of the ground-state photoionization
+threshold to $\mathrm{IP}(^{3}\!A_{2}) = \SI{3.06}{\electronvolt}$ imposes a
+hard blue boundary at \SI{405}{\nano\meter}. Both conventional choices are
+outside the $5\%$ tolerance window \SIrange{462}{486}{\nano\meter}:
+\SI{405}{\nano\meter} by a factor $3.7$, because it sits on the far blue flank
+of the absorption envelope with direct ground-state ionization switching on
+immediately beyond it, and \SI{532}{\nano\meter} by a factor $2.7$, because the
+absorption maximum has moved past it. Inside the window the steady-state charge
+state is nearly wavelength independent---excited-state ionization and
+recombination both scale with the absorption cross section and largely cancel
+from the \NVm{} fraction---so the optimum coincides with the maximum of the
+Franck-Condon absorption envelope and is insensitive to every phenomenological
+charge-transfer constant in the model. This answer is conditional on
+quasi-hydrostatic stress at the NV layer: with the deviatoric stress of a
+standard flat culet ($\alpha = 0.56$) the same model returns
+\SI{508}{\nano\meter}, but such a culet has no usable ODMR contrast above
+\SIrange{40}{50}{\giga\pascal}, so a micropillar or equivalent geometry is a
+precondition for megabar sensing rather than a refinement of it. The commercial
+\SI{473}{\nano\meter} line lies \SI{1}{\nano\meter} from the optimum and is
+predicted to be operationally optimal, buying back a factor $2.7$ in sensitivity
+over green excitation---a factor $7$ in the acquisition time of a magnetic map.
+That recommendation carries a threshold and a regime. Below
+\SI{71}{\giga\pascal} the same model returns green as the better choice, so it
+reproduces the absence of a blue advantage reported at \SI{50}{\giga\pascal};
+the resulting sign change near \SI{70}{\giga\pascal} cannot be produced or
+displaced by the wavelength-dependent systematics that a single-pressure
+comparison is unable to separate, and is accordingly the measurement that would
+falsify this work. The wavelength itself is a low-power statement: the optimum
+moves into the blue as the excitation begins to saturate the transition, and at
+the upper end of the intensity range in which existing high-pressure
+measurements operate, holding \SI{473}{\nano\meter} costs a factor $1.6$,
+comparable to the gain being claimed.
+The emission band shifts with the zero-phonon line as well, so a passband
+inherited from ambient practice collects only $26\%$ of the \NVm{} light at
+\SI{120}{\giga\pascal}; moving the excitation into the blue is what makes it
+possible to move the detection cut-on with it, and the two gains compound to a
+factor $\simeq 4$ in sensitivity.
+The model reproduces, without further adjustment, twenty-two published
+high-pressure observations spanning \SIrange{0}{150}{\giga\pascal} and four
+excitation wavelengths---four of them the calibration anchors, one of them a
+measurement that found no effect, and one recorded as unreproduced.
 \end{abstract}
 
 \maketitle
@@ -175,7 +213,7 @@ electron-phonon coupling strengthens substantially---the absorption Huang-Rhys
 factor of the Jahn-Teller-inactive modes rises from $3.08$ to $4.61$ and the
 absorption Debye-Waller factor falls from $2.2\%$ to $0.36\%$---so the absorption
 envelope both broadens and moves its weight to higher energy, placing its
-maximum near \SI{475}{\nano\meter}. Third, the photoionization thresholds shift
+maximum near \SI{474}{\nano\meter}. Third, the photoionization thresholds shift
 upward as well: $\mathrm{IP}(\gsA)$ rises from \SI{2.68}{\electronvolt} to
 \SI{3.06}{\electronvolt} and $\mathrm{IP}(\esE)$ from \SI{1.16}{\electronvolt} to
 \SI{1.63}{\electronvolt}~\cite{Ho2026,Razinkovas2021}. Since
@@ -208,18 +246,18 @@ and the electron-phonon parameters are taken from the \SI{120}{\giga\pascal}
 photophysics of Ref.~\cite{Ho2026}, and only the charge-transfer rate constants
 and the \NVz{} background weight remain phenomenological. Minimizing $\eta$ over
 the blue excitation window at \SI{120}{\giga\pascal} yields an optimum at
-$\lopt = \SI{475}{\nano\meter}$. The balance turns out to be resolved in a
+$\lopt = \SI{474}{\nano\meter}$. The balance turns out to be resolved in a
 specific and testable way: within the blue window the two intensity-linear charge
 channels---excited-state ionization and recombination---both scale with $\sabs$
 and cancel from $\fm$ to better than $0.2\%$, so at fixed power the optimum is
 fixed by the photon rate and coincides with the maximum of the absorption
 envelope, while the ionization physics enters as a hard boundary at
 \SI{405}{\nano\meter} rather than as a detuning of the optimum. Relative to the
-optimum, \SI{532}{\nano\meter} costs a factor $5.2$ and \SI{405}{\nano\meter} a
-factor $4.2$ in sensitivity, while the $5\%$ tolerance window
-\SIrange{463}{486}{\nano\meter} contains the commercial \SI{473}{\nano\meter}
-line at a cost of $0.1\%$. We further show that $\lopt$ tracks the ZPL at
-\SIrange{0.6}{0.7}{\nano\meter\per\giga\pascal}, so that the choice must be made
+optimum, \SI{532}{\nano\meter} costs a factor $2.7$ and \SI{405}{\nano\meter} a
+factor $3.7$ in sensitivity, while the $5\%$ tolerance window
+\SIrange{462}{486}{\nano\meter} contains the commercial \SI{473}{\nano\meter}
+line at a cost of $0.03\%$. We further show that $\lopt$ tracks the ZPL at
+\SIrange{0.4}{0.6}{\nano\meter\per\giga\pascal}, so that the choice must be made
 per target pressure, and we identify which of the underlying photophysical
 anchors the answer is most sensitive to, and hence which quantities a calibration
 experiment should pin down first.
@@ -271,9 +309,20 @@ a saturating form,
   + E_{\max}\left[1 - e^{-P/P_0}\right],
   \label{eq:zpl}
 \end{equation}
-with $E_{\max} = \SI{0.758}{\electronvolt}$ and $P_0 = \SI{160}{\giga\pascal}$,
-which reproduces the reported shift of $>\SI{0.4}{\electronvolt}$ at
-\SI{120}{\giga\pascal} and the measured curvature at intermediate pressures. The
+whose two parameters are fixed by two \emph{measured} quantities rather than
+chosen: the initial slope $\mathrm{d}E_{\mathrm{ZPL}}/\mathrm{d}P \to
+\SI{5.75}{\milli\electronvolt\per\giga\pascal}$ as $P \to 0$, measured to
+\SI{60}{\giga\pascal} by Ref.~\cite{Doherty2014}, and the total shift
+$\Delta E_{\mathrm{ZPL}}(\SI{120}{\giga\pascal}) =
+\SI{400}{\milli\electronvolt}$ reported by Ref.~\cite{Ho2026}. Requiring both
+gives $E_{\max} = \SI{0.570}{\electronvolt}$ and $P_0 =
+\SI{99.1}{\giga\pascal}$; the slope has fallen to
+\SI{1.0}{\milli\electronvolt\per\giga\pascal} by \SI{120}{\giga\pascal},
+which is why the linear extrapolation of Ref.~\cite{Doherty2014} places the ZPL
+at \SI{532}{\nano\meter} near \SI{66}{\giga\pascal} while the saturating form
+places it at \SI{112}{\giga\pascal}. Because $\Delta
+E_{\mathrm{ZPL}}(\SI{120}{\giga\pascal})$ is pinned, the initial slope has no
+influence on $\lopt$ at that pressure (Table~\ref{tab:tornado}). The
 absorption Huang-Rhys factor of the Jahn-Teller-inactive modes and the two
 photoionization thresholds are all reported to be nearly linear in $P$, and are
 interpolated between their end points,
@@ -357,9 +406,9 @@ wrong. The \emph{maximum} of Eq.~\eqref{eq:sigma} is not the discrete Poisson
 mean $E_{\mathrm{ZPL}} + S_{\mathrm{abs}}\hbar\omega$: extremizing the continuous
 envelope gives $\ln S_{\mathrm{abs}} = \psi(n+1)$, whose root at $S_{\mathrm{abs}}
 = 4.61$ is $n = 4.10$ rather than $n = S_{\mathrm{abs}}$. At
-\SI{120}{\giga\pascal} the envelope therefore peaks at \SI{474.8}{\nano\meter},
-whereas the phonon-number mean would place it at \SI{469}{\nano\meter}. The
-$\simeq\SI{6}{\nano\meter}$ difference is comparable to the tolerances quoted in
+\SI{120}{\giga\pascal} the envelope therefore peaks at \SI{474.0}{\nano\meter},
+whereas the phonon-number mean would place it at \SI{468.8}{\nano\meter}. The
+$\simeq\SI{5}{\nano\meter}$ difference is comparable to the tolerances quoted in
 Sec.~\ref{sec:resultsA} and must not be conflated with a physical detuning.
 
 \subsection{Charge-state dynamics}
@@ -458,8 +507,13 @@ transition saturates. The one-photon ground-state channel remains linear,
 $G_{\mathrm{ion}}^{\mathrm{GS}} = a_{\mathrm{gs}}[E_\gamma-\mathrm{IP}(\gsA)]_{+}u$.
 
 \emph{Recombination through the \NVz{} envelope.} Recombination proceeds via
-excitation of \NVz{}, which has its own Franck-Condon envelope, displaced by the
-ambient \NVz{}--\NVm{} ZPL gap of \SI{0.21}{\electronvolt}~\cite{Doherty2013}:
+excitation of \NVz{}, which has its own Franck-Condon envelope. The \NVz{} ZPL
+lies at \SI{575}{\nano\meter} (\SI{2.156}{\electronvolt}),
+\SI{0.21}{\electronvolt} \emph{above} the \NVm{} ZPL~\cite{Doherty2013}, so that
+envelope is displaced to the \emph{blue}---at \SI{120}{\giga\pascal} it peaks
+near \SI{439}{\nano\meter} against \SI{474}{\nano\meter} for \NVm{}. The sign
+matters: it determines which way $\lopt$ moves with power
+(Sec.~\ref{sec:resultsB}).
 \begin{equation}
   G_{\mathrm{rec}} = r_0\,\sigma_{\NVz}(\lambda,P)\,u\,n_{E^0} + r_{\mathrm{bg}} .
 \end{equation}
@@ -498,10 +552,12 @@ Sec.~\ref{sec:calibration} is done.
   \begin{ruledtabular}
   \begin{tabular}{llcc}
     symbol & meaning & value & MC range \\ \colrule
-    $E_{\max}$ & ZPL shift amplitude & \SI{0.758}{\electronvolt} & $\pm 10\%$ \\
-    $P_0$ & ZPL shift scale & \SI{160}{\giga\pascal} & $\pm 15\%$ \\
+    $\Delta E_{\mathrm{ZPL}}(120)$ & measured ZPL shift & \SI{400}{\milli\electronvolt} & $\pm\SI{20}{\milli\electronvolt}$ \\
+    $\mathrm{d}E_{\mathrm{ZPL}}/\mathrm{d}P|_0$ & measured initial slope & \SI{5.75}{\milli\electronvolt\per\giga\pascal} & $\pm 0.25$ \\
     $\partial S_{\mathrm{abs}}$ & HR slope & $1.53/P_{120}$ & $\pm 15\%$ \\
-    $\hbar\omega$ & effective phonon & \SI{65}{\milli\electronvolt} & fixed \\ \colrule
+    $\hbar\omega$ & effective phonon & \SI{65}{\milli\electronvolt} & fixed \\
+    $\sigma_{\mathrm{ZPL}}$ & ZPL line width & \SI{15}{\milli\electronvolt} & $0.7$--$1.4\times$ \\
+    $T$ & temperature & \SI{300}{\kelvin} & fixed \\ \colrule
     $a_{\mathrm{gs}}$ & one-photon ionization & 6.0 & $0.5$--$1.6\times$ \\
     $a_{\mathrm{es}}$ & two-step ionization & 0.9 & $0.5$--$1.8\times$ \\
     $r_0$ & recombination & 1.2 & $0.7$--$1.3\times$ \\
@@ -574,15 +630,15 @@ At \SI{120}{\giga\pascal} the anchored inputs give $E_{\mathrm{ZPL}} =
 and $\mathrm{IP}(\gsA) = \SI{3.060}{\electronvolt}$ (\SI{405.2}{\nano\meter}).
 Minimizing Eq.~\eqref{eq:eta} over $\lambda$ yields
 \begin{equation}
-  \lopt(\SI{120}{\giga\pascal}) = \SI{474.8}{\nano\meter},
+  \lopt(\SI{120}{\giga\pascal}) = \SI{474.0}{\nano\meter},
 \end{equation}
 which coincides with the maximum of the absorption envelope to
 \SI{0.02}{\nano\meter}.
 
 That coincidence is a result rather than a triviality, and it identifies which
 physics sets the answer. Across the whole blue window the steady-state charge
-state is essentially constant: $\fm$ varies from $0.5806$ to $0.5816$ over
-\SIrange{463}{486}{\nano\meter}, a spread of $0.2\%$
+state is essentially constant: $\fm$ varies from $0.5822$ to $0.5833$ over
+\SIrange{462}{486}{\nano\meter}, a spread of $0.2\%$
 [Fig.~\ref{fig:sweep}(b)]. This is the cancellation of
 Eq.~\eqref{eq:fminus-limit} in action. With $\fm$ constant, both $C$ and the
 $\fm$ factor in $R$ are constant, and $\eta \propto \sabs^{-1/2}$; the minimum of
@@ -617,13 +673,14 @@ an artifact of our parameterization.
   \begin{ruledtabular}
   \begin{tabular}{lccl}
     $\lambda$ (nm) & $\eta/\eta_{\mathrm{opt}}$ & $\sabs/\sabs^{\max}$ & comment \\ \colrule
-    405 & 4.23  & 0.026 & blue flank; at the $\mathrm{IP}(\gsA)$ edge \\
-    457 & 1.12  & 0.788 & inside the $10\%$ window \\
-    473 & 1.00  & 0.998 & \textbf{operationally optimal} \\
-    475 & 1.00  & 1.000 & model optimum \\
-    488 & 1.07  & 0.869 & inside the $10\%$ window \\
-    505 & 1.44  & 0.460 & outside \\
-    532 & 5.16  & 0.012 & at the absorption onset \\
+    405 & 3.67  & 0.038 & blue flank; at the $\mathrm{IP}(\gsA)$ edge \\
+    450 & 1.20  & 0.679 & outside the $10\%$ window \\
+    457 & 1.10  & 0.824 & inside the $10\%$ window \\
+    473 & 1.00  & 0.999 & \textbf{operationally optimal} \\
+    474 & 1.00  & 1.000 & model optimum \\
+    488 & 1.07  & 0.874 & inside the $10\%$ window \\
+    505 & 1.37  & 0.509 & outside \\
+    532 & 2.67  & 0.096 & at the absorption onset \\
   \end{tabular}
   \end{ruledtabular}
 \end{table}
@@ -632,14 +689,20 @@ Table~\ref{tab:lines} lists the penalty incurred by the commercially available
 laser lines. The two conventional choices fail for opposite reasons, and in both
 cases the cause is the collapse of the cross section rather than a charge-state
 effect. The \SI{532}{\nano\meter} line, still the default in most NV setups, is
-degraded by a factor $5.2$ because at \SI{120}{\giga\pascal} it excites
-\SI{3}{\nano\meter} to the red of the ZPL, where $\sabs$ has fallen to $4\%$ of
-its ambient-pressure green value---a factor of $83$ below $\sabs$ at the
-optimum. The \SI{405}{\nano\meter} line is degraded by a comparable factor $4.2$
-because it lies far out on the blue flank, where $\sabs = 0.085$; there the
-ground-state ionization term contributes only $9\%$ of the total ionization rate,
-because \SI{405}{\nano\meter} sits barely above threshold. Its real significance
-is the absence of room to move further blue.
+degraded by a factor $2.7$ because at \SI{120}{\giga\pascal} it excites
+\SI{3}{\nano\meter} to the red of the ZPL, where $\sabs$ has fallen to $26\%$ of
+its ambient-pressure green value---a factor of $10$ below $\sabs$ at the
+optimum. The \SI{405}{\nano\meter} line is degraded by the larger factor $3.7$,
+because it lies far out on the blue flank, where $\sabs = 0.10$; there the
+ground-state ionization term contributes only $8\%$ of the total ionization rate,
+since \SI{405}{\nano\meter} sits barely above threshold. Its real significance
+is the absence of room to move further blue. That \SI{405}{\nano\meter} is worse
+than \SI{532}{\nano\meter}, rather than better, follows from evaluating the
+absorption envelope at the temperature of the experiment
+(Sec.~\ref{sec:model:sigma}): the thermal phonon population supplies the
+anti-Stokes wing that keeps green excitation viable below the ZPL, and there is
+no counterpart to it on the blue flank, where the penalty is the intrinsic
+falloff of the Franck-Condon envelope.
 
 The practical failure of green excitation is already visible in existing
 measurements. In Ref.~\cite{Ho2026} the PL spectra were recorded with
@@ -648,17 +711,50 @@ measurements. In Ref.~\cite{Ho2026} the PL spectra were recorded with
 \SI{113.8}{\giga\pascal} in the other; the switch to blue at intermediate
 pressure was an operational necessity rather than a preference. The present
 analysis quantifies that necessity and extends it, since at
-\SI{120}{\giga\pascal} even \SI{457}{\nano\meter} leaves $12\%$ of the
+\SI{120}{\giga\pascal} even \SI{457}{\nano\meter} leaves $10\%$ of the
 sensitivity unclaimed.
 
-The tolerance windows are \SIrange{463.2}{486.1}{\nano\meter} at the $5\%$ level
-and \SIrange{458.5}{490.6}{\nano\meter} at the $10\%$ level. The commercial
-\SI{473}{\nano\meter} DPSS line lies \SI{1.8}{\nano\meter} from the optimum and
-costs $0.1\%$; it is the recommended practical choice, and no custom source is
+The tolerance windows are \SIrange{461.6}{486.2}{\nano\meter} at the $5\%$ level
+and \SIrange{456.6}{491.1}{\nano\meter} at the $10\%$ level. The commercial
+\SI{473}{\nano\meter} DPSS line lies \SI{1.0}{\nano\meter} from the optimum and
+costs $0.03\%$; it is the recommended practical choice, and no custom source is
 required. The width of the window is itself worth noting: it is set by the
 breadth of the pressure-broadened sideband, which is a consequence of the
 increased electron-phonon coupling. The same physics that forces the move into
 the blue also makes the choice forgiving once there.
+
+\subsection{The detection band moves too}
+\label{sec:resultsA:band}
+
+The emission band shifts with the ZPL just as the absorption band does, and by
+more: the emission Huang-Rhys factor rises from $3.39$ to $5.25$ and the
+emission Debye-Waller factor falls from $4.9\%$ to below
+$1\%$~\cite{Ho2026}, so the emission maximum, $E_{\mathrm{ZPL}} -
+S_{\mathrm{em}}\hbar\omega$, moves from \SI{719}{\nano\meter} at ambient
+pressure to \SI{619}{\nano\meter} at \SI{120}{\giga\pascal}. A passband chosen
+at ambient pressure to pass \NVm{} while rejecting the laser and \NVz{}---in
+practice \SIrange{650}{800}{\nano\meter}---therefore collects a shrinking
+fraction of the light: $82\%$ at ambient, $47\%$ at \SI{50}{\giga\pascal},
+$26\%$ at \SI{120}{\giga\pascal}. Since $\eta \propto R^{-1/2}$, that alone
+costs a factor $2.0$ in sensitivity at \SI{120}{\giga\pascal}---comparable to
+the entire gain from optimizing the excitation.
+
+The remedy is available only \emph{because} the excitation has moved. With
+\SI{532}{\nano\meter} excitation a cut-on below \SI{650}{\nano\meter} is
+impractical; with \SI{473}{\nano\meter} it is routine. Moving the cut-on to
+\SI{600}{\nano\meter} raises the collected fraction at \SI{120}{\giga\pascal}
+from $26\%$ to $62\%$, a further factor $1.6$ in $\eta$. The two choices
+compound: relative to the conventional pairing of \SI{532}{\nano\meter}
+excitation with a \SIrange{650}{800}{\nano\meter} passband, blue excitation with
+a re-tuned passband is worth a factor $\simeq 4$ in sensitivity, i.e. a factor
+$\simeq 17$ in the acquisition time of a magnetic map.
+
+Being a property of the emission, the collection efficiency is independent of
+excitation wavelength---emission leaves the relaxed \esE{} whatever vibronic
+level was populated---so it multiplies $\eta$ by a common factor and leaves
+$\lopt$, the tolerance windows and Table~\ref{tab:lines} exactly unchanged. It
+matters for absolute sensitivity, and it matters for interpreting published
+count rates (Sec.~\ref{sec:discussion:counts}).
 
 \subsection{Uncertainty of the optimum}
 \label{sec:resultsA:mc}
@@ -666,13 +762,13 @@ the blue also makes the choice forgiving once there.
 Propagating all inputs of Table~\ref{tab:knobs} through $600$ Monte Carlo draws
 gives
 \begin{equation}
-  \lopt = 474.8^{\,+6.3}_{\,-6.9}\ \si{\nano\meter}
+  \lopt = 474.0^{\,+3.7}_{\,-4.3}\ \si{\nano\meter}
   \quad (16\text{--}84\%),
 \end{equation}
-with a standard deviation of \SI{6.3}{\nano\meter}. The band is wide enough to
-span most of the $5\%$ tolerance window, so at this level of input uncertainty
-the correct statement is not ``\SI{475}{\nano\meter}'' but ``inside the
-\SIrange{463}{486}{\nano\meter} window, with \SI{473}{\nano\meter} a safe
+with a standard deviation of \SI{4.0}{\nano\meter}. The band spans about a third
+of the $5\%$ tolerance window, so at this level of input uncertainty
+the correct statement is not ``\SI{474}{\nano\meter}'' but ``inside the
+\SIrange{462}{486}{\nano\meter} window, with \SI{473}{\nano\meter} a safe
 choice.'' The next subsection shows that this band is almost entirely inherited
 from the ZPL parameterization and could be tightened substantially without any
 new experiment.
@@ -689,23 +785,29 @@ new experiment.
   \begin{ruledtabular}
   \begin{tabular}{lccc}
     parameter & range & $\Delta\lopt$ ($-$) & $\Delta\lopt$ ($+$) \\ \colrule
-    $P_0$              & $\pm 15\%$ & \SI{-7.93}{\nano\meter} & \SI{+6.79}{\nano\meter} \\
-    $E_{\max}$         & $\pm 10\%$ & \SI{+7.38}{\nano\meter} & \SI{-7.16}{\nano\meter} \\
+    $\Delta E_{\mathrm{ZPL}}(120)$ & $\pm\SI{20}{\milli\electronvolt}$ & \SI{+3.65}{\nano\meter} & \SI{-3.60}{\nano\meter} \\
     $S_{\mathrm{abs}}$ slope & $\pm 15\%$ & \SI{+2.73}{\nano\meter} & \SI{-2.70}{\nano\meter} \\ \colrule
+    $\mathrm{d}E_{\mathrm{ZPL}}/\mathrm{d}P|_0$ & $\pm 0.25$ & $0$ & $0$ \\
+    $\sigma_{\mathrm{ZPL}}$ & $0.7$--$1.4\times$ & $0$ & $0$ \\
     $a_{\mathrm{gs}}$  & $\pm 50\%$ & $0$ & $0$ \\
     $a_{\mathrm{es}}$  & $\pm 50\%$ & $0$ & $0$ \\
     $r_0$              & $\pm 30\%$ & $0$ & $0$ \\
     $r_{\mathrm{bg}}$  & $\pm 40\%$ & $0$ & $0$ \\
     $w_0$              & $\pm 30\%$ & $0$ & $0$ \\
+    $C_{\mathrm{amb}}$ & $\pm 50\%$ & $0$ & $0$ \\
+    $E_{\mathrm{ISC}}$ & $\pm 30\%$ & $0$ & $0$ \\
   \end{tabular}
   \end{ruledtabular}
 \end{table}
 
 Table~\ref{tab:tornado} is the most useful result of this section for planning
-purposes. At fixed power, $\lopt$ depends on the ZPL position and the
-electron-phonon coupling and on nothing else. Every phenomenological
-charge-transfer constant---including the two ionization rates, over ranges of
-$\pm 50\%$---leaves $\lopt$ unchanged to numerical precision.
+purposes. At fixed power, $\lopt$ depends on two measured numbers---the ZPL
+shift at the working pressure and the slope of the Huang-Rhys factor---and on
+nothing else. Every phenomenological charge-transfer constant, including the two
+ionization rates over ranges of $\pm 50\%$, and both constants of the contrast
+prefactor $C_0(P)$, leave $\lopt$ unchanged to numerical precision. So does the
+initial slope of the ZPL shift, once the shift at \SI{120}{\giga\pascal} is
+pinned: the answer depends on where the ZPL \emph{is}, not on how it got there.
 
 Two consequences follow. First, the fixed-power answer is considerably more
 trustworthy than the number of phenomenological knobs in the model would suggest:
@@ -721,10 +823,11 @@ parameterization. Expressed as derivatives,
 \end{equation}
 so a ZPL known to \SI{20}{\milli\electronvolt} fixes $\lopt$ to
 \SI{3.6}{\nano\meter}, well inside the $5\%$ tolerance window. The
-\SI{6.3}{\nano\meter} band of Sec.~\ref{sec:resultsA:mc} reflects the
-deliberately loose $\pm 10\%$/$\pm 15\%$ randomization of $E_{\max}$ and $P_0$,
-not the actual precision of the measured ZPL, and constraining those two
-parameters to the reported ZPL data would shrink it by roughly a factor of two.
+\SI{4.0}{\nano\meter} band of Sec.~\ref{sec:resultsA:mc} is essentially that
+number combined with the $\pm 15\%$ uncertainty of the Huang-Rhys slope, and it
+cannot be reduced except by measuring one of those two quantities better. A
+factor-of-two improvement in the reported $\Delta E_{\mathrm{ZPL}}$ at
+\SI{120}{\giga\pascal} would bring the band inside \SI{3}{\nano\meter}.
 
 Second, and less comfortably, the calibration programme of
 Sec.~\ref{sec:calibration} cannot improve the fixed-power answer at all. Its
@@ -735,8 +838,8 @@ where the cancellation is expected to fail.
 
 $\lopt$ is a property of the pressure, not of the technique. Figure
 \ref{fig:sweep}(c) shows that it follows the ZPL and the sideband edge at
-\SIrange{0.6}{0.7}{\nano\meter\per\giga\pascal}, moving from
-\SI{486.7}{\nano\meter} at \SI{100}{\giga\pascal} to \SI{474.8}{\nano\meter} at
+\SIrange{0.4}{0.6}{\nano\meter\per\giga\pascal}, moving from
+\SI{484.1}{\nano\meter} at \SI{100}{\giga\pascal} to \SI{474.0}{\nano\meter} at
 \SI{120}{\giga\pascal}; at both pressures it again coincides with the
 cross-section maximum. Over the \SIrange{97}{172}{\giga\pascal} window spanned by
 the (La,Ce)H$_9$ family~\cite{Semenok2022LaCeH9} the total excursion exceeds the
@@ -745,61 +848,184 @@ target pressure. A cell intended to cover a wide pressure range would benefit
 from two lines---\SI{488}{\nano\meter} below $\simeq\SI{110}{\giga\pascal}$ and
 \SI{473}{\nano\meter} above---rather than from a single compromise.
 
+
+\subsection{The blue advantage has a threshold pressure}
+\label{sec:resultsA:threshold}
+
+\begin{table}[t]
+  \caption{The recommendation reverses below \SI{71}{\giga\pascal}. Ratio of
+  the sensitivity of the two lines at the same pressure and the same power;
+  values below unity mean green is the better choice. The
+  \SI{50}{\giga\pascal} row is the pressure at which
+  Ref.~\cite{Bhattacharyya2022} compared blue with green and found no distinct
+  advantage.}
+  \label{tab:threshold}
+  \begin{ruledtabular}
+  \begin{tabular}{ccc}
+    $P$ (GPa) & $\lopt$ (nm) & $\eta(\SI{532}{\nano\meter})/\eta(\SI{473}{\nano\meter})$ \\ \colrule
+     20 & 554 & 0.31 \\
+     30 & 542 & 0.37 \\
+     50 & 520 & 0.59 \\
+     71 & 503 & 1.00 \\
+    100 & 484 & 1.95 \\
+    120 & 474 & 2.67 \\
+    150 & 466 & 3.76 \\
+  \end{tabular}
+  \end{ruledtabular}
+\end{table}
+
+Run at lower pressure the same calculation returns the opposite
+recommendation, and this is the one place where the model can be tested against
+a published \emph{null} result. Table~\ref{tab:threshold} gives
+$\eta(\SI{532}{\nano\meter})/\eta(\SI{473}{\nano\meter})$ as a function of
+pressure. Below \SI{71}{\giga\pascal} the ratio is smaller than unity and green
+is the better choice, by a factor $3$ at \SI{20}{\giga\pascal}. Blue overtakes
+green at \SI{71}{\giga\pascal}, leads by $20\%$ at \SI{78}{\giga\pascal}, by
+$50\%$ at \SI{87}{\giga\pascal}, and by a factor $2$ only at
+\SI{102}{\giga\pascal}. The threshold depends on which blue line is used:
+\SI{457}{\nano\meter} crosses at \SI{82}{\giga\pascal} and
+\SI{450}{\nano\meter} at \SI{87}{\giga\pascal}, because a line further from
+$\lopt$ has to wait for a larger shift of the envelope before it pays.
+
+This reproduces an experiment that found nothing.
+Reference~\cite{Bhattacharyya2022} compared \SI{450}{\nano\meter} with
+\SI{532}{\nano\meter} cwODMR on a $[100]$ culet at \SI{50}{\giga\pascal} and
+reported no distinct advantage for the blue line. The model places that
+measurement \SI{37}{\giga\pascal} below its own \SI{450}{\nano\meter}
+crossover, in a regime where it predicts green to be ahead. A positive
+reproduction can always be arranged by adjusting parameters; predicting where an
+effect is \emph{absent} constrains the structure of the model rather than its
+constants, and among the observations available in the literature this is the
+one that does the most work.
+
+It also settles the design of the experiment that would test the present
+analysis. A comparison of two excitation wavelengths at a single pressure
+measures a ratio that carries the relative calibration of the two laser powers,
+the relative transmission of anvil and optics at the two wavelengths, and the
+relative detection efficiency. Those systematics reach a factor of two without
+difficulty and are not separable from the predicted factor $2.7$. All of them
+are, however, pressure independent, whereas the prediction is not: the same
+cell, the same two lines and the same optics, swept from \SIrange{40}{120}{\giga\pascal},
+must show green ahead at the bottom, blue ahead at the top, and a crossing near
+\SI{70}{\giga\pascal}. A multiplicative systematic can move a ratio, but it
+cannot create a crossing or displace one, since it does not depend on pressure.
+The sign change, not the ratio at one pressure, is the falsifiable measurement.
+
 % =====================================================================
-\section{Power dependence: status and open problem}
+\section{Power dependence}
 \label{sec:resultsB}
 
 \begin{figure}[t]
   \includegraphics[width=\linewidth]{../code/power_wavelength_sensitivity_120GPa.png}
-  \caption{Diagnostic output of the intensity-explicit model of
-  Sec.~\ref{sec:model:power} at \SI{120}{\giga\pascal} with the provisional
-  parameters of Table~\ref{tab:knobs}: (a) $\log_{10}\eta(\lambda,u)$ with the
+  \caption{Intensity-explicit model of Sec.~\ref{sec:model:power} at
+  \SI{120}{\giga\pascal}: (a) $\log_{10}\eta(\lambda,u)$ with the
   optimal-wavelength ridge, (b) the ridge with its Monte Carlo band, (c)
-  $\eta(u)$ for candidate laser lines. \textbf{This is not presented as a
-  result.} The ridge runs to \SI{405}{\nano\meter} by $u \simeq 20$, which is
-  inconsistent with the fixed-power limit; see the text.}
+  $\eta(u)$ for candidate laser lines. The dimensionless intensity $u$ is
+  defined so that $u = 1$ half-saturates the \NVm{} transition at $\lopt$ at
+  this pressure; the linear photoluminescence measured at
+  \SI{100}{\giga\pascal} by Ref.~\cite{Dai2022} places existing experiments at
+  $u \lesssim 0.3$.}
   \label{fig:power}
 \end{figure}
 
-The intensity-explicit model of Sec.~\ref{sec:model:power} was constructed to
-answer whether $\lopt$ moves with laser power---a question with direct
-consequences in a DAC, where the usable power is capped by sample heating rather
-than by the source. The physical expectation is definite. At high $u$ the
-two-photon channel grows as $\sabs^2u^2$ and therefore penalizes excitation
-directly on the cross-section peak more than in the wings, while recombination
-saturates through the \NVz{} envelope, which is displaced to the red. Both
-effects should push $\lopt$ \emph{red} of the fixed-power value as power
-increases, and the low-power limit should return the fixed-power answer, where
-the dark term $r_{\mathrm{bg}}$ supports $\fm$.
+Whether $\lopt$ moves with laser power has direct consequences in a DAC, where
+the usable power is capped by sample heating rather than by the source. Two
+things had to be fixed before the question could be asked.
 
-The current implementation does not reproduce this. With the provisional
-constants of Table~\ref{tab:knobs} the ridge runs the wrong way, from
-\SI{463}{\nano\meter} at $u = 0.05$ to \SI{425}{\nano\meter} at $u = 1$ and
-\SI{405}{\nano\meter} at $u = 20$ (Fig.~\ref{fig:power}), and it does not
-converge to \SI{474.8}{\nano\meter} as $u \to 0$. Two candidate causes have been
-identified and neither has yet been excluded:
+\subsection{Fixing the intensity unit}
 
-\begin{enumerate}
-\item The saturation scales $\Gamma_d$ and $\Gamma_{d0}$ are set to unity in the
-  same arbitrary units as $\sabs$, which is normalized to green absorption at
-  ambient pressure. At \SI{120}{\giga\pascal} the peak $\sabs$ is $3.27$ in those
-  units, so $n_E$ is already above $3/4$ at $u = 1$ at the optimum but far from
-  saturation in the wings. The excited-state population is then a strongly
-  \emph{decreasing} function of $\sabs$ in relative terms, which inverts the
-  intended weighting. The reference intensity $I_{\mathrm{ref}}$ needs to be
-  defined against a stated saturation condition rather than left implicit.
-\item Setting $R = \fm n_E$ removes the explicit $\sabs$ factor from the photon
-  rate entirely; in the saturated regime $\eta$ then rewards whatever wavelength
-  maximizes $n_E$ per unit ionization, which is not the same optimization.
-\end{enumerate}
+The excited-state population $n_E = \sabs u/(\sabs u + \Gamma_d)$ is meaningful
+only once $\Gamma_d$ and $\sabs$ share a scale. Because $\sabs$ is normalized to
+green absorption at ambient pressure---an arbitrary unit in which the
+\SI{120}{\giga\pascal} peak is $2.8$---setting $\Gamma_d = 1$ left the optimum
+already three-quarters saturated at $u = 1$ while the wings remained linear, so
+$n_E$ was a \emph{decreasing} function of $\sabs$ in relative terms. We now
+define $u$ against a stated saturation condition: $u = 1$ is the intensity that
+half-saturates the \NVm{} transition at $\lopt$ at the reference pressure, i.e.
+$\Gamma_d = \sabs(\lopt(P_{\mathrm{ref}}), P_{\mathrm{ref}})$. The low-intensity
+limit $n_E \to \sabs u/\Gamma_d$ then restores $R \propto \fm\sabs$, and the
+model returns the fixed-power answer: $\lopt(u \to 0) = \SI{474.0}{\nano\meter}$,
+verified as a regression test.
 
-Resolving this requires fixing the units of the saturation scales against a
-defined reference---most naturally the intensity at which the transition at
-$\lopt$ is half-saturated---and verifying the low-power limit as a regression
-test before any conclusion is drawn. Until that is done, Fig.~\ref{fig:power} is
-reported as a diagnostic of the current parameterization and no claim is made
-about the power dependence of $\lopt$. The Introduction poses the power
-dependence as an open question for exactly this reason.
+\subsection{The direction of the shift}
+
+The physical expectation stated in an earlier version of this work---that
+$\lopt$ should move \emph{red} with power---rested on the claim that the \NVz{}
+envelope is displaced to the red of the \NVm{} envelope. It is not. The \NVz{}
+ZPL is \SI{0.21}{\electronvolt} above the \NVm{} ZPL, so the recombination
+envelope lies to the \emph{blue} (Sec.~\ref{sec:model:power}), and the
+competition runs the other way: raising $u$ makes two-photon ionization, which
+follows $\sabs^2u^2$, penalize the \NVm{} absorption peak, while recombination
+is fastest where $\sigma_{\NVz}$ is largest, \SI{35}{\nano\meter} further blue.
+Both terms push $\lopt$ toward shorter wavelength. Reversing the sign of the
+\NVz{} displacement in the code reverses the ridge, from
+\SIrange{474}{405}{\nano\meter} to \SIrange{474}{554}{\nano\meter}, confirming
+that this single input controls the direction.
+
+At \SI{120}{\giga\pascal} the ridge runs
+\SI{474.0}{\nano\meter} $(u \to 0) \to \SI{473.3}{\nano\meter}\,(u = 0.06) \to
+\SI{461}{\nano\meter}\,(u = 0.1) \to \SI{445}{\nano\meter}\,(u = 0.3)$, and
+saturates against the $\mathrm{IP}(\gsA)$ edge at \SI{405.2}{\nano\meter} above
+$u \simeq 30$; it cannot pass that edge. Over $250$ Monte Carlo draws of the
+intensity-dependent knobs the direction is unanimous: every draw places
+$\lopt(u \ge 0.1)$ blue of its own $u \to 0$ value.
+
+\subsection{Where experiments actually sit}
+
+Reference~\cite{Dai2022} measured the photoluminescence of NV centers at
+\SI{100}{\giga\pascal} as a function of excitation power and found it
+\emph{linear}, concluding that a single-photon process dominates. In the present
+units that observation places the measurement at $u \lesssim 0.3$, since $R(u)$
+departs from linearity by $10\%$ at $u = 0.28$. This is the operationally
+important statement: over $u < 0.06$ the optimum moves by less than
+\SI{1}{\nano\meter}, but by $u = 0.1$ it has moved \SI{13}{\nano\meter} and left
+the $5\%$ tolerance window, and by $u = 0.2$ it has left the $10\%$ window. The
+power dependence is therefore not negligible---it becomes comparable to the
+tolerance band just below the onset of saturation, which is where one would
+naturally operate to maximize photon rate.
+
+The cost of ignoring this is not small. If the recommendation of
+Sec.~\ref{sec:resultsA} is followed literally---\SI{473}{\nano\meter}, selected
+in the $u \to 0$ limit---while the measurement is made at finite power, the
+penalty relative to the optimum \emph{at that power} is $1.01$ at $u = 0.1$,
+$1.27$ at $u = 0.2$ and $1.61$ at $u = 0.3$, where the optimum has moved to
+\SI{445}{\nano\meter}. At the upper end of the range in which
+Ref.~\cite{Dai2022} places existing high-pressure measurements, that penalty is
+comparable to the factor $2.7$ claimed here over green excitation: the
+wavelength error would consume most of the gain the wavelength choice was made
+to secure. The headline number is therefore a statement about a regime and not
+about the technique. It is correct for $u \lesssim 0.1$; above that the
+recommendation moves into the blue with power, and a wavelength quoted without
+the power at which it applies is incomplete.
+
+We do not replace \SI{473}{\nano\meter} with a numerically different
+recommendation, because the magnitude of the shift depends on the constants
+listed below, which are not yet calibrated. What follows instead is a condition
+and a measurement. The condition is $u \lesssim 0.1$. The measurement that
+converts it into an experimental power is a single saturation curve
+$R(I)$ taken at the target pressure: $u$ is defined by a half-saturation
+condition, so the intensity at which $R(I)$ departs from linearity fixes the
+scale directly. That measurement is considerably cheaper than the two-beam
+sweep of Sec.~\ref{sec:calibration} and should precede any comparison of
+excitation wavelengths, since it determines which wavelengths the comparison
+ought to use.
+
+The corresponding optimum in intensity is shallow. At \SI{473}{\nano\meter},
+$\eta(u)$ is minimized at $u^{*} \simeq 0.11$ and is only $30\%$ worse at
+$u = 0.3$, so there is little to gain by pushing power in a DAC where the same
+power heats the sample.
+
+\subsection{What is and is not established}
+
+The \emph{direction} of the shift and the existence of the
+\SI{405.2}{\nano\meter} floor follow from the structure of the model---the
+relative placement of the two Franck-Condon envelopes and the position of the
+ionization edge---and both are anchored quantities. The \emph{magnitude} is not:
+it depends on $a'_{\mathrm{es}}$, on the saturation scales $s_d$ and $s_{d0}$,
+and on our use of the \NVm{} Huang-Rhys factor and Debye-Waller factor as
+stand-ins for the \NVz{} ones. Those are exactly the constants the two-beam
+calibration of Sec.~\ref{sec:calibration} is designed to fix, and the power
+dependence---unlike the fixed-power optimum---is genuinely sensitive to them.
 
 % =====================================================================
 \section{Planned experiment and calibration}
@@ -854,7 +1080,7 @@ $\sabs$ values break the degeneracy at fixed $u$.
 
 Because $\lopt$ at fixed power is insensitive to every parameter this calibration
 determines (Table~\ref{tab:tornado}), the calibration is not a check on the
-\SI{475}{\nano\meter} result. It tests three other things. It fixes the absolute
+\SI{474}{\nano\meter} result. It tests three other things. It fixes the absolute
 sensitivity scale, converting $\eta$ into
 \si{\nano\tesla\per\sqrt{\hertz}}. It determines whether the cancellation of
 Eq.~\eqref{eq:fminus-limit} survives at working intensities, which is the
@@ -883,11 +1109,14 @@ Eqs.~\eqref{eq:gion}--\eqref{eq:grec} directly.
 % ---------------------------------------------------------------------
 
 \emph{[To be written when the measurements are available. The predictions to be
-compared against are: $\lopt = \SI{474.8}{\nano\meter}$ at
-\SI{120}{\giga\pascal}; $\eta(\SI{473}{\nano\meter})/\eta(\lopt) = 1.001$;
-$\eta(\SI{457}{\nano\meter})/\eta(\lopt) = 1.12$;
-$\eta(\SI{532}{\nano\meter})/\eta(\lopt) = 5.16$; and $\fm \simeq 0.58$,
-wavelength independent to $0.2\%$ across \SIrange{463}{486}{\nano\meter}.]}
+compared against are: $\lopt = \SI{474.0}{\nano\meter}$ at
+\SI{120}{\giga\pascal}; $\eta(\SI{473}{\nano\meter})/\eta(\lopt) = 1.000$;
+$\eta(\SI{457}{\nano\meter})/\eta(\lopt) = 1.10$;
+$\eta(\SI{532}{\nano\meter})/\eta(\lopt) = 2.67$; $\fm \simeq 0.58$,
+wavelength independent to $0.2\%$ across \SIrange{462}{486}{\nano\meter}; and
+the green/blue crossover at \SI{71}{\giga\pascal}
+(Sec.~\ref{sec:resultsA:threshold}), which is the prediction least exposed to
+wavelength-dependent systematics.]}
 
 % =====================================================================
 \section{Discussion}
@@ -896,12 +1125,208 @@ wavelength independent to $0.2\%$ across \SIrange{463}{486}{\nano\meter}.]}
 \subsection{Scope of the claim}
 
 The result is a statement about relative sensitivity between excitation
-wavelengths at fixed excitation power, under near-hydrostatic conditions, with
-the optical response described by a single-mode Franck-Condon envelope. It is not
-a prediction of absolute sensitivity, which requires the calibration; it is not a
-statement about (111)-oriented anvils under uniaxial stress, where the ZPL splits
-and the anchors of Table~\ref{tab:anchors} would have to be re-derived; and it is
-not yet a statement about the choice of operating power.
+wavelengths, at low excitation intensity, for NV centers held in a
+quasi-hydrostatic stress environment, with the optical response described by a
+single-mode Franck-Condon envelope evaluated at the experiment's temperature. It
+is not a prediction of absolute sensitivity, which requires the calibration of
+Sec.~\ref{sec:calibration}.
+
+The stress condition deserves to be stated first rather than last, because it is
+the strongest of the three. At an anvil tip the normal stress equals the chamber
+pressure while the tangential component is reduced by a factor $\alpha$, and
+Ref.~\cite{Hilberer2023} measured $\alpha$ directly from the ODMR field
+response: $\alpha = 0.56$ for a standard flat culet, $\alpha = 0.95$ for a
+FIB-machined micropillar. The same work measured the ZPL shift per unit
+compressed volume in both geometries---$-769\,\mathrm{meV}/(\mathrm{cm^3\,
+mol^{-1}})$ on the micropillar against $-434$ on the flat culet---so at equal
+compression the deviatorically stressed culet shifts the ZPL by only $0.56$ of
+the quasi-hydrostatic value. Deviatoric stress red-shifts the \esE{} manifold
+and thereby opposes the hydrostatic blue shift, as Davies and
+Hamer~\cite{DaviesHamer1976} established at low stress.
+
+Propagating that measured ratio through the model gives
+Table~\ref{tab:alpha}. The recommendation is not merely weakened by deviatoric
+stress---it inverts. In a standard flat culet at \SI{120}{\giga\pascal} the
+optimum returns to \SI{508}{\nano\meter} and \SI{532}{\nano\meter} outperforms
+\SI{473}{\nano\meter}.
+
+\begin{table}[t]
+  \caption{Dependence of the optimum on the stress anisotropy $\alpha =
+  \sigma_{\parallel}/\sigma_{\perp}$ at the culet, at \SI{120}{\giga\pascal} and
+  room temperature. The $\alpha$ dependence is calibrated to the two geometries
+  measured in Ref.~\cite{Hilberer2023}. The $\alpha = 0.56$ row is not a
+  straightforward operating point: a flat culet drives the ODMR contrast through
+  zero near \SIrange{40}{50}{\giga\pascal}, after which it recovers with inverted
+  sign~\cite{Hilberer2023,Huang2025ISC}.}
+  \label{tab:alpha}
+  \begin{ruledtabular}
+  \begin{tabular}{lcccc}
+    geometry & $\alpha$ & $\Delta E_{\mathrm{ZPL}}$(120) & $\lopt$ &
+      $\eta(532)/\eta(473)$ \\ \colrule
+    ideal hydrostatic      & 1.00 & \SI{422}{\milli\electronvolt} & \SI{470}{\nano\meter} & $3.25$ \\
+    micropillar~\cite{Hilberer2023,Ho2026} & 0.95 & \SI{400}{\milli\electronvolt} & \SI{474}{\nano\meter} & $2.66$ \\
+    intermediate           & 0.80 & \SI{333}{\milli\electronvolt} & \SI{486}{\nano\meter} & $1.73$ \\
+    standard flat culet~\cite{Hilberer2023} & 0.56 & \SI{226}{\milli\electronvolt} & \SI{508}{\nano\meter} & $0.86$ \\
+  \end{tabular}
+  \end{ruledtabular}
+\end{table}
+
+This does not undermine the result; it supplies its precondition. The same
+deviatoric stress that pulls $\lopt$ back to the green also disrupts the ODMR
+contrast: Ref.~\cite{Hilberer2023} reports that a flat culet loses practical
+magnetic sensitivity above \SIrange{40}{50}{\giga\pascal}, with the contrast
+first vanishing near \SI{40}{\giga\pascal} and then inverting sign, while the
+micropillar retains negative contrast of $5\%$, $3\%$ and $1.5\%$ at $73$, $103$
+and \SI{131}{\giga\pascal}. The \emph{ab initio} calculation of
+Ref.~\cite{Huang2025ISC} explains why: symmetry-breaking (non-hydrostatic)
+stress lifts the \esE{} orbital degeneracy and opens intersystem-crossing
+channels that are absent under hydrostatic compression, and around
+\SI{60}{\giga\pascal} in a $(100)$-cut anvil the lower-branch crossing becomes
+spin-selective toward the dark sublevel, inverting the sign of the ground-state
+polarization -- and hence of the contrast -- rather than merely suppressing it.
+No sensitivity has been computed for that inverted-contrast regime, so
+Table~\ref{tab:alpha} does not use it; ``not an operating point'' here means
+``not modelled,'' not ``physically dead.'' A quasi-hydrostatic geometry is
+still the entry ticket to a $\lopt$ set by the anchors of
+Table~\ref{tab:anchors}, since it is the geometry in which they were
+measured~\cite{Ho2026}. The Berkeley route to the same end---a (111)-cut
+culet, in which the \esE{} of the axial NV group red-shifts and the
+intersystem crossing is preserved~\cite{Bhattacharyya2022}---is expected to
+behave similarly, and Ref.~\cite{Huang2025ISC} finds \emph{ab initio} that
+near-uniaxial stress along $[111]$ is not merely tolerable but genuinely
+optimal for the contrast of that NV subensemble. Neither a measurement of
+$\alpha$ nor of the ZPL shift exists yet for that geometry in the convention of
+Table~\ref{tab:anchors}, so we still do not extrapolate Table~\ref{tab:alpha}
+to it.
+
+\subsection{Is the contrast wavelength independent?}
+\label{sec:discussion:clambda}
+
+Everything in Sec.~\ref{sec:resultsA} rests on one assumption: that $C$ does not
+depend on the excitation wavelength, so that minimizing $\eta$ is maximizing
+$\sabs$. The assumption has a specific way to fail. Under stress the \esE{}
+orbital doublet splits, with an orbital-strain coupling of $850 \pm
+\SI{130}{\tera\hertz}$ per unit strain~\cite{Barfuss2017}; if the two branches
+had different intersystem-crossing rates, and if the excitation wavelength
+selected between them, then $C = C(\lambda)$ and the optimum would move. This is
+the mechanism suggested in Ref.~\cite{Bhattacharyya2022} as a way to measure ISC
+rates from different orbital states, and it is worth taking seriously precisely
+because it would be useful if true.
+
+It does not survive quantitatively, for two independent reasons.
+
+\emph{The splitting is small compared with $k_BT$.} In the micropillar geometry
+the deviatoric stress at \SI{120}{\giga\pascal} is $(1-\alpha)P =
+\SI{6}{\giga\pascal}$, giving a strain of $5$--$10 \times 10^{-3}$ depending on
+whether one uses Young's modulus or $C_{44}$, and hence a branch splitting
+$\delta = \SIrange{19}{36}{\milli\electronvolt}$ against $k_BT =
+\SI{26}{\milli\electronvolt}$. The branches are thermally mixed, not resolved.
+For comparison, the Franck-Condon envelope is \SI{140}{\milli\electronvolt}
+wide, so the two branch envelopes overlap almost completely and the fraction of
+absorption going into either branch varies by only $3$--$6$ percentage points
+across the whole $5\%$ tolerance window.
+
+\emph{The population cannot remember which branch absorbed the photon.} Downward
+orbital relaxation in \esE{} is spontaneous phonon emission: it requires no
+thermal activation and proceeds on the picosecond scale whatever $\delta$ is.
+That is the same relaxation that motionally averages the excited-state zero-field
+splitting to \SI{1.42}{\giga\hertz} at room temperature~\cite{Rogers2009}. The
+intersystem crossing, at $\Gamma_{\mathrm{ISC}} \sim
+\SI{3e7}{\per\second}$, is four orders of magnitude slower. The branch
+populations therefore reach thermal equilibrium---a distribution fixed by
+$\delta$ and $T$ alone---roughly $10^4$ relaxation times before a single ISC
+event. The contrast is set by the relaxed \esE{}, for exactly the reason the
+emission spectrum is (Kasha's rule). The same argument disposes of the
+vibrational analogue: a vibrationally hot \esE{} has a larger \esE{}--$^{1}\!A_1$
+gap and hence a different ISC rate, but vibrational relaxation is also
+picosecond.
+
+Because the first argument alone would be uncomfortable---$\delta \simeq k_BT$
+is not a large margin---we also bound the worst case, granting the failure
+mechanism everything it needs: no orbital relaxation at all, so the branch
+populated by absorption is the branch that crosses. Writing $C(\lambda) =
+r(\lambda)C_A + [1-r(\lambda)]C_B$ with $r$ the branch-selection ratio computed
+from the two displaced envelopes, and weighting only $C$ (which enters $\eta$
+linearly, unlike $\sqrt{R}$, so this maximizes the effect), a contrast ratio
+$C_B/C_A$ anywhere between $0$ and $10$ moves $\lopt$ by at most
+\SI{3.8}{\nano\meter} at $\delta = \SI{19}{\milli\electronvolt}$ and
+\SI{7.3}{\nano\meter} at $\delta = \SI{36}{\milli\electronvolt}$---inside the
+$5\%$ window in every case. Even with one branch completely dark, $\delta$ must
+exceed \SI{63}{\milli\electronvolt} before $\lopt$ leaves that window, a margin
+of $1.7$--$3.3$ over the micropillar value. The threshold is comfortably
+exceeded in a flat culet ($\delta \simeq
+\SIrange{170}{320}{\milli\electronvolt}$), which is one more reason that
+geometry is unusable, and it is another instance of the pattern of
+Sec.~\ref{sec:discussion}: what makes the answer robust is the same
+quasi-hydrostatic condition that makes the measurement possible at all.
+
+The direct test is cheap and does not require new hardware: measure the ODMR
+\emph{contrast}---not the signal-to-noise ratio, which convolves contrast with
+photon rate---at two excitation wavelengths at the same pressure and the same
+optical pumping rate. Reference~\cite{Bhattacharyya2022} already recorded
+cwODMR spectra at \SI{532}{} and \SI{450}{\nano\meter} on a (100) culet near
+\SI{50}{\giga\pascal}; extracting the two contrasts from that data would settle
+the question at moderate pressure immediately.
+
+\subsection{Two measurements of the pressure dependence of the photoluminescence}
+\label{sec:discussion:counts}
+
+Two published measurements of how NV fluorescence under \SI{532}{\nano\meter}
+excitation evolves with pressure appear to disagree, and the disagreement is
+instructive. Reference~\cite{Ho2026} reports the spectrally integrated PL
+intensity at constant laser power and integration time and finds a broad
+\emph{dome}---a rise to a maximum at intermediate pressure, then a
+decline---which it attributes to the absorption cross section sweeping past the
+fixed laser line, noting that the radiative quantum efficiency is stable to
+\SI{120}{\giga\pascal}. Reference~\cite{Dai2022} reports a confocal count rate
+and finds a dramatic fall over the first \SI{50}{\giga\pascal} followed by a
+slow decline.
+
+These are different observables. The model computes the first: $R \propto
+\fm\sabs$ is the rate of absorbed photons, and it reproduces the dome, peaking
+at \SI{38}{\giga\pascal}. A count rate additionally carries the collection
+efficiency of Sec.~\ref{sec:resultsA:band}, which falls by a factor $3.2$ from
+ambient to \SI{140}{\giga\pascal}. Including it moves the modelled peak down to
+\SI{28}{\giga\pascal} and its height from $2.8$ to $2.3$ times the ambient
+value, and takes the \SI{140}{\giga\pascal} count rate to $3\%$ of ambient. The
+filter thus accounts for most of the high-pressure decline but not for the
+initial rise, which the model retains and Ref.~\cite{Dai2022} does not observe.
+
+We do not force that residual. It is a factor of roughly two, confined below
+\SI{30}{\giga\pascal}, and the quantity it concerns has been measured directly
+and found to rise~\cite{Ho2026}. The discrepancy is therefore between two
+experiments rather than between the model and experiment, and the most likely
+origin is instrumental: Ref.~\cite{Dai2022} tracks a micron-sized diamond
+particle in a compressing pressure medium, where focus, collection solid angle
+and medium transparency all drift, whereas Ref.~\cite{Ho2026} works with an NV
+layer fixed in an anvil micropillar. The discriminating measurement is
+straightforward---spectrally integrated PL yield at constant power over
+\SIrange{0}{50}{\giga\pascal} under \SI{532}{\nano\meter} excitation---and it is
+included in Sec.~\ref{sec:experiment}.
+
+\subsection{Delivering blue light through the anvil}
+
+A practical obstacle stands between the recommendation and its use. Type Ib
+diamond, the standard host for high-density NV ensembles, absorbs strongly below
+\SI{500}{\nano\meter} through its substitutional-nitrogen continuum. In
+Ref.~\cite{Bhattacharyya2022} this forced the excitation to be delivered through
+the opposite, untreated anvil, which restricted the measurement to the NV
+centers in the sample-chamber region. A \SI{473}{\nano\meter} recommendation
+that cannot be delivered through the sensing anvil is not a recommendation.
+
+The route taken by Refs.~\cite{Hilberer2023,Ho2026} removes the obstacle: the NV
+layer is created by nitrogen focused-ion-beam implantation into a low-nitrogen
+anvil followed by annealing, so the bulk of the anvil never carries the
+type Ib nitrogen continuum and the excitation is delivered through the sensing
+anvil itself. Consistently, that work stepped the excitation down through
+\SI{532}{}, \SI{488}{}, \SI{457}{} and \SI{405}{\nano\meter} as pressure
+increased, explicitly to follow the absorption blue shift---the practice this
+paper quantifies. Any implementation of the present recommendation must use
+implantation into a low-nitrogen anvil rather than a bulk type Ib anvil; we note
+in passing that our model places \SIrange{457}{473}{\nano\meter} well ahead of
+\SI{405}{\nano\meter} at \SIrange{100}{130}{\giga\pascal}, so the final step of
+that sequence appears to overshoot, which is directly testable against the
+existing data.
 
 \subsection{Limitations}
 
@@ -917,22 +1342,42 @@ envelope maximum, and $K^2$ affects primarily the width and the fine structure,
 this is expected to shift $\lopt$ less than the $S_{\mathrm{abs}}$ uncertainty
 already tabulated, but it has not been verified.
 
-Two further caveats follow from the conditions under which the anchors were
-obtained. The lineshapes of Ref.~\cite{Ho2026} are low-temperature: the
-measurements were made at \SI{30}{\kelvin} and $\simeq\SI{90}{\kelvin}$, and
-the calculated envelopes are correspondingly low-temperature. Our Franck-Condon
-envelope inherits that assumption, so a room-temperature high-pressure ODMR
-experiment would see a thermally broadened absorption band, and a correspondingly
-broader---though not obviously displaced---tolerance window. Separately, even in
-the near-hydrostatic micropillar geometry with $\alpha \simeq 0.95$ the \esE{}
-degeneracy is lifted at high pressure and the ZPL splits, with only the lower
-branch reproduced by the calculation. We use a single hydrostatic ZPL. Given
+The lineshapes of Ref.~\cite{Ho2026} are low-temperature---the measurements were
+made at \SI{30}{\kelvin} and $\simeq\SI{90}{\kelvin}$---but the envelope is no
+longer evaluated at that temperature by default. The single-mode multiphonon
+lineshape carries $T$ explicitly through $\bar n = [e^{\hbar\omega/k_BT}-1]^{-1}$,
+so a room-temperature experiment is described directly. This matters more than a
+broadening correction usually would. At $T = 0$ the envelope vanishes
+identically below the ZPL, and at \SI{120}{\giga\pascal} the
+\SI{532}{\nano\meter} line lies \SI{14}{\milli\electronvolt} \emph{below} it, so
+the whole \SI{532}{\nano\meter} cross section came from the tail of an ad hoc
+ZPL Gaussian and jumped discontinuously by a factor $4.6$ where the ZPL crosses
+\SI{532}{\nano\meter}. That artifact inflated the green penalty from $2.7$ to
+$5.2$ at \SI{120}{\giga\pascal} and to $110$ at \SI{140}{\giga\pascal}, in plain
+contradiction with the room-temperature \SI{532}{\nano\meter} cwODMR reported to
+\SI{140}{\giga\pascal}~\cite{Dai2022} and the \SI{50}{\micro\tesla\per\sqrt{\hertz}}
+achieved near \SI{150}{\giga\pascal}~\cite{Bhattacharyya2022}. Because a single
+effective mode of \SI{65}{\milli\electronvolt} has $\bar n = 0.088$ at
+\SI{300}{\kelvin}, while the real phonon spectrum extends to much softer modes,
+the thermal wing computed here is a lower bound.
+
+Two caveats survive. Even in the micropillar geometry with $\alpha \simeq 0.95$
+the \esE{} degeneracy is lifted and the ZPL splits, with only the lower branch
+reproduced by the calculation of Ref.~\cite{Ho2026}; we use a single ZPL. Given
 $\partial\lopt/\partial E_{\mathrm{ZPL}} \simeq
 \SI{-182}{\nano\meter\per\electronvolt}$, a splitting of
 \SIrange{20}{40}{\milli\electronvolt} corresponds to
-\SIrange{4}{7}{\nano\meter} of ambiguity in $\lopt$---comparable to the $5\%$
-tolerance window, and a reason to prefer a source near the center of that window
-rather than at its edge.
+\SIrange{4}{7}{\nano\meter} of ambiguity in $\lopt$---a reason to prefer a source
+near the center of the tolerance window rather than at its edge. Separately, the
+contrast prefactor $C_0(P)$ is a single decaying exponential calibrated to the
+hydrostatic, randomly oriented case~\cite{Dai2022}; it is wavelength
+independent and therefore cannot move $\lopt$, but it should not be read as a
+prediction of contrast for a specific culet cut. The \emph{ab initio}
+intersystem-crossing rate of Ref.~\cite{Huang2025ISC} is not monotonic even
+under pure hydrostatic stress -- it peaks near \SI{30}{\giga\pascal} before
+falling -- and under deviatoric stress it can invert the sign of the contrast
+outright (Sec.~\ref{sec:discussion}); $C_0(P)$ captures none of this structure,
+only the net decay observed at \SI{120}{\giga\pascal} by Ref.~\cite{Dai2022}.
 
 Finally, sample heating is not modelled at all: at fixed power the neglect is
 harmless, but the moment power dependence is addressed, the absorbed power at the
@@ -946,9 +1391,14 @@ ZPL shift---is confirmed and made quantitative. What the present analysis adds i
 the specific target, the tolerance, the identification of \SI{405}{\nano\meter}
 as a boundary rather than an option, and the observation that within the window
 the answer is controlled entirely by measured optical quantities and not by
-charge-transfer phenomenology. The practical recommendation is narrow enough to
-act on and cheap enough to adopt: a \SI{473}{\nano\meter} DPSS source in place of
-the \SI{532}{\nano\meter} default.
+charge-transfer phenomenology. Reference~\cite{Hilberer2023} already stepped its
+excitation down through \SI{532}{}, \SI{488}{}, \SI{457}{} and
+\SI{405}{\nano\meter} with rising pressure; the present model reproduces the
+direction and the ordering of that sequence and identifies where it should stop.
+The practical recommendation is narrow enough to act on and cheap enough to
+adopt: a \SI{473}{\nano\meter} DPSS source in place of the
+\SI{532}{\nano\meter} default, in an anvil whose NV layer sits in a
+quasi-hydrostatic stress environment.
 
 % =====================================================================
 \section{Summary and outlook}
@@ -958,7 +1408,7 @@ The pressure-induced reorganization of NV photophysics at
 \SI{120}{\giga\pascal}---a ZPL blue shift beyond \SI{0.4}{\electronvolt}, a
 $50\%$ increase of the absorption Huang-Rhys factor, and a rise of the
 ground-state photoionization threshold to \SI{3.06}{\electronvolt}---places the
-optimal ODMR excitation in a window centered at \SI{474.8}{\nano\meter}. Both
+optimal ODMR excitation in a window centered at \SI{474.0}{\nano\meter}. Both
 conventional choices lie outside it, for opposite reasons:
 \SI{532}{\nano\meter} because the absorption onset has moved past it,
 \SI{405}{\nano\meter} because it lies on the far blue flank with the ionization
@@ -971,21 +1421,32 @@ the absorption maximum itself, and---as the anchor analysis shows---it is
 determined entirely by the ZPL position and the electron-phonon coupling, with no
 sensitivity to any of the phenomenological charge-transfer constants. The
 practical consequence is immediate: a \SI{473}{\nano\meter} source recovers
-essentially the full optimum, buying back a factor of $\simeq 5$ in sensitivity
-relative to green excitation, equivalently a factor of $\simeq 25$ in the
-acquisition time of a magnetic map.
+essentially the full optimum, buying back a factor of $2.7$ in sensitivity
+relative to green excitation, equivalently a factor of $7$ in the acquisition
+time of a magnetic map, and a further factor of $1.6$ becomes available because
+blue excitation is what permits the detection band to be moved with the emission
+(Sec.~\ref{sec:resultsA:band}).
 
-Three things remain to be done. The power dependence is unresolved
-(Sec.~\ref{sec:resultsB}): the cancellation that makes the fixed-power answer so
-robust is expected to fail once ionization becomes a two-photon process and
-recombination proceeds through the displaced \NVz{} envelope, and the current
-implementation must be repaired and its low-power limit verified before any
-conclusion is drawn. The calibration (Sec.~\ref{sec:calibration}) will fix the
-absolute scale and provide the first measurement of $\fm$ under compression. And
-the measurements themselves (Sec.~\ref{sec:experiment}) will test a set of
-predictions that are unusually sharp for a phenomenological model, precisely
-because the quantity being predicted turns out not to depend on the
-phenomenology.
+The answer is bounded on two sides, and both bounds are part of the result. It
+is bounded in pressure: below \SI{71}{\giga\pascal} green is the better choice,
+which is why a comparison at \SI{50}{\giga\pascal} found no advantage for blue,
+and the crossing between the two regimes is the prediction that a
+single-pressure measurement cannot fake
+(Sec.~\ref{sec:resultsA:threshold}). It is bounded in power: the optimum moves
+into the blue as the transition saturates, so \SI{473}{\nano\meter} is the
+answer for $u \lesssim 0.1$ and not a property of the technique
+(Sec.~\ref{sec:resultsB}).
+
+Three things remain to be done, in order. A saturation curve at the target
+pressure fixes the intensity scale and therefore decides which of the two power
+regimes an experiment is in; it is the cheapest of the three and everything
+else depends on it. The two-beam calibration (Sec.~\ref{sec:calibration}) fixes
+the absolute sensitivity scale and provides the first measurement of $\fm$ under
+compression. And a pressure sweep through the green/blue crossing
+(Sec.~\ref{sec:experiment}) tests the prediction that is least exposed to
+systematic error, precisely because the quantity being predicted---the pressure
+at which the ordering reverses---does not depend on any of the multiplicative
+factors that a wavelength comparison must otherwise control.
 
 \begin{acknowledgments}
 \emph{[To be completed.]}
@@ -1005,22 +1466,34 @@ All figures and quoted values are generated by the code in \texttt{code/}:
   \item \texttt{nv\_model\_power.py} --- the intensity-explicit extension of
     Sec.~\ref{sec:model:power}.
   \item \texttt{fig1\_green\_blue\_mix.py} --- green/blue/mixed excitation versus
-    pressure; reproduces the crossover near \SI{86}{\giga\pascal}.
+    pressure; reproduces the \SI{457}{\nano\meter} crossover near
+    \SI{82}{\giga\pascal}.
+  \item \texttt{repro\_literature.py} --- the reproduction suite: every published
+    observation the model is checked against, with its source and its verdict.
+  \item \texttt{analysis\_C\_lambda.py} --- the orbital-branch analysis of
+    Sec.~\ref{sec:discussion:clambda}.
+  \item \texttt{tests/test\_freeze.py} --- the regression suite that pins the
+    frozen numbers, including bit-exact backward compatibility.
   \item \texttt{fig2\_blue\_wavelength\_sweep.py} --- Fig.~\ref{fig:sweep}.
   \item \texttt{fig3\_power\_sweep.py} --- Fig.~\ref{fig:power}.
 \end{itemize}
 
 \begin{verbatim}
 cd code
+python fig1_green_blue_mix.py                  # green/blue crossover
 python fig2_blue_wavelength_sweep.py           # 120 GPa (vs 100, 140)
 python fig2_blue_wavelength_sweep.py 100 75 125
-python fig3_power_sweep.py                     # diagnostic only
+python fig3_power_sweep.py                     # power dependence
+python repro_literature.py                     # the reproduction suite
+python analysis_C_lambda.py                    # the C(lambda) analysis
+python -m pytest tests/ -q                     # the freeze tests
 \end{verbatim}
 
-Regression values pinned by the tests: $\lopt = \SI{487}{\nano\meter}$ at
-\SI{100}{\giga\pascal}, $\lopt = \SI{475}{\nano\meter}$ at
-\SI{120}{\giga\pascal}, green/blue crossover at \SI{86}{\giga\pascal}, and
-$\eta(\SI{457}{\nano\meter})/\eta(\lopt) = 1.12$ at \SI{120}{\giga\pascal}.
+Regression values pinned by the tests: $\lopt = \SI{484}{\nano\meter}$ at
+\SI{100}{\giga\pascal}, $\lopt = \SI{474}{\nano\meter}$ at
+\SI{120}{\giga\pascal}, the \SIlist{473;457;450}{\nano\meter} crossovers
+against \SI{532}{\nano\meter} at \SIlist{71;82;87}{\giga\pascal}, and
+$\eta(\SI{457}{\nano\meter})/\eta(\lopt) = 1.10$ at \SI{120}{\giga\pascal}.
 
 \bibliographystyle{apsrev4-2}
 \bibliography{refs}
