@@ -32,6 +32,21 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
 - `repro_literature.py` — reproduction of 26 published observations with the
   frozen model (plus 1 recorded as OPEN); prints the commercial-line table,
   the anvil-geometry table and the MC uncertainty of `lambda_opt`.
+- `fig4_tornado.py` — anchor sensitivity of `lambda_opt` at 120 GPa (PLAN A3):
+  two measured optical quantities move it, the nine phenomenological constants
+  move it by exactly zero → `tornado_lambda_opt_120GPa.png`.
+- `fig5_threshold.py` — `eta(532)/eta(473)` vs pressure: the recommendation
+  reverses at ~71 GPa, which is the falsifiable prediction and the reason the
+  50 GPa null result of [Bha22] is a reproduction → `threshold_green_blue.png`.
+- `fig6_three_shifts.py` — talk figure: the absorption envelope (586 → 474 nm)
+  and the ionisation edge (463 → 405 nm) closing on the window
+  → `talk_three_shifts.png`.
+- `fig7_answer_talk.py` — talk figure: single-panel `eta(lambda)` with the 5%
+  tolerance window and the cost of each commercial line
+  → `talk_answer_<P>GPa.png`.
+- `talk_style.py` — shared style for the four presentation figures (one message
+  per figure; only 405/473/532 nm are ever drawn together, because 457 and
+  473 nm are perceptually the same colour).
 - `tests/test_freeze.py` — freeze tests (bit-exact legacy T=0 golden values,
   envelope physics, invariance of `lambda_opt`, C-4/C-7 and power-model
   regressions) plus the literature suite.
@@ -51,6 +66,10 @@ python fig2_blue_wavelength_sweep.py              # blue sweep @120 GPa (compare
 python fig2_blue_wavelength_sweep.py 100 75 125   # blue sweep @100 GPa (compare 75,125)
 python fig3_power_sweep.py                        # power dependence @120 GPa
 python analysis_C_lambda.py                       # C(lambda) assumption
+python fig4_tornado.py                            # anchor sensitivity of lambda_opt
+python fig5_threshold.py                          # green/blue crossover pressure
+python fig6_three_shifts.py                       # talk: the two closing edges
+python fig7_answer_talk.py                        # talk: the answer, single panel
 python repro_literature.py                        # literature reproduction table
 python -m pytest tests/ -q                        # freeze tests
 ```
@@ -82,6 +101,7 @@ eta ∝ Δν / (C √R)                      # lower = better
 ```
 
 ## Known limitations
+The claim these figures support is frozen in `docs/claim_freeze.md`.
 See `docs/code_audit_2026-08.md` for the full audit. The open items that touch
 numbers quoted in the paper are: the excitation weight `I` is a photon flux, not
 an optical power (a fixed-power convention moves `lambda_opt` +1.6 nm and the
