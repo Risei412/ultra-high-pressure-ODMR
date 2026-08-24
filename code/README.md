@@ -46,7 +46,11 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   → `talk_answer_<P>GPa.png`.
 - `talk_style.py` — shared style for the four presentation figures (one message
   per figure; only 405/473/532 nm are ever drawn together, because 457 and
-  473 nm are perceptually the same colour).
+  473 nm are perceptually the same colour).  Two styles: `--style talk`
+  (default, wavelength-as-colour, for `slides/talk_deck.html`) and
+  `--style st` (Institute of Science Tokyo deck style — colour encodes
+  argumentative role, annotation budget 0–3, larger type; writes `*_st.png`
+  for `slides/build_pptx.py`).
 - `tests/test_freeze.py` — freeze tests (bit-exact legacy T=0 golden values,
   envelope physics, invariance of `lambda_opt`, C-4/C-7 and power-model
   regressions) plus the literature suite.
@@ -70,6 +74,7 @@ python fig4_tornado.py                            # anchor sensitivity of lambda
 python fig5_threshold.py                          # green/blue crossover pressure
 python fig6_three_shifts.py                       # talk: the two closing edges
 python fig7_answer_talk.py                        # talk: the answer, single panel
+python fig6_three_shifts.py --style st            # Science Tokyo variants (*_st.png)
 python repro_literature.py                        # literature reproduction table
 python -m pytest tests/ -q                        # freeze tests
 ```

@@ -59,7 +59,7 @@ for label, key, lo, hi, rng, measured in ROWS:
 # measured movers first, then the flat ones in the order given
 rows.sort(key=lambda r: (-max(abs(r[2]), abs(r[3]))))
 
-fig, ax = plt.subplots(figsize=(10.6, 6.2))
+fig, ax = plt.subplots(figsize=(8.4, 5.2) if ts.LEAN else (10.6, 6.2))
 y = np.arange(len(rows))[::-1]
 
 for yi, (label, rng, d_lo, d_hi, measured) in zip(y, rows):
@@ -67,18 +67,20 @@ for yi, (label, rng, d_lo, d_hi, measured) in zip(y, rows):
     span = max(abs(d_lo), abs(d_hi))
     if span < 0.01:
         ax.plot(0, yi, 'o', color=col, ms=7, zorder=3)
-        ax.text(0.35, yi, ts.t('0.00 nm — 動かない', '0.00 nm — no effect'),
-                va='center', ha='left', fontsize=11.5, color=ts.MUTED)
+        if not ts.LEAN:      # one repeated label per row is redundant on a slide
+            ax.text(0.35, yi, ts.t('0.00 nm — 動かない', '0.00 nm — no effect'),
+                    va='center', ha='left', fontsize=11.5, color=ts.MUTED)
     else:
         ax.barh(yi, d_lo, height=0.55, color=col, alpha=0.95, zorder=3)
         ax.barh(yi, d_hi, height=0.55, color=col, alpha=0.55, zorder=3)
         ax.text(max(d_lo, d_hi) + 0.25, yi, f'±{span:.1f} nm',
-                va='center', ha='left', fontsize=12, color=ts.INK,
+                va='center', ha='left', fontsize=14 if ts.LEAN else 12, color=ts.INK,
                 weight='bold')
 
 ax.axvline(0, color=ts.INK2, lw=1.4, zorder=4)
 ax.set_yticks(y)
-ax.set_yticklabels([f'{r[0]}   {r[1]}' for r in rows], fontsize=12.5)
+ax.set_yticklabels([f'{r[0]}   {r[1]}' for r in rows],
+                   fontsize=14 if ts.LEAN else 12.5)
 ax.set_xlim(-5.2, 6.8)
 ax.set_xlabel(ts.t('120 GPa における $\\lambda_{\\mathrm{opt}}$ の変化  (nm)',
                    'shift of $\\lambda_{opt}$ at 120 GPa  (nm)'))
@@ -94,6 +96,11 @@ handles = [Patch(facecolor=ts.ACCENT, label=ts.t('測定量 — 答えを動か�
                                                  'measured — moves it')),
            Patch(facecolor=ts.MUTED, label=ts.t('現象論定数 — 動かさない',
                                                 'fitted — moves nothing'))]
+if ts.LEAN:
+    zero_rows = [yi for yi, r in zip(y, rows) if max(abs(r[2]), abs(r[3])) < 0.01]
+    ax.text(0.5, float(np.mean(zero_rows)), ts.t('すべて 0.00 nm', 'all 0.00 nm'),
+            va='center', ha='left', fontsize=13, color=ts.MUTED)
+
 leg = ax.legend(handles=handles, loc='center left', bbox_to_anchor=(0.0, 0.40),
                 fontsize=12.5, handlelength=1.1, handleheight=1.1,
                 borderpad=0.9, labelspacing=0.8, frameon=True)
@@ -102,5 +109,5 @@ leg.get_frame().set_edgecolor(ts.RULE)
 leg.get_frame().set_alpha(1.0)
 leg.set_zorder(10)
 
-plt.savefig('tornado_lambda_opt_120GPa.png')
-print(f'\nsaved tornado_lambda_opt_120GPa.png ; baseline lambda_opt = {base:.2f} nm')
+plt.savefig(f'tornado_lambda_opt_120GPa{ts.SUF}.png')
+print(f'\nsaved tornado_lambda_opt_120GPa{ts.SUF}.png ; baseline lambda_opt = {base:.2f} nm')
