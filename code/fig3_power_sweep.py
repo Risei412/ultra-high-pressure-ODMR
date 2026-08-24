@@ -51,16 +51,20 @@ fig, axs = plt.subplots(1, 3, figsize=(15.6, 4.6))
 
 # (a) heatmap
 ax = axs[0]
-LOG_ETA = np.log10(np.clip(ETA, 1e-3, 1e4))
+# normalise to the GLOBAL optimum of the map: eta here is in the arbitrary
+# units of the model (~1e2-1e3 at 120 GPa), so the absolute 1-50 colour scale
+# used before clipped the whole panel to a single colour.
+LOG_ETA = np.log10(np.clip(ETA / np.nanmin(ETA), 1.0, 1e4))
 pc = ax.pcolormesh(lam, u_grid, LOG_ETA, shading='auto', cmap='viridis_r',
-                    vmin=np.log10(1), vmax=np.log10(50))
+                    vmin=0.0, vmax=np.log10(50))
 ax.plot(lam_opt, u_grid, color='w', lw=2.2)
 ax.plot(lam_opt, u_grid, color='#c1272d', lw=1.2, label='optimal $\\lambda$')
 ax.set_yscale('log')
 ax.set_xlabel('Blue excitation wavelength  $\\lambda$  (nm)')
 ax.set_ylabel('Normalised intensity  $u = I/I_{ref}$')
-ax.set_title(f'(a)  $\\log_{{10}}\\eta(\\lambda,u)$ @ {Pi} GPa', loc='left', weight='bold', fontsize=11)
-cb = fig.colorbar(pc, ax=ax, pad=0.02); cb.set_label(r'$\log_{10}\eta$ (lower=better)')
+ax.set_title(f'(a)  $\\log_{{10}}[\\eta(\\lambda,u)/\\eta_{{\\min}}]$ @ {Pi} GPa', loc='left', weight='bold', fontsize=11)
+cb = fig.colorbar(pc, ax=ax, pad=0.02)
+cb.set_label(r'$\log_{10}(\eta/\eta_{\min})$ (lower=better)')
 ax.legend(frameon=False, fontsize=9, loc='upper right')
 
 # (b) ridge vs power

@@ -128,8 +128,14 @@ def default_randomiser_power(rng):
         Emax=base.Emax, P0=base.P0, S_slope=base.S_slope, T=base.T,
         zpl_width=base.zpl_width,
         a_gs=base.a_gs, r0=base.r0, rbg=base.rbg, w0=base.w0,
-        Gamma_d=1.0  * rng.uniform(0.6, 1.6),
-        Gamma_d0=1.0 * rng.uniform(0.6, 1.6),
+        # s_d/s_d0, NOT the absolute Gamma_d/Gamma_d0: overriding the absolute
+        # rates re-introduces the Sec. V intensity-unit bug inside the Monte
+        # Carlo (Gamma_d ~ 1 against a central value of 2.77), which shifted the
+        # sampled ridge blue of the central curve so that the 16-84% band no
+        # longer bracketed it.  Randomising the dimensionless residual keeps
+        # every draw on its own saturation reference.
+        s_d=1.0  * rng.uniform(0.6, 1.6),
+        s_d0=1.0 * rng.uniform(0.6, 1.6),
         a_es2=0.9    * rng.uniform(0.5, 1.8),
         Gamma_c=0.6  * rng.uniform(0.5, 1.8),
         Gamma_satC=1.2 * rng.uniform(0.5, 1.8),

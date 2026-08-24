@@ -493,9 +493,9 @@ def test_crossover_survives_the_charge_transfer_constants():
     depend on the phenomenological knobs any more than lambda_opt does.
     """
     ref = brentq(lambda P: _ratio(NVModel(T=BASE_T), P) - 1.0, 20., 145.)
-    for kw in ({'a_gs': 0.0}, {'a_gs': 12.0}, {'r_0': None}, {'rbg': 1.0},
-               {'w0': 0.5}, {'w0': 2.0}, {'C_amb': 0.12}, {'E_isc': 0.25}):
-        kw = {k: v for k, v in kw.items() if v is not None}
+    for kw in ({'a_gs': 0.0}, {'a_gs': 12.0}, {'r0': 0.5}, {'r0': 4.0},
+               {'rbg': 1.0}, {'w0': 0.5}, {'w0': 2.0},
+               {'C_amb': 0.12}, {'E_isc': 0.25}):
         m = NVModel(T=BASE_T, **kw)
         assert abs(brentq(lambda P: _ratio(m, P) - 1.0, 20., 145.) - ref) < 2.0
 
@@ -529,3 +529,24 @@ def test_power_penalty_of_the_headline_wavelength():
     assert penalty(0.10) < 1.05
     assert 1.2 < penalty(0.20) < 1.4
     assert 1.5 < penalty(0.30) < 1.8
+
+
+def test_power_randomiser_keeps_the_saturation_reference_unit():
+    """
+    The MC randomiser must randomise the DIMENSIONLESS residual s_d, not the
+    absolute Gamma_d.  Overriding Gamma_d puts every draw back on the arbitrary
+    'green at ambient' cross-section unit -- the Sec. V bug -- which pushed the
+    sampled eta(lambda,u) ridge blue of the central curve, so that the 16-84%
+    band no longer bracketed the curve it was drawn around.
+    """
+    from nv_model_power import default_randomiser_power
+    rng = np.random.default_rng(11)
+    for _ in range(5):
+        mm = default_randomiser_power(rng)
+        assert mm.Gamma_d == pytest.approx(
+            mm.s_d * mm.sigma_abs(nm2eV(mm.lam_sat_ref), mm.sat_ref_P), rel=1e-12)
+        assert mm.Gamma_d0 == pytest.approx(
+            mm.s_d0 * mm.sigma_NV0(nm2eV(mm.lam_sat_ref), mm.sat_ref_P), rel=1e-12)
+        # u = 1 half-saturates (up to the residual s_d) at the reference point
+        nE = mm.eta_u([(mm.lam_sat_ref, 1.0)], mm.sat_ref_P, 1.0)[4]
+        assert float(nE) == pytest.approx(1.0 / (1.0 + mm.s_d), abs=1e-9)
