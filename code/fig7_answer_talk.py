@@ -91,9 +91,6 @@ ax.set_xlabel('Excitation wavelength  $\\lambda$  (nm)')
 ax.set_ylabel(ts.t('ロックイン感度  $\\eta/\\eta_{\\mathrm{opt}}$\n(小さいほど良い)',
                    'Lock-in sensitivity  $\\eta/\\eta_{\\mathrm{opt}}$\n(lower is better)'))
 ax.grid(axis='y', alpha=0.25)
-ax.set_title(ts.t(f'{Pi} GPa の答え:474 nm、市販 473 nm でよい',
-                  f'The answer at {Pi} GPa: 474 nm, and 473 nm buys it'),
-             loc='left', weight='bold', pad=14)
 
 out = f'talk_answer_{Pi}GPa.png'
 plt.savefig(out)

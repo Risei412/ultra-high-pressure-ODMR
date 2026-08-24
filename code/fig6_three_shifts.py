@@ -102,9 +102,6 @@ ax.text(537, 0.5 * (b473 + b532),
         color=ts.INK2, fontsize=12.5, va='center', ha='left')
 
 ax.legend(loc='upper right', fontsize=13.5)
-ax.set_title(ts.t('120 GPa では 2 つの端が窓を挟み込む',
-                'At 120 GPa two edges close in on the window'),
-             loc='left', weight='bold', pad=14)
 
 plt.savefig('talk_three_shifts.png')
 print(f'saved talk_three_shifts.png ; peak {pk0:.0f} -> {pk120:.0f} nm ; '

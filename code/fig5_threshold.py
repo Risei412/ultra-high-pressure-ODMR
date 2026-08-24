@@ -86,9 +86,6 @@ ax.set_xlabel('Pressure  $P$  (GPa)')
 ax.set_ylabel(ts.t('$\\eta$(532 nm) / $\\eta$(473 nm)\n(>1 なら青が有利)',
                    '$\\eta$(532 nm) / $\\eta$(473 nm)\n(>1: blue is better)'))
 ax.grid(alpha=0.22)
-ax.set_title(ts.t('推奨は 71 GPa で逆転する — これが反証条件',
-                  'the recommendation reverses at 71 GPa -- this is the test'),
-             loc='left', weight='bold', pad=14)
 
 plt.savefig('threshold_green_blue.png')
 print(f'saved threshold_green_blue.png ; crossover {xo:.1f} GPa ; '

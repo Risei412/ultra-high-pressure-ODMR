@@ -1,28 +1,31 @@
 """
 build_standalone.py
-Inline every <img src="..."> of intro_deck.html as a data: URI so the deck is a
-single self-contained file (needed for hosting, e-mail, or offline viewing).
+Inline every <img src="..."> of a deck as a data: URI so it is a single
+self-contained file (needed for hosting, e-mail, or offline viewing).
 
 Run from the repository root or from slides/:
-    python slides/build_standalone.py
+    python slides/build_standalone.py                  # intro_deck.html
+    python slides/build_standalone.py talk_deck.html   # any other deck
 Out:
-    slides/intro_deck.standalone.html
+    slides/<name>.standalone.html
 """
 import base64
 import mimetypes
 import pathlib
 import re
+import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-SRC = HERE / 'intro_deck.html'
-OUT = HERE / 'intro_deck.standalone.html'
+NAME = sys.argv[1] if len(sys.argv) > 1 else 'intro_deck.html'
+SRC = (HERE / NAME) if not pathlib.Path(NAME).is_absolute() else pathlib.Path(NAME)
+OUT = SRC.with_suffix('').with_suffix('.standalone.html')
 
 
 def inline(match):
     src = match.group(1)
     if src.startswith(('data:', 'http:', 'https:')):
         return match.group(0)
-    path = (HERE / src).resolve()
+    path = (SRC.parent / src).resolve()
     if not path.is_file():
         raise FileNotFoundError(f'referenced asset not found: {path}')
     mime = mimetypes.guess_type(path.name)[0] or 'application/octet-stream'

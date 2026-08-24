@@ -1,5 +1,4 @@
 __pycache__/
-slides/intro_deck.standalone.html
 
 # LaTeX build output
 paper/out/
@@ -12,3 +11,4 @@ paper/out/
 *.out
 *.synctex.gz
 *.toc
+*.standalone.html

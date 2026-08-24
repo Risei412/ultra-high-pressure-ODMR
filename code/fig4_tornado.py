@@ -19,6 +19,7 @@ Out:  tornado_lambda_opt_120GPa.png  (+ the table, on stdout)
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 
 import talk_style as ts
 from nv_model import NVModel
@@ -87,19 +88,19 @@ ax.tick_params(axis='y', length=0)
 
 n_meas = sum(1 for r in rows if r[4])
 ax.axhline(y[n_meas] + 0.5, color=ts.RULE, lw=1.2)
-ax.text(-5.0, y[0] + 0.95, ts.t('答えを動かす — 測定された光学量',
-                                'moves the answer -- measured optics'),
-        color=ts.ACCENT, fontsize=13, weight='bold', va='center')
-ax.text(-5.0, y[n_meas] + 0.38,
-        ts.t('動かさない — 残りすべて(校正でフィットする定数を含む)',
-             'moves nothing -- everything else, fitted constants included'),
-        color=ts.MUTED, fontsize=13, weight='bold', va='center')
+ax.set_ylim(y.min() - 0.7, y.max() + 0.7)
 
-ax.set_title(ts.t(f'フィットできる量は答えを 1 nm も動かさない'
-                  f'  ($\\lambda_{{\\mathrm{{opt}}}}$ = {base:.1f} nm)',
-                  f'nothing fittable moves the answer'
-                  f'  ($\\lambda_{{opt}}$ = {base:.1f} nm)'),
-             loc='left', weight='bold', pad=14)
+handles = [Patch(facecolor=ts.ACCENT, label=ts.t('測定量 — 答えを動かす',
+                                                 'measured — moves it')),
+           Patch(facecolor=ts.MUTED, label=ts.t('現象論定数 — 動かさない',
+                                                'fitted — moves nothing'))]
+leg = ax.legend(handles=handles, loc='center left', bbox_to_anchor=(0.0, 0.40),
+                fontsize=12.5, handlelength=1.1, handleheight=1.1,
+                borderpad=0.9, labelspacing=0.8, frameon=True)
+leg.get_frame().set_facecolor('white')
+leg.get_frame().set_edgecolor(ts.RULE)
+leg.get_frame().set_alpha(1.0)
+leg.set_zorder(10)
 
 plt.savefig('tornado_lambda_opt_120GPa.png')
 print(f'\nsaved tornado_lambda_opt_120GPa.png ; baseline lambda_opt = {base:.2f} nm')
