@@ -38,14 +38,14 @@ python fig2_blue_wavelength_sweep.py 100 75 125   # blue sweep @100 GPa (compare
 |---|---|
 | green/blue crossover (457 nm fixed) | ~86 GPa |
 | optimal blue λ @100 GPa | 487 nm (η(457)/opt = 1.35) |
-| optimal blue λ @120 GPa | 475 nm (η(487)/opt = 1.06, η(457)/opt = 1.12) |
+| optimal blue λ @120 GPa | 475.5 nm at equal optical power (473 nm penalty = 0.2%) |
 | optimal blue λ tracking | ~0.6–0.7 nm/GPa (follows ZPL / sideband edge) |
 
 ## Model summary
 ```
 eta ∝ Δν / (C √R)                      # lower = better
   C = C0 · f₋/(f₋ + w0(1−f₋))          # contrast, diluted by NV0 background
-  R = f₋ · σ_abs                        # detected photon rate (fixed power)
+  R = f₋ · (I/Eγ) · σ_abs               # detected rate at fixed optical power
   f₋ = G_rec/(G_rec+G_ion)             # steady-state NV⁻ fraction
     G_ion = a_gs·ReLU(Eγ − IP(³A₂)) + a_es·σ_abs
     G_rec = r0·σ_abs + rbg

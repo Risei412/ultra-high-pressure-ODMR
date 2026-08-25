@@ -70,7 +70,8 @@ GOLDEN_T0 = {
 def legacy():
     """The pre-revision model: T=0 envelope, legacy ZPL, no ISC prefactor,
     no collection efficiency.  Every extension must be off here."""
-    return NVModel(Emax=0.758, P0=160.0, T=0.0, isc=False, collection=False)
+    return NVModel(Emax=0.758, P0=160.0, T=0.0, isc=False, collection=False,
+                   intensity_basis='photon_flux')
 
 
 @pytest.mark.parametrize('key', sorted(GOLDEN_T0))
@@ -151,7 +152,8 @@ BASE_T = 300.0
 def test_lambda_opt_is_invariant_under_the_ISC_prefactor():
     """
     C-3: C0(P) is the ISC contrast prefactor.  It is wavelength independent, so
-    the paper's claim `lambda_opt = argmax sigma_abs` cannot depend on it.
+    the paper's claim `lambda_opt = argmax(lambda * sigma_abs)` at fixed optical
+    power cannot depend on it.
     """
     ref = NVModel(T=BASE_T).lambda_opt(120.)
     for kw in ({'isc': False},
@@ -171,11 +173,20 @@ def test_lambda_opt_is_invariant_under_the_charge_transfer_constants():
         assert NVModel(T=BASE_T, **kw).lambda_opt(120.) == pytest.approx(ref, abs=0.05)
 
 
-def test_lambda_opt_equals_the_absorption_maximum():
+def test_fixed_power_optimum_equals_photon_absorption_rate_maximum():
     m = NVModel(T=BASE_T)
     lam = np.arange(402., 640., 0.01)
     s = m.sigma_abs(nm2eV(lam), 120.)
-    assert m.lambda_opt(120.) == pytest.approx(lam[s.argmax()], abs=0.05)
+    # At equal optical power the photon flux is proportional to lambda.
+    assert m.lambda_opt(120.) == pytest.approx(lam[(lam * s).argmax()], abs=0.05)
+
+
+def test_equal_optical_power_is_not_equal_photon_flux():
+    m = NVModel()
+    assert m.photon_flux_factor(532.) == pytest.approx(1.0)
+    assert m.photon_flux_factor(473.) == pytest.approx(473. / 532.)
+    old = NVModel(intensity_basis='photon_flux')
+    assert old.photon_flux_factor(473.) == pytest.approx(1.0)
 
 
 # ---------------------------------------------------------------------------
@@ -205,14 +216,13 @@ def test_zpl_shift_saturates():
     assert s120 < 0.6 * s0
 
 
-def test_mc_band_is_tighter_than_the_legacy_randomisation():
-    """C-2: randomising the measured quantities, not (Emax, P0), narrows the band."""
+def test_mc_band_includes_effective_phonon_uncertainty():
+    """The spectral-model uncertainty that sets the optimum must not be frozen out."""
     rng = np.random.default_rng(0)
     new = np.array([default_randomiser(rng, T=BASE_T).lambda_opt(120.) for _ in range(120)])
-    from nv_model import legacy_randomiser
-    rng = np.random.default_rng(0)
-    old = np.array([legacy_randomiser(rng).lambda_opt(120.) for _ in range(120)])
-    assert new.std() < 0.8 * old.std()
+    assert new.std() > 3.0
+    assert NVModel(hw=0.055).lambda_opt(120.) != pytest.approx(
+        NVModel(hw=0.075).lambda_opt(120.), abs=2.0)
 
 
 # ---------------------------------------------------------------------------
@@ -221,7 +231,7 @@ def test_mc_band_is_tighter_than_the_legacy_randomisation():
 
 def test_headline_numbers():
     m = NVModel(T=BASE_T)
-    assert m.lambda_opt(120.) == pytest.approx(474.0, abs=1.0)
+    assert m.lambda_opt(120.) == pytest.approx(475.5, abs=0.3)
     # 473 nm DPSS must remain within 1% of the optimum
     pen = m.eta_lambda(473., 120.)[0] / m.eta_lambda(m.lambda_opt(120.), 120.)[0]
     assert pen < 1.01
@@ -313,6 +323,15 @@ def test_saturation_reference_is_half_saturation_at_the_optimum():
     assert float(nE) == pytest.approx(0.5, abs=1e-9)
 
 
+def test_power_mc_preserves_its_saturation_reference():
+    from nv_model_power import default_randomiser_power
+    rng = np.random.default_rng(123)
+    for _ in range(12):
+        m = default_randomiser_power(rng)
+        nE = m.eta_u([(m.lam_sat_ref, 1.0)], m.sat_ref_P, 1.0)[4]
+        assert float(nE) == pytest.approx(0.5, abs=1e-9)
+
+
 def test_photon_rate_is_linear_in_power_at_low_u():
     """Dai et al. 2022 measured linear PL vs power at 100 GPa."""
     m = _power_model()
@@ -402,7 +421,7 @@ def test_widening_the_passband_recovers_sensitivity_at_high_pressure():
 
 def test_orbital_branch_analysis_leaves_lambda_opt_in_the_window():
     """
-    The central claim lambda_opt = argmax sigma_abs requires C to be wavelength
+    The central claim lambda_opt = argmax(lambda * sigma_abs) requires C to be wavelength
     independent.  The threat is stress-split 3E orbital branches with different
     ISC rates.  analysis_C_lambda quantifies it: the splitting delta in the
     micropillar geometry must stay below the threshold at which a completely
@@ -493,7 +512,7 @@ def test_crossover_survives_the_charge_transfer_constants():
     depend on the phenomenological knobs any more than lambda_opt does.
     """
     ref = brentq(lambda P: _ratio(NVModel(T=BASE_T), P) - 1.0, 20., 145.)
-    for kw in ({'a_gs': 0.0}, {'a_gs': 12.0}, {'r_0': None}, {'rbg': 1.0},
+    for kw in ({'a_gs': 0.0}, {'a_gs': 12.0}, {'r0': 0.5}, {'rbg': 1.0},
                {'w0': 0.5}, {'w0': 2.0}, {'C_amb': 0.12}, {'E_isc': 0.25}):
         kw = {k: v for k, v in kw.items() if v is not None}
         m = NVModel(T=BASE_T, **kw)
@@ -527,5 +546,5 @@ def test_power_penalty_of_the_headline_wavelength():
         return float(np.asarray(mp.eta_lambda_u(473., 120., u)[0])) / eta.min()
     assert penalty(0.05) < 1.01
     assert penalty(0.10) < 1.05
-    assert 1.2 < penalty(0.20) < 1.4
-    assert 1.5 < penalty(0.30) < 1.8
+    assert 1.15 < penalty(0.20) < 1.25
+    assert 1.4 < penalty(0.30) < 1.6

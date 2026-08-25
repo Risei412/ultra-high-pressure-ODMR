@@ -3,7 +3,7 @@ analysis_C_lambda.py
 --------------------
 Test of the last untested assumption behind the central claim of this work:
 that the CW-ODMR contrast C is independent of the excitation wavelength, so
-that lambda_opt = argmax sigma_abs.
+that lambda_opt = argmax(lambda * sigma_abs) at fixed optical power.
 
 Run:  python analysis_C_lambda.py
 

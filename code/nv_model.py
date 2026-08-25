@@ -29,7 +29,8 @@ to be pinned down by the (I_405, I_457) intensity-sweep calibration.
 Sensitivity model
   Lock-in CW-ODMR sensitivity:      eta  ~  d(nu) / ( C * sqrt(R) )   (lower = better)
     C = C0(P) * f- / (f- + w0 (1-f-))  contrast: ISC prefactor x NV0 dilution
-    R = f- * sigma_abs                 detected photon rate (fixed excitation power)
+    R = f- * Phi * sigma_abs           detected rate at fixed optical power
+      Phi = I / E_photon               photon flux (I denotes optical power density)
     f- = G_rec / (G_rec + G_ion)       steady-state NV- fraction
       G_ion = a_gs * ReLU(E_photon - IP_A2)   one-photon ground-state ionisation
             + a_es * sigma_abs                two-photon (via 3E) ionisation
@@ -163,6 +164,8 @@ class NVModel:
                  dE120=0.400, slope0=5.75e-3,   # ZPL, from measurement (C-2)
                  Emax=None, P0=None,            # legacy override of the above
                  T=300.0,                       # measurement temperature, K (C-1)
+                 hw=HW,                         # effective phonon energy (eV)
+                 intensity_basis='optical_power', # beam weights are equal optical powers
                  alpha=ALPHA_REF,               # stress anisotropy sigma_par/sigma_perp (C-4)
                  S_slope=(4.61 - 3.08),         # S_abs(P) = 3.08 + S_slope * P/120
                  a_gs=6.0, a_es=0.9,            # ionisation rate constants (phenom.)
@@ -180,6 +183,10 @@ class NVModel:
         else:
             self.Emax, self.P0 = _zpl_shape(dE120, slope0)
         self.T = float(T)
+        self.hw = float(hw)
+        if intensity_basis not in ('optical_power', 'photon_flux'):
+            raise ValueError("intensity_basis must be 'optical_power' or 'photon_flux'")
+        self.intensity_basis = intensity_basis
         self.alpha = float(alpha)
         self._afac = _alpha_factor(self.alpha)
         self.S_slope = S_slope
@@ -213,13 +220,13 @@ class NVModel:
         T -> 0 limit is exactly exp(-S) S^p / Gamma(p+1) for p >= 0, else 0.
         """
         x = np.asarray(x, float)
-        p = x / HW
+        p = x / self.hw
         S = np.asarray(S, float)
 
         if self.T <= 0.0:
             nbar = 0.0
         else:
-            r = HW / (KB * self.T)
+            r = self.hw / (KB * self.T)
             nbar = 1.0 / np.expm1(r) if r < 700.0 else 0.0
 
         if nbar < _T0_TOL:                                  # frozen T=0 branch
@@ -273,7 +280,7 @@ class NVModel:
         """
         Fraction of NV- emission falling inside the detection passband.
 
-        R = f- * sigma_abs counts ABSORBED photons.  What a confocal setup
+        R = f- * photon_flux * sigma_abs counts ABSORBED photons.  What a confocal setup
         records is the emission that survives a long-pass filter chosen at
         ambient pressure to reject the laser and NV0 -- typically 650-800 nm.
         The emission band blue shifts with the ZPL (peak 719 nm at ambient,
@@ -305,11 +312,26 @@ class NVModel:
         return out
 
     # ---- steady-state NV- fraction ----
+    def photon_flux_factor(self, lam_nm):
+        """Photon flux per beam-weight, normalised to one at 532 nm.
+
+        Experimental comparisons in this project hold optical power fixed.  A
+        beam of power density I contains I/E_photon photons, hence its optical
+        rates carry a factor E_532/E_photon = lambda/532.  The legacy
+        ``photon_flux`` basis is retained only to reproduce historical outputs.
+        """
+        lam_nm = np.asarray(lam_nm, float)
+        if self.intensity_basis == 'photon_flux':
+            return np.ones_like(lam_nm)
+        return lam_nm / 532.0
+
     def f_minus(self, beams, P):
-        """beams: list of (wavelength_nm, relative_intensity)."""
+        """beams: ``(wavelength_nm, relative optical power)`` by default."""
         relu = lambda u: np.clip(u, 0, None)
-        s   = sum(I * self.sigma_abs(nm2eV(lam), P) for lam, I in beams)
-        Ggs = sum(self.a_gs * relu(nm2eV(lam) - self.IP_A2(P)) * I for lam, I in beams)
+        s = sum(I * self.photon_flux_factor(lam) * self.sigma_abs(nm2eV(lam), P)
+                for lam, I in beams)
+        Ggs = sum(self.a_gs * relu(nm2eV(lam) - self.IP_A2(P)) * I
+                  * self.photon_flux_factor(lam) for lam, I in beams)
         Gion = Ggs + self.a_es * s
         Grec = self.r0 * s + self.rbg
         return Grec / (Grec + Gion), s
@@ -384,7 +406,8 @@ def default_randomiser(rng, T=300.0):
     """
     Standard randomisation for the MC bands.
 
-    C-2: the ZPL is randomised through the two MEASURED quantities
+    C-2: the ZPL is randomised through the two MEASURED quantities, while the
+    single-effective-mode approximation is exposed through a +/-15% range on hw.
       dE120  = 0.400 +/- 0.020 eV   (Ho et al., ">400 meV at 120 GPa")
       slope0 = 5.75 +/- 0.25 meV/GPa (Doherty et al.; 5.5 measured / 5.75 theory)
     rather than through (Emax, P0) independently.  dE_ZPL(120 GPa) is the only
@@ -395,6 +418,7 @@ def default_randomiser(rng, T=300.0):
         dE120=0.400 + 0.020 * rng.normal(),
         slope0=5.75e-3 + 0.25e-3 * rng.normal(),
         T=T,
+        hw=0.065 * rng.uniform(0.85, 1.15),
         S_slope=(4.61 - 3.08) * rng.uniform(0.85, 1.15),
         zpl_width=0.015 * rng.uniform(0.7, 1.4),
         a_gs=6.0 * rng.uniform(0.50, 1.60),
@@ -409,6 +433,7 @@ def legacy_randomiser(rng):
         Emax=0.758 * rng.uniform(0.90, 1.10),
         P0=160.0  * rng.uniform(0.85, 1.15),
         T=0.0,
+        intensity_basis='photon_flux',
         S_slope=(4.61 - 3.08) * rng.uniform(0.85, 1.15),
         a_gs=6.0 * rng.uniform(0.50, 1.60),
         r0=1.2   * rng.uniform(0.70, 1.30),

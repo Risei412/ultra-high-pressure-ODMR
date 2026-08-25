@@ -266,10 +266,12 @@ def main():
     # ---------------- the answer itself --------------------------------------
     lam = np.arange(402, 640, 0.01)
     s = m.sigma_abs(nm2eV(lam), 120.)
-    check('R14', 'this work', 'lambda_opt at 120 GPa coincides with the maximum of '
-          'the absorption envelope',
-          f'lambda_opt = {lo120:.2f} nm, sigma_abs max at {lam[s.argmax()]:.2f} nm',
-          abs(lo120 - lam[s.argmax()]) < 1.0)
+    rate = lam * s                    # fixed optical power: photon flux ~ lambda
+    check('R14', 'this work', 'lambda_opt at 120 GPa coincides with the maximum '
+          'photon-absorption rate at fixed optical power',
+          f'lambda_opt = {lo120:.2f} nm, lambda*sigma max at '
+          f'{lam[rate.argmax()]:.2f} nm',
+          abs(lo120 - lam[rate.argmax()]) < 1.0)
 
     # tolerance windows
     e = np.array([m.eta_lambda(l, 120.)[0] for l in lam])

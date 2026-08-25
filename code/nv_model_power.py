@@ -72,9 +72,10 @@ class NVModelPower(NVModel):
         lam_ref = self.lambda_opt(sat_ref_P)
         E_ref = nm2eV(lam_ref)
         self.lam_sat_ref = lam_ref
-        self.Gamma_d = (s_d * self.sigma_abs(E_ref, sat_ref_P)
+        flux_ref = self.photon_flux_factor(lam_ref)
+        self.Gamma_d = (s_d * flux_ref * self.sigma_abs(E_ref, sat_ref_P)
                         if Gamma_d is None else Gamma_d)
-        self.Gamma_d0 = (s_d0 * self.sigma_NV0(E_ref, sat_ref_P)
+        self.Gamma_d0 = (s_d0 * flux_ref * self.sigma_NV0(E_ref, sat_ref_P)
                          if Gamma_d0 is None else Gamma_d0)
         self.s_d, self.s_d0 = s_d, s_d0
 
@@ -92,9 +93,12 @@ class NVModelPower(NVModel):
         """beams: list of (wavelength_nm, relative_spectral_weight); u: scalar or array."""
         relu = lambda v: np.clip(v, 0, None)
         u = np.asarray(u, float)
-        s   = sum(w * self.sigma_abs(nm2eV(lam), P) for lam, w in beams)   # NV- absorption
-        s0  = sum(w * self.sigma_NV0(nm2eV(lam), P) for lam, w in beams)   # NV0 absorption
-        Ggs = sum(self.a_gs * relu(nm2eV(lam) - self.IP_A2(P)) * w for lam, w in beams) * u
+        s = sum(w * self.photon_flux_factor(lam) * self.sigma_abs(nm2eV(lam), P)
+                for lam, w in beams)   # NV- excitation rate per optical power
+        s0 = sum(w * self.photon_flux_factor(lam) * self.sigma_NV0(nm2eV(lam), P)
+                 for lam, w in beams)  # NV0 excitation rate per optical power
+        Ggs = sum(self.a_gs * relu(nm2eV(lam) - self.IP_A2(P)) * w
+                  * self.photon_flux_factor(lam) for lam, w in beams) * u
 
         nE  = (s * u) / (s * u + self.Gamma_d)
         nE0 = (s0 * u) / (s0 * u + self.Gamma_d0)
@@ -125,11 +129,14 @@ def default_randomiser_power(rng):
     from nv_model import default_randomiser
     base = default_randomiser(rng)
     return NVModelPower(
-        Emax=base.Emax, P0=base.P0, S_slope=base.S_slope, T=base.T,
+        Emax=base.Emax, P0=base.P0, S_slope=base.S_slope, T=base.T, hw=base.hw,
         zpl_width=base.zpl_width,
         a_gs=base.a_gs, r0=base.r0, rbg=base.rbg, w0=base.w0,
-        Gamma_d=1.0  * rng.uniform(0.6, 1.6),
-        Gamma_d0=1.0 * rng.uniform(0.6, 1.6),
+        # u is defined by the measured NV- half-saturation point, so s_d=1 is
+        # a definition rather than an uncertain model parameter.  The relative
+        # NV0 saturation scale remains uncertain.
+        s_d=1.0,
+        s_d0=1.0 * rng.uniform(0.6, 1.6),
         a_es2=0.9    * rng.uniform(0.5, 1.8),
         Gamma_c=0.6  * rng.uniform(0.5, 1.8),
         Gamma_satC=1.2 * rng.uniform(0.5, 1.8),
