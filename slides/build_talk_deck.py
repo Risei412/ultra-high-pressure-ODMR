@@ -39,6 +39,7 @@ Slide map (draft -> talk):
 """
 import copy
 import os
+import unicodedata
 import re
 import shutil
 import sys
@@ -60,7 +61,7 @@ NS = {'a': A, 'p': P, 'r': R}
 
 ACCENT = '1C3177'          # Institute of Science Tokyo navy: the text colour
 BODY_CLR = ACCENT          # body copy is the institutional navy, not near-black
-REVERSED = 'FFFFFF'        # the foot sentence is white on a navy band
+REVERSED = 'FFFFFF'        # reserved for the table header
 REF_CLR = '6E7488'         # the citation strip stays grey and stays quiet
 MIN_SZ = 1800              # nothing on a projected slide may be under 18 pt
 REF_SZ = 1200              # except the citation strips, which nobody reads live
@@ -129,7 +130,6 @@ BODY = {
         '窓の中に市販線が 3 本 — 457 nm ×1.11、488 nm ×1.05。',
         'λ_{opt} は **0.4–0.6 nm/GPa** で動く。100 GPa では 486 nm。',
     ],
-    (6, 'TextBox 5'): [''],
     (7, 'TextBox 3'): [
         '較正は Dai 2022 の 3 点だけ。'
         '0–150 GPa・4 波長を **26/26 再現**する。',
@@ -163,21 +163,22 @@ BODY = {
 # DOES show -- how to read it, and the fact it establishes -- goes here, as one
 # sentence across the foot of the slide, so the column stops narrating the plot.
 BOTTOM = {
-    4: ['吸収極大とイオン化端が同時に青へ動き、'
-        '120 GPa では σ(473) が σ(532) の **10 倍**になる。'],
-    5: ['動かすのは光学入力 3 つだけで、'
-        '**校正でフィットする現象論定数は 1 つも λopt を動かさない**。'],
-    6: ['λopt の不確かさ ±5.5 nm は 5% 許容窓の半分を占める — '
-        '**答えは点ではなく窓である**。'],
-    7: ['50 GPa の既報が**青の優位を見つけなかったこと自体**が、'
-        'モデルの再現になっている。'],
-    8: ['既存実験がいる u ≲ 0.3 では 473 nm 固定が ×1.51 になり、'
-        '**緑への ×2.5 の大半を食う**。'],
+    4: ['120 GPa では σ(473) が σ(532) の **10 倍**になる。'],
+    5: ['**校正でフィットする現象論定数は 1 つも λopt を動かさない。**'],
+    6: ['λopt の不確かさ ±5.5 nm は**許容窓の半分**を占める。'],
+    7: ['**青の優位が見つからなかったこと自体**が再現である。'],
+    8: ['既存実験がいる u ≲ 0.3 で **473 nm 固定は ×1.51** になる。'],
 }
 
 # the citation strip on each slide, exempt from the 18 pt floor
 REFS = {2: 'TextBox 7', 3: 'TextBox 8', 4: 'TextBox 4', 5: 'TextBox 4',
-        6: 'TextBox 5', 7: 'TextBox 4', 8: 'TextBox 4'}
+        7: 'TextBox 4', 8: 'TextBox 4'}
+
+# slide 6 shows only our own calculation, so it cites nothing and its strip goes
+DROP = {(6, 'TextBox 5')}
+
+# what the foot is cloned from when the slide has no citation strip
+FOOT_TEMPLATE = {6: 'TextBox 4'}
 
 # Whole-string substitutions for shapes that only need a number changed.
 PATCHES = {
@@ -226,7 +227,9 @@ GEOMETRY = {
 }
 
 # the sentence across the foot, and the citation strip under it
-BOTTOM_SZ = 2000           # the foot is one sentence; give it the emphasis
+# The foot is one sentence, so it can be set larger than the body.  The size
+# is chosen per slide: the largest of these that still keeps it on one line.
+BOTTOM_SIZES = (2800, 2600, 2400, 2200, 2000)
 BOTTOM_BOX = dict(left=0.55, top=6.18, width=12.24, height=0.62)
 REF_BOX = dict(left=0.55, top=6.92, width=12.24, height=0.45)
 
@@ -551,8 +554,6 @@ def apply_colours(tree, ref_shape=None):
         name = cNvPr.get('name') if cNvPr is not None else ''
         if name == ref_shape:
             colour = REF_CLR
-        elif name == 'BottomNote':
-            colour = REVERSED
         else:
             colour = BODY_CLR
         for clr in sp.iter(f'{{{A}}}srgbClr'):
@@ -597,6 +598,17 @@ def apply_font_sizes(tree, ref_shape=None):
     return sorted(set(raised))
 
 
+def _fit_size(text, width_in):
+    """Largest of BOTTOM_SIZES that keeps the sentence on one line."""
+    units = sum(1.0 if unicodedata.east_asian_width(ch) in 'WF' else 0.5
+                for ch in re.sub(r'\*\*|##|_\{|\}', '', text))
+    room = width_in * 72 * 0.97
+    for sz in BOTTOM_SIZES:
+        if units * sz / 100 <= room:
+            return sz
+    return BOTTOM_SIZES[-1]
+
+
 def add_bottom_note(tree, shapes, template_name, paragraphs):
     """Clone the citation strip into a second box for the foot sentence."""
     template = shapes[template_name]
@@ -608,25 +620,22 @@ def add_bottom_note(tree, shapes, template_name, paragraphs):
     set_geometry(note, **BOTTOM_BOX)
     set_text(note, paragraphs)
 
-    # reverse it: the one sentence of the slide sits in the institutional navy
-    spPr = note.find(f'{{{P}}}spPr')
-    for child in spPr.findall(f'{{{A}}}noFill'):
-        spPr.remove(child)
-    fill = etree.SubElement(spPr, f'{{{A}}}solidFill')
-    etree.SubElement(fill, f'{{{A}}}srgbClr').set('val', ACCENT)
     body = note.find(f'{{{P}}}txBody/{{{A}}}bodyPr')
-    body.set('lIns', str(int(0.18 * EMU_IN)))
-    body.set('rIns', str(int(0.18 * EMU_IN)))
-    body.set('tIns', str(int(0.09 * EMU_IN)))
-    body.set('bIns', str(int(0.09 * EMU_IN)))
     body.set('anchor', 'ctr')
     # inherited from a 9 pt citation: bring the runs back to the floor first,
     # the accent colour comes from the markup
-    for rPr in note.iter(f'{{{A}}}rPr'):
-        rPr.set('sz', str(BOTTOM_SZ))
-        clr = rPr.find(f'{{{A}}}solidFill/{{{A}}}srgbClr')
-        if clr is not None and clr.get('val') != ACCENT:
-            clr.set('val', '101426')
+    size = _fit_size(paragraphs[0], BOTTOM_BOX['width'])
+    for run in note.iter(f'{{{A}}}r'):
+        rPr = run.find(f'{{{A}}}rPr')
+        if rPr is None:
+            rPr = etree.Element(f'{{{A}}}rPr')
+            run.insert(0, rPr)
+        rPr.set('sz', str(size))
+        fill = rPr.find(f'{{{A}}}solidFill')
+        if fill is None:
+            fill = etree.SubElement(rPr, f'{{{A}}}solidFill')
+            etree.SubElement(fill, f'{{{A}}}srgbClr')
+        fill.find(f'{{{A}}}srgbClr').set('val', ACCENT)
     return note
 
 
@@ -766,8 +775,13 @@ def main(src=DEFAULT_SRC, out=OUT):
             patch_runs(tree, PATCHES[pos])
         if pos in TABLES:
             set_table(tree, TABLES[pos])
+        for sp_pos, sp_name in DROP:
+            if sp_pos == pos:
+                sp = shapes.pop(sp_name)
+                sp.getparent().remove(sp)
         if pos in BOTTOM:
-            add_bottom_note(tree, shapes, REFS[pos], BOTTOM[pos])
+            add_bottom_note(tree, shapes,
+                            REFS.get(pos) or FOOT_TEMPLATE[pos], BOTTOM[pos])
         if pos in REFS:
             set_geometry(shapes[REFS[pos]], **REF_BOX)
 

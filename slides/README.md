@@ -44,7 +44,7 @@ the back of a room, and dropping them frees the foot of the slide.
 ## Colour
 
 Three values, nothing else: Institute of Science Tokyo navy `1C3177` for all
-text, white `FFFFFF` where the foot band and the table header reverse it, and
+text, white `FFFFFF` where the table header reverses it, and
 grey `6E7488` on the citation strip, which is not meant to compete. The figures
 follow the same rule -- navy for what the slide is about, one neutral grey for
 the option being argued against, and no third colour.
@@ -54,8 +54,10 @@ the option being argued against, and no third colour.
 On a figure slide the right-hand column had been narrating the plot. It now
 carries only what the figure cannot show, in 50-90 Japanese characters; the
 fact the figure establishes is
-**one sentence** across the foot (`BOTTOM`) at 20 pt, with the citation at
-12 pt beneath it. One sentence is the rule, not a target: anything the sentence
+**one sentence** across the foot (`BOTTOM`), in navy, at the largest of
+28/26/24/22/20 pt that still keeps it on one line -- which is what makes the
+sentences short. The title already carries the headline, so the foot carries
+the number. The citation sits at 12 pt beneath it. One sentence is the rule, not a target: anything the sentence
 does not need in order to carry the claim -- a legend gloss, a value already
 labelled on the plot, a definition the axis already gives -- comes out of the
 foot. The grey strip is references and nothing else -- annotations that used
