@@ -125,10 +125,16 @@ def drop_ph(slide, idx):
     ph._element.getparent().remove(ph._element)
 
 
+ASSETS = HERE / 'assets'
+
+
 def picture(slide, name, x, y, w):
-    pic = slide.shapes.add_picture(str(CODE / name), Inches(x), Inches(y),
-                                   width=Inches(w))
-    return pic
+    """`name` resolves against code/ first, then slides/assets/."""
+    path = CODE / name
+    if not path.is_file():
+        path = ASSETS / name
+    return slide.shapes.add_picture(str(path), Inches(x), Inches(y),
+                                    width=Inches(w))
 
 
 def reference(slide, text):
@@ -224,63 +230,74 @@ set_ph(s1, 12, '2026-08', size=12, color=SCIENCE_BLUE)
 s1.notes_slide.notes_text_frame.text = (
     '0:00–0:40  結論を先に置く。市販 473 nm DPSS で最適の 0.03% 以内。')
 
-# ---- 2. why this experiment at all (for a non-specialist) ----------------
-s2a = content_slide('なぜ 120 GPa で局所磁気イメージングなのか')
-table(s2a, L, 1.35, 5.55, 2.5,
+# ---- 2. what a diamond anvil cell is, and why 120 GPa --------------------
+s2a = content_slide('試料は 2 枚のダイヤモンドの先端にある')
+picture(s2a, 'lit_dac_schematic.png', L + 0.35, 1.30, 2.55)
+textbox(s2a, L, 6.05, 3.5, 0.8,
+        [[('キュレット径 ~100 µm、試料は pL。', {})]],
+        size=14, color=MUTED)
+table(s2a, 4.45, 1.30, 4.35, 2.3,
       [['超水素化物', '転移温度', '合成圧力'],
        ['H₃S', '203 K', '155 GPa'],
        ['LaH₁₀', '250–260 K', '170 GPa'],
        ['CeH₉', '≤ 115 K', '80–100 GPa'],
        ['(La,Ce)H₉', '148–178 K', '97–172 GPa']],
-      col_w=[2.05, 1.75, 1.75], size=14, hi_row=4)
-textbox(s2a, L, 4.05, 5.55, 1.4,
+      col_w=[1.65, 1.35, 1.35], size=13, hi_row=4)
+textbox(s2a, 4.45, 3.95, 4.35, 2.0,
         [[('最高の T', {}), ('c', {'sub': True}),
-          (' は最高の圧力にはない。実験の現実味がある超水素化物は '
-           '100 GPa 前後に集中する。', {})]], size=16)
-textbox(s2a, COL_X - 1.35, 1.35, COL_W + 1.35, 5.2,
+          (' は最高の圧力にはない。', {'bold': True})],
+         [('実験の現実味がある超水素化物は 100 GPa 前後に集中する。'
+           'よく特性の分かった DAC で届く圧力帯である。', {})]], size=16)
+textbox(s2a, 9.15, 1.30, 3.65, 5.0,
         [[('試料が小さすぎる。', {'bold': True}),
-          ('120 GPa のキュレットは数十 µm、試料体積は pL。'
-           'バルク磁化測定ではアンビルとガスケットの背景から分離できない。', {})],
+          ('数十 µm・pL の試料の磁化を、バルク測定でアンビルとガスケットの'
+           '背景から分離することはできない。', {})],
          [('抵抗の落下だけでは決着しない。', {'bold': True}),
-          ('必要なのは磁束排除そのものの観測であり、局所・空間分解された'
-           '磁気測定が決着をつける測定になった。', {})],
-         [('探針はアンビルの内側に作る。', {'bold': True}),
-          ('キュレット表面の数十 nm 下に注入された NV は試料から µm の距離にあり、'
-           '同じ圧力を経験する。ODMR が局所磁場と局所応力を同時に読み出す。', {})]],
-        size=17)
-reference(s2a, 'A. P. Drozdov et al., Nature 525, 73 (2015) / 569, 528 (2019);  '
-               'N. P. Salke et al., Nat. Commun. 10, 4453 (2019);  '
-               'J. Bi et al., Nat. Commun. 13, 5952 (2022);  '
-               'P. Bhattacharyya et al., Nature 627, 73 (2024).')
+          ('この分野は繰り返しそれを経験してきた。必要なのは'
+           '磁束排除そのものの観測である。', {})],
+         [('だから決着をつける測定は、', {}),
+          ('局所・空間分解された磁気測定', {'bold': True}),
+          ('になった。', {})]], size=16)
+reference(s2a, '図: P. Bhattacharyya, PhD thesis, UC Berkeley (2022), Fig. 2.2. '
+               ' データ: A. P. Drozdov et al., Nature 525, 73 (2015) / 569, 528 '
+               '(2019);  N. P. Salke et al., Nat. Commun. 10, 4453 (2019);  '
+               'J. Bi et al., Nat. Commun. 13, 5952 (2022).')
 s2a.notes_slide.notes_text_frame.text = (
-    '0:40–1:50  専門外向けの動機。狙う圧力帯 → 抵抗では決着しない → '
-    'センサーをアンビル内に作る、の 3 段。')
+    '0:40–1:50  DAC とは何かを図で見せる。狙う圧力帯 → 試料が小さすぎる → '
+    '抵抗では決着しない、の 3 段。')
 
-# ---- 2. why sensitivity --------------------------------------------------
-s2 = content_slide('感度が空間分解能と (P, T) 点数を決める')
-framed(s2, L, 1.55, 6.6, 1.15,
-       [[('測定時間  ∝  画素数 / η', {'size': 26}),
-         ('B', {'size': 26, 'sub': True}), ('2', {'size': 26, 'sup': True})]])
-textbox(s2, L, 3.15, 7.1,ac := 3.2,
-        [[('水素化物超伝導の決定実験は', {}),
-          ('局所磁気マップ', {'bold': True}),
-          ('になった。', {})],
-         [('CeH', {}), ('9', {'sub': True}),
-          (' の Meissner 効果は、超伝導領域がミクロン'
-           'スケールで強く不均一であることを示した。', {})],
+# ---- 3. the probe, the published result, and why speed is everything -----
+s2 = content_slide('アンビルの内側の NV が、局所の磁束排除を撮る')
+picture(s2, 'lit_nv_in_anvil.png', L + 0.15, 1.30, 1.95)
+picture(s2, 'lit_meissner_map.png', 2.85, 1.42, 5.75)
+textbox(s2, L, 3.85, 8.1, 0.6,
+        [[('先行研究の実測。(左) NV はキュレット表面の 50 nm 下に注入され、'
+           '試料から µm の距離で同じ圧力を経験する。'
+           '(中央・右) CeH', {}), ('9', {'sub': True}),
+          (' 上で磁場比 B/H が 0.67 まで落ちる = 局所の磁束排除。'
+           'しかも ~10 µm で不均一。', {})]], size=14, color=MUTED)
+framed(s2, L, 4.95, 5.3, 0.95,
+       [[('測定時間  ∝  画素数 / η', {'size': 22}),
+         ('B', {'size': 22, 'sub': True}), ('2', {'size': 22, 'sup': True})]])
+textbox(s2, 6.2, 4.95, 2.4, 1.0,
+        [[('マップは ODMR スペクトルのラスタである。', {})]], size=15)
+textbox(s2, COL_X + 0.45, 1.45, COL_W, 5.0,
+        [[('科学的な中身はマップにある。', {'bold': True}),
+          ('遮蔽場のテクスチャ、捕捉磁束の幾何、そしてその T', {}),
+          ('c', {'sub': True}), (' 近傍・圧力に沿った発展。', {})],
          [('1 回のロードに数週間、1 回のアンビル破損で全損する領域では、', {}),
           ('感度は空間分解能・視野・到達できる (P, T) 点数を買う通貨', {'bold': True}),
-          ('である。', {})]], size=18)
-textbox(s2, COL_X + 0.6, 1.55, COL_W - 0.2, 1.2,
-        [[('×2.7', {'size': 40, 'bold': True, 'color': SCIENCE_BLUE})],
-         [('感度', {'size': 15, 'color': MUTED})]], space_after=2)
-textbox(s2, COL_X + 0.6, 2.95, COL_W - 0.2, 1.2,
-        [[('×7', {'size': 40, 'bold': True, 'color': SCIENCE_BLUE})],
-         [('マップ 1 枚の取得時間', {'size': 15, 'color': MUTED})]], space_after=2)
-reference(s2, 'P. Bhattacharyya et al., Nature 627, 73 (2024);  '
-              'J. F. Barry et al., Rev. Mod. Phys. 92, 015004 (2020)')
+          ('である。', {})],
+         [('×2.7', {'size': 34, 'bold': True, 'color': SCIENCE_BLUE}),
+          ('  感度', {'size': 15, 'color': MUTED})],
+         [('×7', {'size': 34, 'bold': True, 'color': SCIENCE_BLUE}),
+          ('  マップ 1 枚の取得時間', {'size': 15, 'color': MUTED})]], size=16)
+reference(s2, '図: P. Bhattacharyya, PhD thesis, UC Berkeley (2022), Fig. 7.2(a), '
+              '7.8(b,c);  同グループの成果は P. Bhattacharyya et al., Nature 627, '
+              '73 (2024).  J. F. Barry et al., Rev. Mod. Phys. 92, 015004 (2020).')
 s2.notes_slide.notes_text_frame.text = (
-    '1:50–2:40  マップ時間 ∝ 画素数/η²。感度は指標ではなく通貨。')
+    '1:50–2:40  探針はアンビル内。既に撮れている実測を見せ、'
+    'マップ時間 ∝ 画素数/η² で感度が通貨だと言う。')
 
 # ---- 3. the two edges ----------------------------------------------------
 s3 = content_slide('120 GPa では吸収帯とイオン化端が同時に青へ動く')
