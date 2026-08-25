@@ -59,6 +59,9 @@ CT = 'http://schemas.openxmlformats.org/package/2006/content-types'
 NS = {'a': A, 'p': P, 'r': R}
 
 ACCENT = '1C3177'          # the deck's navy, used for the one line that matters
+MIN_SZ = 1800              # nothing on a projected slide may be under 18 pt
+EMU_IN = 914400
+FIG_DPI = 200              # talk_figs.py renders at this resolution
 
 
 # ==========================================================================
@@ -85,73 +88,90 @@ BODY = {
     (1, 'Content Placeholder 2'): [
         '緑 532 nm 比で感度 ×2.5、磁気マップ取得時間 ×6',
     ],
+    (2, 'TextBox 7'): [
+        '図: Bhattacharyya, PhD thesis, UC Berkeley (2022) Fig. 2.2。'
+        'データ: Drozdov, Nature 525, 73 (2015) / 569, 528 (2019); '
+        'Salke, Nat. Commun. 10, 4453 (2019); Bi, ibid. 13, 5952 (2022)。',
+    ],
+    (3, 'TextBox 4'): [
+        '先行研究の実測。(左) NV はキュレット表面の 50 nm 下に注入され、'
+        '試料から µm の距離で同じ圧力を経験する。'
+        '(中央・右) CeH₉ 上で B/H が 0.67 まで落ちる = 局所の磁束排除、'
+        'しかも ~10 µm で不均一。',
+    ],
+    (3, 'TextBox 8'): [
+        '図: Bhattacharyya, PhD thesis (2022) Fig. 7.2, 7.8; '
+        '同グループの成果は Nature 627, 73 (2024)。'
+        'η の定義は Barry et al., RMP 92, 015004 (2020)。',
+    ],
     (4, 'TextBox 3'): [
         'ZPL が +0.40 eV 青方偏移し、Huang–Rhys 因子が 3.08 → 4.61 に増える。'
         '吸収極大は 586 → 474 nm。',
         '同時に IP(³A₂) が 2.68 → 3.06 eV に上がる。3.06 eV = 405 nm。'
         'これより青は NV⁻ を直接 NV⁰ に変える。',
         '120 GPa では σ(473) は σ(532) の **10 倍**。',
-        'η ∝ Δν/(C√R) はコントラストに線形、光子レートに √ で効く。'
+        'η ∝ Δν/(C√R) は C に線形、光子レートに √ で効く。'
         '釣り合いの位置は量的問題である。',
+    ],
+    (4, 'TextBox 4'): [
+        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026) — DFT + DAC。'
+        '灰色の常圧曲線は単一有効フォノン近似（50 GPa 以下では粗い）。',
     ],
     (5, 'TextBox 3'): [
         '励起状態イオン化と再結合はどちらも σ_{abs} に比例するので、'
-        '定常 NV⁻ 分率 f₋ から相殺する。f₋ は 463–488 nm で 0.582–0.583、'
-        '**0.2% しか動かない**。',
+        '定常 NV⁻ 分率 f₋ から相殺する。f₋ は窓の中で **0.2% しか動かない**。',
         '校正でフィットする現象論定数は **1 つも λ_{opt} を動かさない**。',
-        '効くのは 3 つだけ — ZPL 位置、電子格子結合、そして'
-        '**単一有効フォノン近似そのもの**。最大の ±6.9 nm は他人の測定値ではなく'
-        '我々のモデル形である。',
+        '効くのは 3 つだけ — ZPL 位置、電子格子結合、'
+        'そして**単一有効フォノン近似そのもの**。'
+        '最大の ±6.9 nm は他人の測定値ではなく我々のモデル形である。',
         '##だから答えは一点ではなく窓で述べる。##',
     ],
     (5, 'TextBox 4'): [
-        '各入力をモンテカルロ範囲の端に振り、他を公称値に固定したときの λopt の変化。'
-        '等パワー比較では光子束が λ に比例するので、最適は σabs 極大 474.0 nm ではなく '
-        'λσabs 極大 475.5 nm。',
+        '各入力を MC 範囲の端に振ったときの λopt の変化。'
+        '等パワー比較では光子束 ∝ λ なので、'
+        '最適は σabs 極大 474.0 nm ではなく λσabs 極大 475.5 nm。',
     ],
     (6, 'TextBox 4'): [
-        '**473 nm DPSS は最適の 0.2% 落ち** — 窓の中に市販線がある。'
-        '457 nm で ×1.11、488 nm で ×1.05。',
-        'λ_{opt} は ZPL に追随して 0.4–0.6 nm/GPa で動く。100 GPa では 486 nm。',
-        '97–172 GPa を通す実験なら 488 nm と 473 nm の 2 本立てが有利。',
+        '**473 nm DPSS は最適の 0.2% 落ち。**457 nm ×1.11、488 nm ×1.05。',
+        'λ_{opt} は ZPL に追随して 0.4–0.6 nm/GPa。100 GPa では 486 nm。',
+        '97–172 GPa を通すなら 488 nm と 473 nm の 2 本立て。',
     ],
     (6, 'TextBox 5'): [
-        '帯は入力のモンテカルロ 16–84%。λopt = 475.5 +5.6 / −5.3 nm。'
-        '単一有効フォノン近似の ±15% を含む。',
+        '感度比は最適 η に対する比。帯は入力の MC 16–84%。'
+        'λopt = 475.5 +5.6 / −5.3 nm（単一有効フォノン近似の ±15% を含む）。',
     ],
     (7, 'TextBox 3'): [
-        '較正に使ったのは Dai 2022 の 3 点だけ（定数 2 個）。'
-        'その上で 0–150 GPa・4 波長の文献値を **26/26 再現**する（1 件は OPEN と申告）。',
-        '50 GPa で青と緑を比較した既報は、**青の明確な優位を見つけなかった**。'
-        'モデルはそこで 0.56、つまり緑が有利と答える。'
+        '較正は Dai 2022 の 3 点だけ（定数 2 個）。'
+        'その上で 0–150 GPa・4 波長を **26/26 再現**する（1 件は OPEN と申告）。',
+        '50 GPa の既報は**青の優位を見つけなかった**。'
+        'モデルはそこで 0.56、緑が有利と答える。'
         '見つからなかったことが再現になっている。',
-        '単一圧力の比較に乗る波長依存の系統誤差は圧力に依らないので、'
+        '波長依存の系統誤差は圧力に依らないので、'
         '比が 1 を横切る位置を作ることも動かすこともできない。',
         '##これが本研究を反証する測定である。##',
     ],
     (7, 'TextBox 4'): [
-        'P. Bhattacharyya, PhD thesis, UC Berkeley (2022), Sec. 6.3;  '
-        'J.-H. Dai et al., Chin. Phys. Lett. 39, 117601 (2022);  '
-        'A. Hilberer et al., PRB 107, L220102 (2023).',
+        'Bhattacharyya, PhD thesis (2022) Sec. 6.3; '
+        'Dai et al., CPL 39, 117601 (2022); '
+        'Hilberer et al., PRB 107, L220102 (2023)。',
     ],
     (8, 'TextBox 3'): [
         '稜線は 475.5 nm (u→0) → 465 nm (u = 0.1) → 447 nm (u = 0.3)。'
         '405 nm のイオン化端で止まる。',
         '473 nm 固定のコストは u = 0.2 で ×1.22、u = 0.3 で ×1.51。'
         '**緑に対する ×2.5 の大半を食う。**',
-        'Dai 2022 の線形 PL は既存の高圧実験を u ≲ 0.3 に置く。'
+        'Dai 2022 の線形 PL は既存実験を u ≲ 0.3 に置く。'
         '移動の**向き**は全ドローで一致するが、**量は校正前のシナリオである**。',
         '##次の一手：473 nm 単色でパワー掃引 1 本。##'
-        'R(I) の線形離脱点が「低励起」を実パワーに換算する。波長比較より先にやる。',
+        'R(I) の線形離脱点が「低励起」を実パワーに換算する。',
     ],
     (8, 'TextBox 4'): [
         'u = 1 は λopt における NV⁻ 遷移の半飽和強度。'
-        '未校正の量は docs/next_step_power_dependence_experiment.md の Stage 1–3 で決める。',
+        '未校正の量は docs/next_step_power_dependence_experiment.md で決める。',
     ],
     (9, 'TextBox 3'): [
-        '検出帯も ZPL とともに青へ動く。常圧で選んだパスバンドは 120 GPa で'
-        '発光の 26% しか拾わない。青励起にして初めて検出カットオンも動かせ、'
-        '×1.6 が上乗せされる — 合計 ×4。',
+        '検出帯も ZPL とともに動く。常圧のパスバンドは 120 GPa で発光の 26% しか拾わない。'
+        '青励起にして初めてカットオンも動かせ、×1.6 が上乗せされる — 合計 ×4。',
         '##120 GPa では 532 nm を 473 nm DPSS に替える。'
         '同じ磁気マップが 1/6 の時間で撮れる。##',
     ],
@@ -165,17 +185,51 @@ PATCHES = {
 # table cell -> new text  {slide: {(row, col): text}}
 TABLES = {
     6: {
+        (0, 1): '感度比',
         (1, 1): '3.76',
-        (2, 1): '1.002', (2, 2): '市販 DPSS — 窓の中',
+        (2, 1): '1.002', (2, 2): '市販 DPSS',
         (3, 1): '2.53',
     },
     9: {
-        (1, 2): '平坦キュレット (α = 0.56) なら 510 nm。その形状は 40–50 GPa で '
-                'ODMR コントラストを失う — micropillar は前提条件',
+        (1, 2): '平坦キュレット (α = 0.56) なら 510 nm。'
+                'その形状は 40–50 GPa で ODMR コントラストを失う — '
+                'micropillar は前提条件',
         (2, 1): '約 73 GPa 以上',
         (3, 2): '未校正（前ページ）。u = 0.3 では最適が 447 nm へ動き、'
                 '473 nm 固定は ×1.51',
     },
+}
+
+# Layout adjustments forced by the 18 pt floor.  Sizes are inches; a shape
+# listed here is moved/resized before its text is written.
+GEOMETRY = {
+    # the citation strips were 9 pt one-liners; at 18 pt they need two lines,
+    # so they move up out of the slide's bottom margin
+    # slide 2 is the tightest: the DAC schematic gives back the height the
+    # three-line citation strip needs at 18 pt (aspect ratio preserved)
+    (2, 'Picture 2'): dict(width=2.33, height=4.30),
+    (2, 'TextBox 3'): dict(top=5.75, height=0.62),
+    (2, 'TextBox 7'): dict(top=6.45, height=0.94),
+    (3, 'TextBox 4'): dict(height=0.95),      # figure caption, now three lines
+    (3, 'TextBox 8'): dict(top=6.75, height=0.62),
+    (4, 'TextBox 4'): dict(top=6.75, height=0.62),
+    (5, 'TextBox 4'): dict(top=6.75, height=0.62),
+    (6, 'TextBox 5'): dict(top=6.75, height=0.62),
+    (7, 'TextBox 4'): dict(top=6.75, height=0.62),
+    (8, 'TextBox 4'): dict(top=6.75, height=0.62),
+    # the hydride table at 18 pt no longer fits three columns in 4.35 in
+    (2, 'Table 4'): dict(width=4.60),
+    # the generated figures are placed 1:1, so their boxes only set the top
+    (4, 'Picture 2'): dict(top=1.45),
+    (5, 'Picture 2'): dict(top=1.35),
+    (6, 'Picture 2'): dict(top=1.45),
+    (7, 'Picture 2'): dict(top=1.45),
+    (8, 'Picture 2'): dict(top=1.45),
+}
+
+# table column widths (points) where the default split breaks at 18 pt
+GRIDS = {
+    (2, 'Table 4'): [115, 103, 113],
 }
 
 NOTES = {
@@ -479,6 +533,56 @@ def set_text(sp, paragraphs):
                 t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
 
 
+def raise_font_sizes(path, minimum=MIN_SZ):
+    """Raise every explicit run size on a slide to at least `minimum`.
+
+    Applies to a:rPr, a:defRPr and a:endParaRPr alike, so a paragraph cannot
+    come back at 9 pt through its end-paragraph properties.  Sizes already at
+    or above the floor -- titles, the two large call-out numbers -- are left
+    exactly as they are.
+    """
+    with open(path, encoding='utf-8') as fh:
+        xml = fh.read()
+    raised = []
+
+    def bump(m):
+        val = int(m.group(1))
+        if val >= minimum:
+            return m.group(0)
+        raised.append(val)
+        return f'sz="{minimum}"'
+
+    xml = re.sub(r'sz="(\d+)"', bump, xml)
+    with open(path, 'w', encoding='utf-8') as fh:
+        fh.write(xml)
+    return sorted({v // 100 for v in raised})
+
+
+def set_geometry(sp, left=None, top=None, width=None, height=None):
+    """Move or resize a shape.  Values are inches; None leaves that edge."""
+    xfrm = sp.find(f'{{{P}}}spPr/{{{A}}}xfrm')
+    if xfrm is None:                                   # tables, pictures
+        xfrm = sp.find(f'{{{P}}}xfrm')
+    off, ext = xfrm.find(f'{{{A}}}off'), xfrm.find(f'{{{A}}}ext')
+    if left is not None:
+        off.set('x', str(int(left * EMU_IN)))
+    if top is not None:
+        off.set('y', str(int(top * EMU_IN)))
+    if width is not None:
+        ext.set('cx', str(int(width * EMU_IN)))
+    if height is not None:
+        ext.set('cy', str(int(height * EMU_IN)))
+
+
+def set_grid(sp, widths_pt):
+    """Reset a table's column widths (points)."""
+    grid = sp.find(f'.//{{{A}}}tblGrid')
+    cols = grid.findall(f'{{{A}}}gridCol')
+    assert len(cols) == len(widths_pt), 'column count mismatch'
+    for col, w in zip(cols, widths_pt):
+        col.set('w', str(int(w * EMU_IN / 72)))
+
+
 def shapes_by_name(tree):
     out = {}
     for sp in tree.getroot().iter():
@@ -527,18 +631,15 @@ def replace_picture(work, slide_name, tree, png, new_media=None):
         target = os.path.basename(rel.get('Target'))
     shutil.copy(png, os.path.join(work, 'ppt', 'media', target))
 
-    # refit: keep the original box, preserve the new aspect ratio, centre it
+    # Place at 1:1.  talk_figs.py draws each figure at exactly the size it is
+    # to occupy, so any rescaling here would silently take the 18 pt labels
+    # below the floor.  Only the left edge and the top are honoured.
     xfrm = pic.find(f'{{{P}}}spPr/{{{A}}}xfrm')
     off, ext = xfrm.find(f'{{{A}}}off'), xfrm.find(f'{{{A}}}ext')
-    x, y = int(off.get('x')), int(off.get('y'))
-    bw, bh = int(ext.get('cx')), int(ext.get('cy'))
     iw, ih = Image.open(png).size
-    scale = min(bw / iw, bh / ih)
-    nw, nh = int(iw * scale), int(ih * scale)
-    off.set('x', str(x + (bw - nw) // 2))
-    off.set('y', str(y + (bh - nh) // 2))
-    ext.set('cx', str(nw))
-    ext.set('cy', str(nh))
+    ext.set('cx', str(int(iw / FIG_DPI * EMU_IN)))
+    ext.set('cy', str(int(ih / FIG_DPI * EMU_IN)))
+    off.set('x', str(int(0.45 * EMU_IN)))
 
     descr = pic.find(f'.//{{{P}}}cNvPr')
     descr.set('descr', os.path.basename(png))
@@ -577,6 +678,13 @@ def main(src=DEFAULT_SRC, out=OUT):
         tree = load(path)
         shapes = shapes_by_name(tree)
 
+        for (sp_pos, sp_name), geo in GEOMETRY.items():
+            if sp_pos == pos:
+                set_geometry(shapes[sp_name], **geo)
+        for (sp_pos, sp_name), widths in GRIDS.items():
+            if sp_pos == pos:
+                set_grid(shapes[sp_name], widths)
+
         if pos in TITLES:
             set_text(shapes['Title 1'], [TITLES[pos]])
         for (sp_pos, sp_name), paras in BODY.items():
@@ -591,6 +699,9 @@ def main(src=DEFAULT_SRC, out=OUT):
             replace_picture(work, name, tree, fig,
                             new_media='image23.png' if pos == 8 else None)
         save(tree, path)
+        raised = raise_font_sizes(path)
+        if raised:
+            print(f'  raised {raised} pt -> {MIN_SZ // 100} pt')
 
         if notes and pos in NOTES:
             np_ = os.path.join(work, 'ppt', 'notesSlides', notes)

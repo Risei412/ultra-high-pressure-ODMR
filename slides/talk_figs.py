@@ -10,6 +10,11 @@ minute; a talk figure is read in ten seconds from the back of a room.  So each
 one carries a single message, has Japanese annotation baked in, and uses large
 type and few elements.
 
+Every figure is drawn at exactly the size it occupies on the slide
+(FIGW inches wide), with no tight-bbox trim, so a label set at 18 pt here is
+18 pt when projected.  Anything that does not survive at that size has been
+cut rather than shrunk.
+
 Run:
     python talk_figs.py            # all figures, 120 GPa
     python talk_figs.py 4 7        # only the figures for slides 4 and 7
@@ -45,9 +50,11 @@ DARK   = '#2b3038'
 BAND   = '#c9d2e6'
 
 JP = ['IPAGothic', 'IPAPGothic', 'DejaVu Sans']
+BASE = 18.0                 # the floor: nothing on a slide may be smaller
+FIGW = 7.70                 # inches; the width of the picture box in the deck
 rcParams.update({
     'font.family': JP,
-    'font.size': 19,
+    'font.size': BASE,
     'axes.linewidth': 1.3,
     'axes.edgecolor': DARK,
     'axes.labelcolor': DARK,
@@ -57,8 +64,6 @@ rcParams.update({
     'mathtext.fontset': 'dejavusans',
     'figure.facecolor': 'white',
     'savefig.facecolor': 'white',
-    'savefig.bbox': 'tight',
-    'savefig.pad_inches': 0.06,
 })
 
 P0 = 120.0
@@ -77,6 +82,8 @@ def _frame(ax):
 def _save(fig, name):
     os.makedirs(OUT, exist_ok=True)
     path = os.path.join(OUT, name)
+    # no bbox='tight': the figure must keep the exact size it was created at,
+    # otherwise the deck rescales it and the point sizes stop being 18
     fig.savefig(path, dpi=DPI)
     plt.close(fig)
     print('wrote', path)
@@ -98,7 +105,7 @@ def fig4_absorption():
     pk0 = lam[s0.argmax()]
     pk120 = lam[s120.argmax()]
 
-    fig, ax = plt.subplots(figsize=(11.2, 6.1))
+    fig, ax = plt.subplots(figsize=(FIGW, 4.30), layout='constrained')
     _frame(ax)
 
     ax.fill_between(lam, 0, s0, color=GREY, alpha=0.20, lw=0)
@@ -113,35 +120,32 @@ def fig4_absorption():
     # the hard blue wall
     ax.axvspan(380, ip120, color=PURPLE, alpha=0.10, lw=0)
     ax.axvline(ip120, color=PURPLE, lw=2.6)
-    ax.text(ip120 + 7, top * 0.55, 'これより青は\nNV$^-$ を直接壊す', color=PURPLE,
-            ha='left', va='center', fontsize=17, linespacing=1.3)
-
-    # the two commercial lines
-    for x, c, lab in ((473.0, NAVY, '473 nm'), (532.0, GREY, '532 nm')):
+    # the two commercial lines, labelled at the foot so the curves stay clear
+    for x, c, lab in ((473.0, NAVY, '473'), (532.0, GREY, '532')):
         ax.axvline(x, color=c, lw=2.0, ls=(0, (5, 4)))
-        ax.text(x + 3, top * 0.995, lab, color=c, ha='left', va='top', fontsize=18)
+        ax.text(x + 3, top * 0.02, lab, color=c, ha='left', va='bottom',
+                fontsize=BASE)
 
-    # arrow 1: the absorption maximum walks blue
-    y1 = top * 0.80
-    ax.annotate('', xy=(pk120, y1), xytext=(pk0, y1),
-                arrowprops=dict(arrowstyle='-|>,head_width=0.32,head_length=0.7',
-                                color=NAVY, lw=2.6, shrinkA=0, shrinkB=0))
-    ax.text((pk0 + pk120) / 2, y1 + top * 0.022,
-            f'吸収極大  {pk0:.0f} → {pk120:.0f} nm',
-            color=NAVY, ha='center', va='bottom', fontsize=19)
-
-    # arrow 2: the ionisation edge walks blue too
-    y2 = top * 0.135
-    ax.annotate('', xy=(ip120, y2), xytext=(ip0, y2),
-                arrowprops=dict(arrowstyle='-|>,head_width=0.32,head_length=0.7',
-                                color=PURPLE, lw=2.6, shrinkA=0, shrinkB=0))
-    ax.text(ip0 + 6, y2, f'イオン化端  {ip0:.0f} → {ip120:.0f} nm',
-            color=PURPLE, ha='left', va='center', fontsize=19)
+    # the two arrows carry the message; both labels sit in one clear block
+    # above the 120 GPa curve rather than on top of it
+    y1, y2 = top * 0.72, top * 0.115
+    for xy, xytext, colour in (((pk120, y1), (pk0, y1), NAVY),
+                               ((ip120, y2), (ip0, y2), PURPLE)):
+        ax.annotate('', xy=xy, xytext=xytext,
+                    arrowprops=dict(
+                        arrowstyle='-|>,head_width=0.32,head_length=0.7',
+                        color=colour, lw=2.6, shrinkA=0, shrinkB=0))
+    box = dict(boxstyle='square,pad=0.12', fc='white', ec='none')
+    ax.text(384, top * 0.99, f'吸収極大 {pk0:.0f} → {pk120:.0f} nm',
+            color=NAVY, ha='left', va='top', fontsize=BASE, bbox=box)
+    ax.text(384, top * 0.88, f'イオン化端 {ip0:.0f} → {ip120:.0f} nm',
+            color=PURPLE, ha='left', va='top', fontsize=BASE,
+            bbox=dict(boxstyle='square,pad=0.12', fc='white', ec='none'))
 
     ax.set_xlabel('励起波長  $\\lambda$  (nm)')
-    ax.set_ylabel('吸収断面積  $\\sigma_{\\mathrm{abs}}$\n(常圧 532 nm = 1)')
-    ax.legend(loc='upper right', frameon=False, fontsize=19,
-              bbox_to_anchor=(1.0, 0.94))
+    ax.set_ylabel('$\\sigma_{\\mathrm{abs}}$  (常圧 532 nm = 1)')
+    ax.legend(loc='upper right', frameon=False, fontsize=BASE,
+              bbox_to_anchor=(1.0, 0.72))
     return _save(fig, 'fig4_absorption.png')
 
 
@@ -153,13 +157,13 @@ def fig4_absorption():
 TORNADO = [
     ('$\\hbar\\omega$  有効フォノン  ±15%',
      dict(hw=0.065 * 0.85), dict(hw=0.065 * 1.15), True),
-    ('$\\Delta E_{\\mathrm{ZPL}}$(120 GPa)  ±20 meV',
+    ('$\\Delta E_{\\mathrm{ZPL}}$(120)  ±20 meV',
      dict(dE120=0.380), dict(dE120=0.420), True),
-    ('$S_{\\mathrm{abs}}$ slope  ±15%',
+    ('$S_{\\mathrm{abs}}$ 勾配  ±15%',
      dict(S_slope=(4.61 - 3.08) * 0.85), dict(S_slope=(4.61 - 3.08) * 1.15), True),
     ('$\\sigma_{\\mathrm{ZPL}}$  0.7–1.4×',
      dict(zpl_width=0.015 * 0.7), dict(zpl_width=0.015 * 1.4), False),
-    ('d$E_{\\mathrm{ZPL}}$/d$P|_0$  ±0.25 meV/GPa',
+    ('d$E_{\\mathrm{ZPL}}$/d$P|_0$  ±0.25',
      dict(slope0=5.50e-3), dict(slope0=6.00e-3), False),
     ('$a_{\\mathrm{gs}}$  ±50%',
      dict(a_gs=3.0), dict(a_gs=9.0), False),
@@ -192,7 +196,7 @@ def _tornado_rows():
 def fig5_tornado():
     ref, rows = _tornado_rows()
     n = len(rows)
-    fig, ax = plt.subplots(figsize=(12.6, 6.6))
+    fig, ax = plt.subplots(figsize=(FIGW, 4.45), layout='constrained')
 
     ys = np.arange(n)[::-1]
     span = max(max(abs(r[1]), abs(r[2])) for r in rows)
@@ -205,30 +209,30 @@ def fig5_tornado():
         ax.barh(y, neg, color=col, height=0.62, zorder=2)
         ax.barh(y, pos, color=col, height=0.62, zorder=2)
         ax.text(pos + 0.30, y, f'±{max(abs(neg), abs(pos)):.1f} nm',
-                va='center', ha='left', color=col, fontsize=19)
+                va='center', ha='left', color=col, fontsize=BASE)
 
     n_optical = sum(1 for r in rows if r[3])
     ax.axhline(ys[n_optical - 1] - 0.5, color='#c8cede', lw=1.4)
     ax.axvline(0, color=DARK, lw=2.0, zorder=4)
 
     ax.set_yticks(ys)
-    ax.set_yticklabels([r[0] for r in rows], fontsize=18)
+    ax.set_yticklabels([r[0] for r in rows], fontsize=BASE)
     ax.set_ylim(-0.8, n - 0.2)
-    ax.set_xlabel(f'120 GPa における $\\lambda_{{\\mathrm{{opt}}}}$ の変化  (nm)'
-                  f'    [基準 {ref:.1f} nm]')
+    ax.set_xlabel(f'$\\lambda_{{\\mathrm{{opt}}}}$ の変化 (nm)   '
+                  f'[基準 {ref:.1f} nm]')
     for side in ('top', 'right', 'left'):
         ax.spines[side].set_visible(False)
     ax.grid(True, axis='x', color='#e8ebf2', lw=1.0)
     ax.set_axisbelow(True)
-    ax.set_xlim(-span - 1.0, span + 3.6)
+    ax.set_xlim(-span - 1.0, span + 5.5)
 
     ax.text(span * 0.30, ys[n_optical] - 0.7, 'すべて 0.00 nm',
-            color=GREY, fontsize=20, va='center')
+            color=GREY, fontsize=BASE, va='center')
     handles = [plt.Rectangle((0, 0), 1, 1, color=NAVY),
                plt.Rectangle((0, 0), 1, 1, color=GREY)]
-    ax.legend(handles, ['光学入力 — 答えを動かす', '現象論定数 — 動かさない'],
+    ax.legend(handles, ['光学入力', '現象論定数'],
               loc='lower right', frameon=True, framealpha=1.0,
-              edgecolor='#dde2ec', fontsize=18)
+              edgecolor='#dde2ec', fontsize=BASE)
     return _save(fig, 'fig5_tornado.png')
 
 
@@ -257,7 +261,7 @@ def fig6_window(n_mc=200):
     opts = np.array([default_randomiser(rng).lambda_opt(P0) for _ in range(n_mc)])
     q16, q84 = np.percentile(opts, [16, 84])
 
-    fig, ax = plt.subplots(figsize=(11.6, 6.2))
+    fig, ax = plt.subplots(figsize=(FIGW, 4.30), layout='constrained')
     _frame(ax)
     ax.set_ylim(0.9, 4.2)
     ax.set_xlim(400, 560)
@@ -269,12 +273,12 @@ def fig6_window(n_mc=200):
 
     # the MC interval of the optimum itself: stated, not drawn on the crowded floor
     ax.text(494, 4.05,
-            f'$\\lambda_{{\\mathrm{{opt}}}}$ = {lopt:.1f} nm\n'
-            f'MC 16–84%: $^{{+{q84 - lopt:.1f}}}_{{-{lopt - q16:.1f}}}$ nm',
-            color=PURPLE, ha='left', va='top', fontsize=18, linespacing=1.5)
+            f'$\\lambda_{{\\mathrm{{opt}}}}$ = {lopt:.1f}\n'
+            f'MC $^{{+{q84 - lopt:.1f}}}_{{-{lopt - q16:.1f}}}$ nm',
+            color=PURPLE, ha='left', va='top', fontsize=BASE, linespacing=1.5)
 
     ax.text((lo_w + hi_w) / 2, 4.12, f'5% 許容窓\n{lo_w:.0f}–{hi_w:.0f} nm',
-            color=NAVY, ha='center', va='top', fontsize=19, linespacing=1.2)
+            color=NAVY, ha='center', va='top', fontsize=BASE, linespacing=1.2)
 
     for x, lab, xt, yt, ha in ((405.0, '405 nm', 410, 3.55, 'left'),
                                (532.0, '532 nm', 528, 2.95, 'right')):
@@ -282,18 +286,18 @@ def fig6_window(n_mc=200):
         ax.plot([x], [y], marker='o', ms=11, color=GREY, zorder=5)
         ax.axvline(x, color=GREY, lw=1.6, ls=(0, (5, 4)))
         ax.text(xt, yt, f'{lab}\n×{y:.1f}', color=GREY,
-                ha=ha, va='center', fontsize=19, linespacing=1.2)
+                ha=ha, va='center', fontsize=BASE, linespacing=1.2)
 
     y473 = float(np.asarray(m.eta_lambda(473.0, P0)[0])) / eopt
     ax.plot([473.0], [y473], marker='o', ms=13, color=PURPLE, zorder=6)
-    ax.annotate(f'473 nm DPSS\n最適の {100 * (y473 - 1):.1f}% 落ち',
+    ax.annotate(f'473 nm\n{100 * (y473 - 1):.1f}% 落ち',
                 xy=(473.0, y473), xytext=(414, 1.62),
-                color=PURPLE, fontsize=19, ha='left', linespacing=1.2,
+                color=PURPLE, fontsize=BASE, ha='left', linespacing=1.2,
                 arrowprops=dict(arrowstyle='-', color=PURPLE, lw=1.8,
                                 shrinkA=2, shrinkB=6))
 
     ax.set_xlabel('励起波長  $\\lambda$  (nm)')
-    ax.set_ylabel('ロックイン感度  $\\eta/\\eta_{\\mathrm{opt}}$\n(小さいほど良い)')
+    ax.set_ylabel('$\\eta/\\eta_{\\mathrm{opt}}$  (小さいほど良い)')
     return _save(fig, 'fig6_window.png')
 
 
@@ -315,7 +319,7 @@ def fig7_crossover(n_mc=120):
                          lambda mm: np.array([_ratio(mm, p) for p in P]),
                          n=n_mc, seed=5)
 
-    fig, ax = plt.subplots(figsize=(11.6, 6.2))
+    fig, ax = plt.subplots(figsize=(FIGW, 4.30), layout='constrained')
     _frame(ax)
     ax.set_yscale('log')
     ax.set_xlim(15, 150)
@@ -325,34 +329,40 @@ def fig7_crossover(n_mc=120):
     ax.fill_between(P, lo_b, hi_b, color=NAVY, alpha=0.13, lw=0)
     ax.plot(P, r, color=NAVY, lw=4.2, zorder=3)
     ax.axhline(1.0, color=DARK, lw=1.8)
+    # the shaded half is where the recommendation reverses; say so in words,
+    # since the axis label no longer has room for the parenthetical
+    ax.text(149, 1.15, '青が有利', color=NAVY, ha='right', va='bottom',
+            fontsize=BASE)
+    ax.text(149, 0.27, '緑が有利', color=GREY, ha='right', va='bottom',
+            fontsize=BASE)
 
     ax.axvline(xover, color=PURPLE, lw=2.0, ls=':')
     ax.plot([xover], [1.0], marker='o', ms=13, color=PURPLE, zorder=5)
     ax.annotate(f'符号が変わる  {xover:.0f} GPa',
                 xy=(xover, 1.0), xytext=(xover + 9, 0.42),
-                color=PURPLE, fontsize=20, ha='left',
+                color=PURPLE, fontsize=BASE, ha='left',
                 arrowprops=dict(arrowstyle='-|>,head_width=0.28,head_length=0.6',
                                 color=PURPLE, lw=1.8))
 
     r50 = _ratio(m, 50.0)
     ax.plot([50.0], [r50], marker='s', ms=13, color=GREY, zorder=5)
-    ax.annotate(f'50 GPa 実測: 優位なし [Bha22]\nモデルは {r50:.2f} — 緑が有利',
+    ax.annotate(f'50 GPa 実測: 優位なし\nモデルは {r50:.2f}',
                 xy=(50.0, r50), xytext=(20, 2.3),
-                color=GREY, fontsize=19, ha='left', linespacing=1.25,
+                color=GREY, fontsize=BASE, ha='left', linespacing=1.25,
                 bbox=dict(boxstyle='square,pad=0.15', fc='white', ec='none'),
                 arrowprops=dict(arrowstyle='-|>,head_width=0.28,head_length=0.6',
                                 color=GREY, lw=1.8))
 
     r120 = _ratio(m, 120.0)
     ax.plot([120.0], [r120], marker='o', ms=13, color=NAVY, zorder=5)
-    ax.text(117.0, r120 * 1.16, f'120 GPa  ×{r120:.1f}', color=NAVY,
-            ha='right', va='bottom', fontsize=20)
+    ax.text(117.0, r120 * 1.16, f'120 GPa ×{r120:.1f}', color=NAVY,
+            ha='right', va='bottom', fontsize=BASE)
 
     ax.set_yticks([0.25, 0.5, 1, 2, 4])
     ax.set_yticklabels(['0.25', '0.5', '1', '2', '4'])
     ax.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
     ax.set_xlabel('圧力  $P$  (GPa)')
-    ax.set_ylabel('$\\eta$(532 nm) / $\\eta$(473 nm)\n(>1 なら青が有利)')
+    ax.set_ylabel('$\\eta$(532) / $\\eta$(473)')
     return _save(fig, 'fig7_crossover.png')
 
 
@@ -371,7 +381,7 @@ def fig8_power(n_mc=60):
     lo_r = ridge(m)
     lo_b, hi_b = mc_band(default_randomiser_power, ridge, n=n_mc, seed=11)
 
-    fig, ax = plt.subplots(figsize=(11.6, 6.2))
+    fig, ax = plt.subplots(figsize=(FIGW, 4.30), layout='constrained')
     _frame(ax)
     ax.set_xscale('log')
     ax.set_xlim(u[0], u[-1])
@@ -379,22 +389,22 @@ def fig8_power(n_mc=60):
 
     # the regime in which the fixed-power recommendation is the answer
     ax.axvspan(u[0], 0.1, color=BAND, alpha=0.5, lw=0)
-    ax.text(np.sqrt(u[0] * 0.1), 494, '低励起  $u \\lesssim 0.1$\n473 nm が最適',
-            color=NAVY, ha='center', va='top', fontsize=19, linespacing=1.25)
+    ax.text(np.sqrt(u[0] * 0.1), 496, '低励起 $u \\lesssim 0.1$\n473 nm が最適',
+            color=NAVY, ha='center', va='top', fontsize=BASE, linespacing=1.25)
 
     ax.fill_between(u, lo_b, hi_b, color=PURPLE, alpha=0.16, lw=0)
     ax.plot(u, lo_r, color=PURPLE, lw=4.2, zorder=3)
 
     ax.axhline(473.0, color=NAVY, lw=2.0, ls=(0, (5, 4)))
-    ax.text(u[-1], 475, '473 nm', color=NAVY, ha='right', va='bottom', fontsize=19)
+    ax.text(u[-1], 475, '473 nm', color=NAVY, ha='right', va='bottom', fontsize=BASE)
     ax.axhline(405.2, color=DARK, lw=2.0, ls=':')
-    ax.text(u[0] * 1.15, 406.5, 'イオン化端 405 nm — 稜線はここで止まる',
-            color=DARK, ha='left', va='bottom', fontsize=18)
+    ax.text(u[0] * 1.15, 406.5, 'イオン化端 405 nm で止まる',
+            color=DARK, ha='left', va='bottom', fontsize=BASE)
 
     # where the existing high-pressure literature sits
     ax.axvspan(0.1, 0.3, color='#f2dede', alpha=0.6, lw=0)
-    ax.text(np.sqrt(0.1 * 0.3), 494, '既存実験は\nこの範囲 [Dai22]',
-            color='#a03b3b', ha='center', va='top', fontsize=18, linespacing=1.25)
+    ax.text(np.sqrt(0.1 * 0.3), 496, '既存実験は\nここ [Dai22]',
+            color='#a03b3b', ha='center', va='top', fontsize=BASE, linespacing=1.25)
 
     mp = NVModelPower()
     anno = {0.1: (0.092, 461, 'right'), 0.3: (0.27, 436, 'right')}
@@ -405,13 +415,13 @@ def fig8_power(n_mc=60):
                / float(np.nanmin(e)))
         xt, yt, ha = anno[uu]
         ax.plot([uu], [best], marker='o', ms=11, color=PURPLE, zorder=5)
-        ax.text(xt, yt, f'$u$={uu}: {best:.0f} nm\n473 固定は ×{pen:.2f}',
-                color=PURPLE, ha=ha, va='top', fontsize=18, linespacing=1.25)
+        ax.text(xt, yt, f'$u$={uu}: {best:.0f} nm\n473 固定 ×{pen:.2f}',
+                color=PURPLE, ha=ha, va='top', fontsize=BASE, linespacing=1.25)
 
-    ax.set_xlabel('規格化強度  $u = I/I_{1/2}$   ($u$=1 で NV$^-$ 遷移が半飽和)')
+    ax.set_xlabel('規格化強度  $u = I/I_{1/2}$')
     ax.set_ylabel('最適励起波長  (nm)')
-    ax.set_title('未校正 — 向きは全ドローで一致、量は校正前のシナリオ',
-                 fontsize=19, color='#a03b3b', pad=12)
+    ax.set_title('未校正 — 向きは頑健、量はシナリオ',
+                 fontsize=BASE, color='#a03b3b', pad=10)
     return _save(fig, 'fig8_power.png')
 
 

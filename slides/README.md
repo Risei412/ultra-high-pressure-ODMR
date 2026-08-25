@@ -29,6 +29,22 @@ Because the Monte Carlo band now spans about half the tolerance window, the
 claim is stated as a window with the commercial 473 nm line inside it, which is
 what `paper/main.tex` says as well.
 
+## Type size
+
+Nothing on a slide is below 18 pt. `build_talk_deck.py` enforces the floor on
+the deck (`raise_font_sizes`, which also covers table cells and end-paragraph
+properties), and `talk_figs.py` enforces it on the figures by drawing each one
+at exactly the size it occupies on the slide -- 7.70 in wide -- so an 18 pt
+label in matplotlib is 18 pt when projected. `replace_picture` places the PNGs
+1:1 for the same reason; rescaling them would quietly break the floor.
+
+Raising 9 pt citations and 14-17 pt body text to 18 pt costs room, so the text
+was cut to fit: shorter figure annotations, tighter phrasing, and the citation
+strips moved up out of the bottom margin. No claim was dropped -- the
+qualifiers that carry one (`micropillar は前提条件`, `1 件は OPEN と申告`,
+the 50 GPa caveat on the ambient absorption curve, the power penalty in the
+conditions table) are all still there.
+
 ## Structure
 
 | # | slide | figure |
