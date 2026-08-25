@@ -41,15 +41,25 @@ label in matplotlib is 18 pt when projected. `replace_picture` places the PNGs
 Citations are the one exemption, at 12 pt: nobody reads a reference list from
 the back of a room, and dropping them frees the foot of the slide.
 
+## Colour
+
+Three values, nothing else: Institute of Science Tokyo navy `1C3177` for all
+text, white `FFFFFF` where the foot band and the table header reverse it, and
+grey `6E7488` on the citation strip, which is not meant to compete. The figures
+follow the same rule -- navy for what the slide is about, one neutral grey for
+the option being argued against, and no third colour.
+
 ## Where text goes
 
 On a figure slide the right-hand column had been narrating the plot. It now
-carries only what the figure cannot show; the fact the figure establishes is
+carries only what the figure cannot show, in 50-90 Japanese characters; the
+fact the figure establishes is
 **one sentence** across the foot (`BOTTOM`) at 20 pt, with the citation at
 12 pt beneath it. One sentence is the rule, not a target: anything the sentence
 does not need in order to carry the claim -- a legend gloss, a value already
 labelled on the plot, a definition the axis already gives -- comes out of the
-foot and, if it is worth keeping at all, goes into the 12 pt line. Raising the body to 18 pt costs room, so phrasing was
+foot. The grey strip is references and nothing else -- annotations that used
+to hide there are said out loud instead. Raising the body to 18 pt costs room, so phrasing was
 tightened throughout -- but no claim was dropped. The qualifiers that carry one
 (`micropillar は前提条件`, `1 件は OPEN と申告`, the 50 GPa caveat on the
 ambient absorption curve, the power penalty in the conditions table) are all

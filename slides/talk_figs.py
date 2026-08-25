@@ -43,8 +43,11 @@ from nv_model_power import (NVModelPower, default_randomiser_power)  # noqa: E40
 # --------------------------------------------------------------------------
 # house style
 # --------------------------------------------------------------------------
-NAVY   = '#1e3a6e'
-PURPLE = '#6b2d91'
+# Institute of Science Tokyo navy, and nothing else that carries meaning.
+# A second colour is spent only where two things must be told apart, and then
+# it is the neutral grey that always means "the other option".
+NAVY   = '#1c3177'
+PURPLE = NAVY            # the highlight is the same colour, set in bold
 GREY   = '#8a94a6'
 DARK   = '#2b3038'
 BAND   = '#c9d2e6'
@@ -226,8 +229,6 @@ def fig5_tornado():
     ax.set_axisbelow(True)
     ax.set_xlim(-span - 1.0, span + 5.5)
 
-    ax.text(span * 0.30, ys[n_optical] - 0.7, 'すべて 0.00 nm',
-            color=GREY, fontsize=BASE, va='center')
     handles = [plt.Rectangle((0, 0), 1, 1, color=NAVY),
                plt.Rectangle((0, 0), 1, 1, color=GREY)]
     ax.legend(handles, ['光学入力', '現象論定数'],
@@ -263,7 +264,7 @@ def fig6_window(n_mc=200):
 
     fig, ax = plt.subplots(figsize=(FIGW, 4.30), layout='constrained')
     _frame(ax)
-    ax.set_ylim(0.9, 4.2)
+    ax.set_ylim(0.95, 4.2)
     ax.set_xlim(400, 560)
 
     ax.axvspan(lo_w, hi_w, color=BAND, alpha=0.55, lw=0)
@@ -277,24 +278,22 @@ def fig6_window(n_mc=200):
             f'MC $^{{+{q84 - lopt:.1f}}}_{{-{lopt - q16:.1f}}}$ nm',
             color=PURPLE, ha='left', va='top', fontsize=BASE, linespacing=1.5)
 
-    ax.text((lo_w + hi_w) / 2, 4.12, f'5% 許容窓\n{lo_w:.0f}–{hi_w:.0f} nm',
-            color=NAVY, ha='center', va='top', fontsize=BASE, linespacing=1.2)
+    ax.text((lo_w + hi_w) / 2, 4.12, '5% 許容窓',
+            color=NAVY, ha='center', va='top', fontsize=BASE)
 
     for x, lab, xt, yt, ha in ((405.0, '405 nm', 410, 3.55, 'left'),
                                (532.0, '532 nm', 528, 2.95, 'right')):
         y = float(np.asarray(m.eta_lambda(x, P0)[0])) / eopt
         ax.plot([x], [y], marker='o', ms=11, color=GREY, zorder=5)
         ax.axvline(x, color=GREY, lw=1.6, ls=(0, (5, 4)))
-        ax.text(xt, yt, f'{lab}\n×{y:.1f}', color=GREY,
-                ha=ha, va='center', fontsize=BASE, linespacing=1.2)
+        ax.text(xt, yt, lab, color=GREY, ha=ha, va='center', fontsize=BASE)
 
     y473 = float(np.asarray(m.eta_lambda(473.0, P0)[0])) / eopt
-    ax.plot([473.0], [y473], marker='o', ms=13, color=PURPLE, zorder=6)
-    ax.annotate(f'473 nm\n{100 * (y473 - 1):.1f}% 落ち',
-                xy=(473.0, y473), xytext=(414, 1.62),
-                color=PURPLE, fontsize=BASE, ha='left', linespacing=1.2,
-                arrowprops=dict(arrowstyle='-', color=PURPLE, lw=1.8,
-                                shrinkA=2, shrinkB=6))
+    ax.plot([473.0], [y473], marker='o', ms=13, color=NAVY, zorder=6)
+    ax.annotate('473 nm', xy=(473.0, y473), xytext=(452, 1.30),
+                color=NAVY, ha='right', va='center', fontsize=BASE,
+                arrowprops=dict(arrowstyle='-', color=NAVY, lw=1.6,
+                                shrinkA=3, shrinkB=8))
 
     ax.set_xlabel('励起波長  $\\lambda$  (nm)')
     ax.set_ylabel('$\\eta/\\eta_{\\mathrm{opt}}$  (小さいほど良い)')
@@ -353,10 +352,6 @@ def fig7_crossover(n_mc=120):
                 arrowprops=dict(arrowstyle='-|>,head_width=0.28,head_length=0.6',
                                 color=GREY, lw=1.8))
 
-    r120 = _ratio(m, 120.0)
-    ax.plot([120.0], [r120], marker='o', ms=13, color=NAVY, zorder=5)
-    ax.text(117.0, r120 * 1.16, f'120 GPa ×{r120:.1f}', color=NAVY,
-            ha='right', va='bottom', fontsize=BASE)
 
     ax.set_yticks([0.25, 0.5, 1, 2, 4])
     ax.set_yticklabels(['0.25', '0.5', '1', '2', '4'])
@@ -387,41 +382,29 @@ def fig8_power(n_mc=60):
     ax.set_xlim(u[0], u[-1])
     ax.set_ylim(398, 500)
 
-    # the regime in which the fixed-power recommendation is the answer
-    ax.axvspan(u[0], 0.1, color=BAND, alpha=0.5, lw=0)
-    ax.text(np.sqrt(u[0] * 0.1), 496, '低励起 $u \\lesssim 0.1$\n473 nm が最適',
-            color=NAVY, ha='center', va='top', fontsize=BASE, linespacing=1.25)
-
     ax.fill_between(u, lo_b, hi_b, color=PURPLE, alpha=0.16, lw=0)
     ax.plot(u, lo_r, color=PURPLE, lw=4.2, zorder=3)
 
-    ax.axhline(473.0, color=NAVY, lw=2.0, ls=(0, (5, 4)))
-    ax.text(u[-1], 475, '473 nm', color=NAVY, ha='right', va='bottom', fontsize=BASE)
+    ax.axhline(473.0, color=GREY, lw=2.0, ls=(0, (5, 4)))
+    ax.text(u[-1], 475, '473 nm', color=GREY, ha='right', va='bottom',
+            fontsize=BASE)
     ax.axhline(405.2, color=DARK, lw=2.0, ls=':')
     ax.text(u[0] * 1.15, 406.5, 'イオン化端 405 nm で止まる',
             color=DARK, ha='left', va='bottom', fontsize=BASE)
 
     # where the existing high-pressure literature sits
-    ax.axvspan(0.1, 0.3, color='#f2dede', alpha=0.6, lw=0)
-    ax.text(np.sqrt(0.1 * 0.3), 496, '既存実験は\nここ [Dai22]',
-            color='#a03b3b', ha='center', va='top', fontsize=BASE, linespacing=1.25)
+    ax.axvspan(0.1, 0.3, color=NAVY, alpha=0.13, lw=0)
+    ax.text(np.sqrt(0.1 * 0.3), 497, '既存実験はここ', color=NAVY,
+            ha='center', va='top', fontsize=BASE)
 
+    # the marker alone: the foot sentence of the slide carries the number
     mp = NVModelPower()
-    anno = {0.1: (0.092, 461, 'right'), 0.3: (0.27, 436, 'right')}
-    for uu in (0.1, 0.3):
-        e = np.asarray(mp.eta_lambda_u(lam, P0, uu)[0])
-        best = lam[int(np.nanargmin(e))]
-        pen = (float(np.asarray(mp.eta_lambda_u(473.0, P0, uu)[0]))
-               / float(np.nanmin(e)))
-        xt, yt, ha = anno[uu]
-        ax.plot([uu], [best], marker='o', ms=11, color=PURPLE, zorder=5)
-        ax.text(xt, yt, f'$u$={uu}: {best:.0f} nm\n473 固定 ×{pen:.2f}',
-                color=PURPLE, ha=ha, va='top', fontsize=BASE, linespacing=1.25)
+    e = np.asarray(mp.eta_lambda_u(lam, P0, 0.3)[0])
+    ax.plot([0.3], [lam[int(np.nanargmin(e))]], marker='o', ms=11,
+            color=NAVY, zorder=5)
 
     ax.set_xlabel('規格化強度  $u = I/I_{1/2}$')
     ax.set_ylabel('最適励起波長  (nm)')
-    ax.set_title('未校正 — 向きは頑健、量はシナリオ',
-                 fontsize=BASE, color='#a03b3b', pad=10)
     return _save(fig, 'fig8_power.png')
 
 

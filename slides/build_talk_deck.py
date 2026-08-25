@@ -58,7 +58,10 @@ PKG = 'http://schemas.openxmlformats.org/package/2006/relationships'
 CT = 'http://schemas.openxmlformats.org/package/2006/content-types'
 NS = {'a': A, 'p': P, 'r': R}
 
-ACCENT = '1C3177'          # the deck's navy, used for the one line that matters
+ACCENT = '1C3177'          # Institute of Science Tokyo navy: the text colour
+BODY_CLR = ACCENT          # body copy is the institutional navy, not near-black
+REVERSED = 'FFFFFF'        # the foot sentence is white on a navy band
+REF_CLR = '6E7488'         # the citation strip stays grey and stays quiet
 MIN_SZ = 1800              # nothing on a projected slide may be under 18 pt
 REF_SZ = 1200              # except the citation strips, which nobody reads live
 EMU_IN = 914400
@@ -90,76 +93,63 @@ BODY = {
         '緑 532 nm 比で感度 ×2.5、磁気マップ取得時間 ×6',
     ],
     (2, 'TextBox 7'): [
-        '図: Bhattacharyya, PhD thesis, UC Berkeley (2022) Fig. 2.2。'
-        'データ: Drozdov, Nature 525, 73 (2015) / 569, 528 (2019); '
-        'Salke, Nat. Commun. 10, 4453 (2019); Bi, ibid. 13, 5952 (2022)。',
+        'Bhattacharyya, PhD thesis (2022) Fig. 2.2; '
+        'Drozdov, Nature 525, 73 (2015); 569, 528 (2019); '
+        'Salke, Nat. Commun. 10, 4453 (2019); Bi, ibid. 13, 5952 (2022).',
     ],
     (3, 'TextBox 4'): [
-        '先行研究の実測。(左) NV はキュレット表面の 50 nm 下に注入され、'
-        '試料から µm の距離で同じ圧力を経験する。'
-        '(中央・右) CeH₉ 上で B/H が 0.67 まで落ちる = 局所の磁束排除、'
-        'しかも ~10 µm で不均一。',
+        'キュレット面の 50 nm 下の NV が、CeH₉ 上で **B/H = 0.67** の'
+        '局所磁束排除を ~10 µm の不均一まで捉えている。',
     ],
     (3, 'TextBox 8'): [
-        '図: Bhattacharyya, PhD thesis (2022) Fig. 7.2, 7.8; '
-        '同グループの成果は Nature 627, 73 (2024)。'
-        'η の定義は Barry et al., RMP 92, 015004 (2020)。',
+        'Bhattacharyya, PhD thesis (2022) Fig. 7.2, 7.8; '
+        'Bhattacharyya et al., Nature 627, 73 (2024); '
+        'Barry et al., Rev. Mod. Phys. 92, 015004 (2020).',
     ],
     (4, 'TextBox 3'): [
-        'ZPL が **+0.40 eV** 青方偏移し、Huang–Rhys 因子が 3.08 → 4.61 に増える。',
-        'IP(³A₂) は 2.68 → **3.06 eV = 405 nm**。'
-        'これより青は NV⁻ を直接 NV⁰ に変える。',
-        'η ∝ Δν/(C√R) は C に線形、光子レートに √ で効く。'
-        '釣り合いの位置は量的問題である。',
+        'ZPL が **+0.40 eV** 青方偏移し、'
+        'Huang–Rhys 因子が 3.08 → 4.61 に増える。',
+        'IP(³A₂) は **3.06 eV = 405 nm**。'
+        'これより青は NV⁻ を NV⁰ に変える。',
+        'η ∝ Δν/(C√R)。C に線形、光子レートに √。',
     ],
     (4, 'TextBox 4'): [
-        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026) — DFT + DAC。'
-        '灰色の常圧曲線は単一有効フォノン近似（50 GPa 以下では粗い）。',
+        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026).',
     ],
     (5, 'TextBox 3'): [
-        '励起状態イオン化と再結合はどちらも σ_{abs} に比例し、'
-        'f₋ から相殺する。f₋ は窓の中で **0.2% しか動かない**。',
-        '最大の ±6.9 nm は他人の測定値ではなく、'
+        'イオン化と再結合はどちらも σ_{abs} に比例し、f₋ から相殺する。'
+        'f₋ は窓の中で **0.2% しか動かない**。',
+        '最大の ±6.9 nm は測定値ではなく、'
         '**我々の単一有効フォノン近似そのもの**である。',
-        '##だから答えは一点ではなく窓で述べる。##',
     ],
     (5, 'TextBox 4'): [
-        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026)。'
-        '等パワー比較では光子束 ∝ λ なので、'
-        '最適は σabs 極大 474.0 nm ではなく λσabs 極大 475.5 nm。',
+        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026).',
     ],
     (6, 'TextBox 4'): [
-        '457 nm ×1.11、488 nm ×1.05 — 窓の中には市販線が 3 本ある。',
-        'λ_{opt} は ZPL に追随して 0.4–0.6 nm/GPa。100 GPa では 486 nm。',
-        '97–172 GPa を通すなら 488 nm と 473 nm の 2 本立て。',
+        '窓の中に市販線が 3 本 — 457 nm ×1.11、488 nm ×1.05。',
+        'λ_{opt} は **0.4–0.6 nm/GPa** で動く。100 GPa では 486 nm。',
     ],
-    (6, 'TextBox 5'): [
-        '表の感度比は最適 η に対する比。'
-        'MC 帯は単一有効フォノン近似の ±15% を含む。',
-    ],
+    (6, 'TextBox 5'): [''],
     (7, 'TextBox 3'): [
-        '較正は Dai 2022 の 3 点だけ（定数 2 個）。'
-        'その上で 0–150 GPa・4 波長を **26/26 再現**する（1 件は OPEN と申告）。',
-        '波長依存の系統誤差は圧力に依らないので、'
-        '比が 1 を横切る位置を作ることも動かすこともできない。',
+        '較正は Dai 2022 の 3 点だけ。'
+        '0–150 GPa・4 波長を **26/26 再現**する。',
+        '波長依存の系統誤差は圧力に依らない。'
+        '比が 1 を横切る位置は作れない。',
         '##これが本研究を反証する測定である。##',
     ],
     (7, 'TextBox 4'): [
         'Bhattacharyya, PhD thesis (2022) Sec. 6.3; '
         'Dai et al., CPL 39, 117601 (2022); '
-        'Hilberer et al., PRB 107, L220102 (2023)。',
+        'Hilberer et al., PRB 107, L220102 (2023).',
     ],
     (8, 'TextBox 3'): [
-        '移動の**向き**は 250 ドロー全部で一致する。'
-        'しかし**量は校正前のシナリオであって結果ではない**。',
+        '**向き**は 250 ドロー全部で一致するが、'
+        '**量は校正前のシナリオである**。',
         '##次の一手：473 nm 単色でパワー掃引 1 本。##'
-        'R(I) の線形離脱点が「低励起」を実パワーに換算する。'
-        '2 ビーム掃引よりずっと安く、波長比較より先にやる。',
+        'R(I) の線形離脱点が「低励起」を実パワーに換算する。',
     ],
     (8, 'TextBox 4'): [
-        'u = 1 は λopt における NV⁻ 遷移の半飽和強度。'
-        '未校正の量は docs/next_step_power_dependence_experiment.md の '
-        'Stage 1–3 で決める。',
+        'J.-H. Dai et al., Chin. Phys. Lett. 39, 117601 (2022).',
     ],
     (9, 'TextBox 3'): [
         '検出帯も ZPL とともに動く。常圧のパスバンドは 120 GPa で発光の 26% しか拾わない。'
@@ -237,7 +227,7 @@ GEOMETRY = {
 
 # the sentence across the foot, and the citation strip under it
 BOTTOM_SZ = 2000           # the foot is one sentence; give it the emphasis
-BOTTOM_BOX = dict(left=0.55, top=6.25, width=12.24, height=0.45)
+BOTTOM_BOX = dict(left=0.55, top=6.18, width=12.24, height=0.62)
 REF_BOX = dict(left=0.55, top=6.92, width=12.24, height=0.45)
 
 # table column widths (points) where the default split breaks at 18 pt
@@ -546,6 +536,35 @@ def set_text(sp, paragraphs):
                 t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
 
 
+def apply_colours(tree, ref_shape=None):
+    """One text colour: Institute of Science Tokyo navy, reversed on the foot.
+
+    The draft used near-black body copy with purple and grey accents.  A talk
+    that is read in ten seconds does not need four text colours -- the deck now
+    speaks in the institutional navy, white where the foot band reverses it,
+    and grey only on the citation strip, which is not meant to compete.
+    """
+    for sp in tree.getroot().iter():
+        if sp.tag not in (f'{{{P}}}sp', f'{{{P}}}graphicFrame'):
+            continue
+        cNvPr = sp.find(f'.//{{{P}}}cNvPr')
+        name = cNvPr.get('name') if cNvPr is not None else ''
+        if name == ref_shape:
+            colour = REF_CLR
+        elif name == 'BottomNote':
+            colour = REVERSED
+        else:
+            colour = BODY_CLR
+        for clr in sp.iter(f'{{{A}}}srgbClr'):
+            parent = clr.getparent().getparent()      # solidFill -> rPr?
+            if parent is not None and parent.tag in (
+                    f'{{{A}}}rPr', f'{{{A}}}defRPr', f'{{{A}}}endParaRPr'):
+                # a white run inside the navy table header must stay white
+                if colour is BODY_CLR and clr.get('val') == 'FFFFFF':
+                    continue
+                clr.set('val', colour)
+
+
 def apply_font_sizes(tree, ref_shape=None):
     """Hold every run to the 18 pt floor, except the citation strip.
 
@@ -588,6 +607,19 @@ def add_bottom_note(tree, shapes, template_name, paragraphs):
     template.getparent().append(note)
     set_geometry(note, **BOTTOM_BOX)
     set_text(note, paragraphs)
+
+    # reverse it: the one sentence of the slide sits in the institutional navy
+    spPr = note.find(f'{{{P}}}spPr')
+    for child in spPr.findall(f'{{{A}}}noFill'):
+        spPr.remove(child)
+    fill = etree.SubElement(spPr, f'{{{A}}}solidFill')
+    etree.SubElement(fill, f'{{{A}}}srgbClr').set('val', ACCENT)
+    body = note.find(f'{{{P}}}txBody/{{{A}}}bodyPr')
+    body.set('lIns', str(int(0.18 * EMU_IN)))
+    body.set('rIns', str(int(0.18 * EMU_IN)))
+    body.set('tIns', str(int(0.09 * EMU_IN)))
+    body.set('bIns', str(int(0.09 * EMU_IN)))
+    body.set('anchor', 'ctr')
     # inherited from a 9 pt citation: bring the runs back to the floor first,
     # the accent colour comes from the markup
     for rPr in note.iter(f'{{{A}}}rPr'):
@@ -744,6 +776,7 @@ def main(src=DEFAULT_SRC, out=OUT):
             replace_picture(work, name, tree, fig,
                             new_media='image23.png' if pos == 8 else None)
         raised = apply_font_sizes(tree, REFS.get(pos))
+        apply_colours(tree, REFS.get(pos))
         save(tree, path)
         if raised:
             print(f'  raised {raised} pt -> {MIN_SZ // 100} pt')
