@@ -1,6 +1,6 @@
 # 主張の凍結（8 分発表版）
 
-対象: 8 分・7 枚のスライド発表。数値はすべて `code/` の実測出力であり、
+対象: 8 分・9 枚のスライド発表。数値はすべて `code/` の実測出力であり、
 `paper/main.tex` と一致する。以後、ここに書いた文言を発表準備の基準とする。
 
 ---
@@ -20,7 +20,7 @@
 |---|---|---|---|
 | S1 | 常圧の 2 択はどちらも窓の外。532 nm は吸収端が追い越した（×2.7）、405 nm は基底状態イオン化端そのもの（×3.7） | ZPL +0.40 eV、IP(³A₂) 3.06 eV = 405 nm | `fig6_three_shifts.py`, `fig7_answer_talk.py` |
 | S2 | 答えは吸収極大に一致し、**現象論定数に一切依存しない** | ES イオン化と再結合が σ_abs に比例して f₋ から相殺（0.2%）。9 定数の応答が厳密に 0 nm | `fig4_tornado.py`, `tests/test_freeze.py` |
-| S3 | 入力は全部他人の測定値。追加調整なしで**既発表 26 件を再現** | Ho 2026 / Doherty 2014 / Dai 2022 / Hilberer 2023 / Bhattacharyya 2022 | `repro_literature.py` |
+| S3 | 入力は全部他人の測定値。追加調整なしで**既発表 26 件を再現**。較正に使ったのは Dai 2022 の 3 点（定数 2 個）だけで、独立な Hilberer 2023 マイクロピラーとは **×0.6–1.2** で一致 | Ho 2026 / Doherty 2014 / Dai 2022 / Hilberer 2023 / Bhattacharyya 2022 | `repro_literature.py`, `fig8_repro_contrast.py` |
 
 ## 3. 境界（2 つ・主張の一部）
 
@@ -40,12 +40,17 @@
 | # | 時間 | スライド | 図 |
 |---|---|---|---|
 | 1 | 0:00–0:40 | 結論先出し：474 nm / 473 nm 市販線 / ×2.7 → ×7 | 数字のみ |
-| 2 | 0:40–1:40 | なぜ感度が全てか：マップ時間 ∝ 画素数/η² | 図なし |
-| 3 | 1:40–3:00 | なぜ自明でないか：2 つの端が窓を挟み込む | `talk_three_shifts.png` |
-| 4 | 3:00–4:20 | 答え | `talk_answer_120GPa.png` |
-| 5 | 4:20–5:20 | なぜ信じられるか：フィットできる量は答えを動かさない | `tornado_lambda_opt_120GPa.png` |
-| 6 | 5:20–6:40 | 反証条件：71 GPa の符号変化 | `threshold_green_blue.png` |
-| 7 | 6:40–8:00 | 適用条件とまとめ | 表のみ |
+| 2 | 0:40–1:50 | **なぜ 120 GPa で局所磁気イメージングなのか**（専門外向けの動機） | T_c–圧力の表 |
+| 3 | 1:50–2:40 | 感度が通貨：測定時間 ∝ 画素数/η² | 図なし |
+| 4 | 2:40–3:50 | なぜ自明でないか：2 つの端が窓を挟み込む | `talk_three_shifts_st.png` |
+| 5 | 3:50–4:50 | 答え | `talk_answer_120GPa_st.png` |
+| 6 | 4:50–5:10 | 現象論非依存：フィットできる量は答えを動かさない | `tornado_lambda_opt_120GPa_st.png` |
+| 7 | 5:10–6:10 | **先行実験の再現**（追加調整なし） | `repro_contrast_st.png` |
+| 8 | 6:10–7:10 | 反証条件：約 70 GPa の符号変化 | `threshold_green_blue_st.png` |
+| 9 | 7:10–8:00 | 適用条件とまとめ | 表のみ |
+
+スライド 2 の論理は `slides/intro_deck.html`（¶1–¶3）を圧縮したもの:
+狙う圧力帯 → 抵抗では決着しない → 探針をアンビルの内側に作る。
 
 ## 6. 凍結した数値と出所
 
@@ -62,6 +67,8 @@
 | λ_opt 追従 | 484.1 nm @100 GPa → 474.0 nm @120 GPa（0.51 nm/GPa） | `nv_model.lambda_opt` |
 | アンカー応答 | ΔE_ZPL(120): ±3.7 nm、S_abs 勾配: ±2.7 nm、他 9 定数: 0.00 nm | `fig4_tornado.py` |
 | 文献再現 | 26/26（OPEN 1 件） | `repro_literature.py` |
+| 較正に使った実験点 | Dai 2022 の 3 点のみ（C_amb, E_isc の 2 定数） | `fig8_repro_contrast.py` |
+| 独立データとの一致 | Hilberer 2023 micropillar 3 点で ×0.58 / ×0.63 / ×1.16 | `fig8_repro_contrast.py` |
 
 ## 7. 発表で言わないと危ない留保
 
@@ -88,4 +95,6 @@ python fig4_tornado.py              # アンカー応答
 python fig5_threshold.py            # 交差圧
 python fig6_three_shifts.py         # 端の移動
 python fig7_answer_talk.py          # 窓とペナルティ
+python fig8_repro_contrast.py       # 先行実験の再現
+python slides/build_pptx.py         # Science Tokyo テンプレートの 9 枚
 ```

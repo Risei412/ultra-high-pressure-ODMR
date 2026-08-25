@@ -224,6 +224,38 @@ set_ph(s1, 12, '2026-08', size=12, color=SCIENCE_BLUE)
 s1.notes_slide.notes_text_frame.text = (
     '0:00–0:40  結論を先に置く。市販 473 nm DPSS で最適の 0.03% 以内。')
 
+# ---- 2. why this experiment at all (for a non-specialist) ----------------
+s2a = content_slide('なぜ 120 GPa で局所磁気イメージングなのか')
+table(s2a, L, 1.35, 5.55, 2.5,
+      [['超水素化物', '転移温度', '合成圧力'],
+       ['H₃S', '203 K', '155 GPa'],
+       ['LaH₁₀', '250–260 K', '170 GPa'],
+       ['CeH₉', '≤ 115 K', '80–100 GPa'],
+       ['(La,Ce)H₉', '148–178 K', '97–172 GPa']],
+      col_w=[2.05, 1.75, 1.75], size=14, hi_row=4)
+textbox(s2a, L, 4.05, 5.55, 1.4,
+        [[('最高の T', {}), ('c', {'sub': True}),
+          (' は最高の圧力にはない。実験の現実味がある超水素化物は '
+           '100 GPa 前後に集中する。', {})]], size=16)
+textbox(s2a, COL_X - 1.35, 1.35, COL_W + 1.35, 5.2,
+        [[('試料が小さすぎる。', {'bold': True}),
+          ('120 GPa のキュレットは数十 µm、試料体積は pL。'
+           'バルク磁化測定ではアンビルとガスケットの背景から分離できない。', {})],
+         [('抵抗の落下だけでは決着しない。', {'bold': True}),
+          ('必要なのは磁束排除そのものの観測であり、局所・空間分解された'
+           '磁気測定が決着をつける測定になった。', {})],
+         [('探針はアンビルの内側に作る。', {'bold': True}),
+          ('キュレット表面の数十 nm 下に注入された NV は試料から µm の距離にあり、'
+           '同じ圧力を経験する。ODMR が局所磁場と局所応力を同時に読み出す。', {})]],
+        size=17)
+reference(s2a, 'A. P. Drozdov et al., Nature 525, 73 (2015) / 569, 528 (2019);  '
+               'N. P. Salke et al., Nat. Commun. 10, 4453 (2019);  '
+               'J. Bi et al., Nat. Commun. 13, 5952 (2022);  '
+               'P. Bhattacharyya et al., Nature 627, 73 (2024).')
+s2a.notes_slide.notes_text_frame.text = (
+    '0:40–1:50  専門外向けの動機。狙う圧力帯 → 抵抗では決着しない → '
+    'センサーをアンビル内に作る、の 3 段。')
+
 # ---- 2. why sensitivity --------------------------------------------------
 s2 = content_slide('感度が空間分解能と (P, T) 点数を決める')
 framed(s2, L, 1.55, 6.6, 1.15,
@@ -248,7 +280,7 @@ textbox(s2, COL_X + 0.6, 2.95, COL_W - 0.2, 1.2,
 reference(s2, 'P. Bhattacharyya et al., Nature 627, 73 (2024);  '
               'J. F. Barry et al., Rev. Mod. Phys. 92, 015004 (2020)')
 s2.notes_slide.notes_text_frame.text = (
-    '0:40–1:40  マップ時間 ∝ 画素数/η²。感度は指標ではなく通貨。')
+    '1:50–2:40  マップ時間 ∝ 画素数/η²。感度は指標ではなく通貨。')
 
 # ---- 3. the two edges ----------------------------------------------------
 s3 = content_slide('120 GPa では吸収帯とイオン化端が同時に青へ動く')
@@ -265,7 +297,7 @@ textbox(s3, COL_X, 1.55, COL_W, 4.6,
 reference(s3, 'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026) — DFT + DAC。'
               '灰色の常圧曲線は単一有効フォノン近似（50 GPa 以下では粗い）。')
 s3.notes_slide.notes_text_frame.text = (
-    '1:40–3:00  2 つの端が窓を挟み込む。常圧曲線は近似が粗い旨を先に断る。')
+    '2:40–3:50  2 つの端が窓を挟み込む。常圧曲線は近似が粗い旨を先に断る。')
 
 # ---- 4. the answer -------------------------------------------------------
 s4 = content_slide('最適は 474 nm、5% 許容窓は 462–486 nm')
@@ -285,7 +317,7 @@ textbox(s4, COL_X, 3.75, COL_W, 2.4,
 reference(s4, '帯は現象論定数のモンテカルロ 16–84%。'
               'λopt = 474.0 +3.7 / −4.3 nm。')
 s4.notes_slide.notes_text_frame.text = (
-    '3:00–4:20  答え。窓の広さと 473 nm の位置を見せる。')
+    '3:50–4:50  答え。窓の広さと 473 nm の位置を見せる。')
 
 # ---- 5. tornado ----------------------------------------------------------
 s5 = content_slide('最適波長を動かすのは測定量だけである')
@@ -297,11 +329,32 @@ textbox(s5, COL_X, 1.55, COL_W, 4.6,
           ('吸収極大そのもの', {'bold': True, 'color': SCIENCE_BLUE}), ('。', {})],
          [('校正でフィットする 9 個の定数は 1 つも λ', {}), ('opt', {'sub': True}),
           (' を動かさない。', {})],
-         [('追加調整なしで、0–150 GPa・4 波長にわたる既発表 26 件を再現。', {})]],
+         [('答えを決めているのは ZPL 位置と電子格子結合 — どちらも'
+           '他人が測った量である。', {})]],
         size=17)
 reference(s5, '各入力をモンテカルロ範囲の端に振り、他を公称値に固定したときの λopt の変化。')
 s5.notes_slide.notes_text_frame.text = (
-    '4:20–5:20  相殺 → 現象論非依存。ゼロが並ぶ絵が主張そのもの。')
+    '4:50–5:10  相殺 → 現象論非依存。ゼロが並ぶ絵が主張そのもの。')
+
+# ---- 6b. reproduction of published experiments ---------------------------
+s6a = content_slide('先行実験を、追加調整なしで再現する')
+picture(s6a, 'repro_contrast_st.png', L - 0.10, 1.45, FIG_W)
+textbox(s6a, COL_X, 1.55, COL_W, 4.8,
+        [[('較正に使ったのは Dai 2022 の 3 点だけ', {'bold': True}),
+          ('（定数 2 個）。', {})],
+         [('Hilberer 2023 のマイクロピラーは、試料形状も励起波長も異なる'
+           '独立データ。自由パラメータを残さずに ', {}),
+          ('×0.6–1.2', {'bold': True, 'color': SCIENCE_BLUE}), (' で一致する。', {})],
+         [('定性的な再現も同じモデルから出る：17 GPa で 405 nm 共鳴は現れず '
+           '100 GPa で現れる／50 GPa では 450 nm に優位がない／励起を '
+           '532 → 488 → 457 nm と下げる運用順序。', {})],
+         [('0–150 GPa・4 波長で 26/26。うち較正 4 件、null 結果 1 件、'
+           '未再現 1 件は OPEN と申告。', {})]], size=17)
+reference(s6a, 'J.-H. Dai et al., Chin. Phys. Lett. 39, 117601 (2022);  '
+               'A. Hilberer et al., PRB 107, L220102 (2023);  '
+               'P. Bhattacharyya, PhD thesis, UC Berkeley (2022).')
+s6a.notes_slide.notes_text_frame.text = (
+    '5:10–6:10  再現。較正は 2 定数だけ、独立データは自由度なしで合う。')
 
 # ---- 6. threshold --------------------------------------------------------
 s6 = content_slide('約 70 GPa で緑と青が入れ替わる')
@@ -317,7 +370,7 @@ textbox(s6, COL_X, 1.55, COL_W, 4.6,
            {'bold': True, 'color': SCIENCE_BLUE})]], size=17)
 reference(s6, 'P. Bhattacharyya, PhD thesis, UC Berkeley (2022), Sec. 6.3.')
 s6.notes_slide.notes_text_frame.text = (
-    '5:20–6:40  反証条件。符号変化は単一圧力の系統誤差では作れない。')
+    '6:10–7:10  反証条件。符号変化は単一圧力の系統誤差では作れない。')
 
 # ---- 7. scope ------------------------------------------------------------
 s7 = content_slide('474 nm が成り立つ条件、成り立たない条件')
@@ -340,7 +393,7 @@ textbox(s7, L, 5.55, 12.2, 1.1,
            '同じ磁気マップが 1/7 の時間で撮れる。',
            {'bold': True, 'color': SCIENCE_BLUE, 'size': 19})]], size=16)
 s7.notes_slide.notes_text_frame.text = (
-    '6:40–8:00  適用条件とまとめ。校正は 474 nm の検証ではなく絶対感度・'
+    '7:10–8:00  適用条件とまとめ。校正は 474 nm の検証ではなく絶対感度・'
     'パワー依存・f₋ の直接測定のために行う。')
 
 prs.save(str(OUT))
