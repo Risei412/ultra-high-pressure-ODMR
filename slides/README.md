@@ -38,12 +38,19 @@ at exactly the size it occupies on the slide -- 7.70 in wide -- so an 18 pt
 label in matplotlib is 18 pt when projected. `replace_picture` places the PNGs
 1:1 for the same reason; rescaling them would quietly break the floor.
 
-Raising 9 pt citations and 14-17 pt body text to 18 pt costs room, so the text
-was cut to fit: shorter figure annotations, tighter phrasing, and the citation
-strips moved up out of the bottom margin. No claim was dropped -- the
-qualifiers that carry one (`micropillar は前提条件`, `1 件は OPEN と申告`,
-the 50 GPa caveat on the ambient absorption curve, the power penalty in the
-conditions table) are all still there.
+Citations are the one exemption, at 12 pt: nobody reads a reference list from
+the back of a room, and dropping them frees the foot of the slide.
+
+## Where text goes
+
+On a figure slide the right-hand column had been narrating the plot. It now
+carries only what the figure cannot show; how to read the figure, and the fact
+it establishes, is one sentence across the foot (`BOTTOM`), with the citation
+at 12 pt beneath it. Raising the body to 18 pt costs room, so phrasing was
+tightened throughout -- but no claim was dropped. The qualifiers that carry one
+(`micropillar は前提条件`, `1 件は OPEN と申告`, the 50 GPa caveat on the
+ambient absorption curve, the power penalty in the conditions table) are all
+still on the slides.
 
 ## Structure
 

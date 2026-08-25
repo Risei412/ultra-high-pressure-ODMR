@@ -60,6 +60,7 @@ NS = {'a': A, 'p': P, 'r': R}
 
 ACCENT = '1C3177'          # the deck's navy, used for the one line that matters
 MIN_SZ = 1800              # nothing on a projected slide may be under 18 pt
+REF_SZ = 1200              # except the citation strips, which nobody reads live
 EMU_IN = 914400
 FIG_DPI = 200              # talk_figs.py renders at this resolution
 
@@ -105,47 +106,37 @@ BODY = {
         'η の定義は Barry et al., RMP 92, 015004 (2020)。',
     ],
     (4, 'TextBox 3'): [
-        'ZPL が +0.40 eV 青方偏移し、Huang–Rhys 因子が 3.08 → 4.61 に増える。'
-        '吸収極大は 586 → 474 nm。',
-        '同時に IP(³A₂) が 2.68 → 3.06 eV に上がる。3.06 eV = 405 nm。'
+        'ZPL が **+0.40 eV** 青方偏移し、Huang–Rhys 因子が 3.08 → 4.61 に増える。',
+        'IP(³A₂) は 2.68 → **3.06 eV = 405 nm**。'
         'これより青は NV⁻ を直接 NV⁰ に変える。',
-        '120 GPa では σ(473) は σ(532) の **10 倍**。',
         'η ∝ Δν/(C√R) は C に線形、光子レートに √ で効く。'
         '釣り合いの位置は量的問題である。',
     ],
     (4, 'TextBox 4'): [
-        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026) — DFT + DAC。'
-        '灰色の常圧曲線は単一有効フォノン近似（50 GPa 以下では粗い）。',
+        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026) — DFT + DAC。',
     ],
     (5, 'TextBox 3'): [
-        '励起状態イオン化と再結合はどちらも σ_{abs} に比例するので、'
-        '定常 NV⁻ 分率 f₋ から相殺する。f₋ は窓の中で **0.2% しか動かない**。',
-        '校正でフィットする現象論定数は **1 つも λ_{opt} を動かさない**。',
-        '効くのは 3 つだけ — ZPL 位置、電子格子結合、'
-        'そして**単一有効フォノン近似そのもの**。'
-        '最大の ±6.9 nm は他人の測定値ではなく我々のモデル形である。',
+        '励起状態イオン化と再結合はどちらも σ_{abs} に比例し、'
+        'f₋ から相殺する。f₋ は窓の中で **0.2% しか動かない**。',
+        '最大の ±6.9 nm は他人の測定値ではなく、'
+        '**我々の単一有効フォノン近似そのもの**である。',
         '##だから答えは一点ではなく窓で述べる。##',
     ],
     (5, 'TextBox 4'): [
-        '各入力を MC 範囲の端に振ったときの λopt の変化。'
-        '等パワー比較では光子束 ∝ λ なので、'
-        '最適は σabs 極大 474.0 nm ではなく λσabs 極大 475.5 nm。',
+        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026)。',
     ],
     (6, 'TextBox 4'): [
-        '**473 nm DPSS は最適の 0.2% 落ち。**457 nm ×1.11、488 nm ×1.05。',
+        '457 nm ×1.11、488 nm ×1.05 — 窓の中には市販線が 3 本ある。',
         'λ_{opt} は ZPL に追随して 0.4–0.6 nm/GPa。100 GPa では 486 nm。',
         '97–172 GPa を通すなら 488 nm と 473 nm の 2 本立て。',
     ],
     (6, 'TextBox 5'): [
-        '感度比は最適 η に対する比。帯は入力の MC 16–84%。'
-        'λopt = 475.5 +5.6 / −5.3 nm（単一有効フォノン近似の ±15% を含む）。',
+        '表の感度比は最適 η に対する比。'
+        'MC 帯は単一有効フォノン近似の ±15% を含む。',
     ],
     (7, 'TextBox 3'): [
         '較正は Dai 2022 の 3 点だけ（定数 2 個）。'
         'その上で 0–150 GPa・4 波長を **26/26 再現**する（1 件は OPEN と申告）。',
-        '50 GPa の既報は**青の優位を見つけなかった**。'
-        'モデルはそこで 0.56、緑が有利と答える。'
-        '見つからなかったことが再現になっている。',
         '波長依存の系統誤差は圧力に依らないので、'
         '比が 1 を横切る位置を作ることも動かすこともできない。',
         '##これが本研究を反証する測定である。##',
@@ -156,18 +147,15 @@ BODY = {
         'Hilberer et al., PRB 107, L220102 (2023)。',
     ],
     (8, 'TextBox 3'): [
-        '稜線は 475.5 nm (u→0) → 465 nm (u = 0.1) → 447 nm (u = 0.3)。'
-        '405 nm のイオン化端で止まる。',
-        '473 nm 固定のコストは u = 0.2 で ×1.22、u = 0.3 で ×1.51。'
-        '**緑に対する ×2.5 の大半を食う。**',
-        'Dai 2022 の線形 PL は既存実験を u ≲ 0.3 に置く。'
-        '移動の**向き**は全ドローで一致するが、**量は校正前のシナリオである**。',
+        '移動の**向き**は 250 ドロー全部で一致する。'
+        'しかし**量は校正前のシナリオであって結果ではない**。',
         '##次の一手：473 nm 単色でパワー掃引 1 本。##'
-        'R(I) の線形離脱点が「低励起」を実パワーに換算する。',
+        'R(I) の線形離脱点が「低励起」を実パワーに換算する。'
+        '2 ビーム掃引よりずっと安く、波長比較より先にやる。',
     ],
     (8, 'TextBox 4'): [
-        'u = 1 は λopt における NV⁻ 遷移の半飽和強度。'
-        '未校正の量は docs/next_step_power_dependence_experiment.md で決める。',
+        '未校正の量は docs/next_step_power_dependence_experiment.md の '
+        'Stage 1–3 で決める。',
     ],
     (9, 'TextBox 3'): [
         '検出帯も ZPL とともに動く。常圧のパスバンドは 120 GPa で発光の 26% しか拾わない。'
@@ -176,6 +164,35 @@ BODY = {
         '同じ磁気マップが 1/6 の時間で撮れる。##',
     ],
 }
+
+# The right-hand column states what the figure cannot show.  What the figure
+# DOES show -- how to read it, and the fact it establishes -- goes here, as one
+# sentence across the foot of the slide, so the column stops narrating the plot.
+BOTTOM = {
+    4: ['図: 常圧（灰）と 120 GPa（紺）の吸収帯。'
+        '吸収極大とイオン化端が同時に青へ動き、'
+        '120 GPa では σ(473) が σ(532) の **10 倍**になる。'
+        '常圧曲線は単一有効フォノン近似で、50 GPa 以下では粗い。'],
+    5: ['図: 各入力を MC 範囲の端に振ったときの λopt の変化。'
+        '動かすのは光学入力 3 つだけで、'
+        '**校正でフィットする現象論定数は 1 つも動かさない**。'
+        '等パワー比較では光子束 ∝ λ なので、'
+        '最適は σabs 極大 474.0 nm ではなく λσabs 極大 475.5 nm。'],
+    6: ['図: 帯は入力の MC 16–84%。λopt = 475.5 +5.6 / −5.3 nm は '
+        '5% 許容窓 463–488 nm の半分を占める。'
+        '**市販の 473 nm DPSS はその窓の中で、最適の 0.2% 落ちにすぎない。**'],
+    7: ['図: 50 GPa の既報は**青の優位を見つけなかった**。'
+        'モデルはそこで 0.56、緑が有利と答える。'
+        '見つからなかったことが再現になっている。'],
+    8: ['図: u = 1 は λopt での NV⁻ 遷移の半飽和強度。'
+        '稜線は 475.5 nm (u→0) から 405 nm のイオン化端まで走る。'
+        'Dai 2022 の線形 PL が置く u ≲ 0.3 では 473 nm 固定のコストが ×1.51 に達し、'
+        '**緑に対する ×2.5 の大半を食う。**'],
+}
+
+# the citation strip on each slide, exempt from the 18 pt floor
+REFS = {2: 'TextBox 7', 3: 'TextBox 8', 4: 'TextBox 4', 5: 'TextBox 4',
+        6: 'TextBox 5', 7: 'TextBox 4', 8: 'TextBox 4'}
 
 # Whole-string substitutions for shapes that only need a number changed.
 PATCHES = {
@@ -203,29 +220,29 @@ TABLES = {
 # Layout adjustments forced by the 18 pt floor.  Sizes are inches; a shape
 # listed here is moved/resized before its text is written.
 GEOMETRY = {
-    # the citation strips were 9 pt one-liners; at 18 pt they need two lines,
-    # so they move up out of the slide's bottom margin
-    # slide 2 is the tightest: the DAC schematic gives back the height the
-    # three-line citation strip needs at 18 pt (aspect ratio preserved)
-    (2, 'Picture 2'): dict(width=2.33, height=4.30),
-    (2, 'TextBox 3'): dict(top=5.75, height=0.62),
-    (2, 'TextBox 7'): dict(top=6.45, height=0.94),
+    # the citation strips drop to 12 pt, so they stay where the draft had them
+    (2, 'TextBox 3'): dict(height=0.62),      # culet caption, now two lines
     (3, 'TextBox 4'): dict(height=0.95),      # figure caption, now three lines
-    (3, 'TextBox 8'): dict(top=6.75, height=0.62),
-    (4, 'TextBox 4'): dict(top=6.75, height=0.62),
-    (5, 'TextBox 4'): dict(top=6.75, height=0.62),
-    (6, 'TextBox 5'): dict(top=6.75, height=0.62),
-    (7, 'TextBox 4'): dict(top=6.75, height=0.62),
-    (8, 'TextBox 4'): dict(top=6.75, height=0.62),
     # the hydride table at 18 pt no longer fits three columns in 4.35 in
     (2, 'Table 4'): dict(width=4.60),
     # the generated figures are placed 1:1, so their boxes only set the top
-    (4, 'Picture 2'): dict(top=1.45),
-    (5, 'Picture 2'): dict(top=1.35),
-    (6, 'Picture 2'): dict(top=1.45),
-    (7, 'Picture 2'): dict(top=1.45),
-    (8, 'Picture 2'): dict(top=1.45),
+    (4, 'Picture 2'): dict(top=1.42),
+    (5, 'Picture 2'): dict(top=1.34),
+    (6, 'Picture 2'): dict(top=1.42),
+    (7, 'Picture 2'): dict(top=1.42),
+    (8, 'Picture 2'): dict(top=1.42),
+    # the right-hand column stops at the foot sentence
+    (4, 'TextBox 3'): dict(top=1.50, height=4.20),
+    (5, 'TextBox 3'): dict(top=1.50, height=4.20),
+    (6, 'TextBox 4'): dict(top=3.55, height=2.15),
+    (7, 'TextBox 3'): dict(top=1.50, height=4.20),
+    (8, 'TextBox 3'): dict(top=1.50, height=4.20),
+    (6, 'Table 3'): dict(top=1.42),
 }
+
+# the sentence across the foot, and the citation strip under it
+BOTTOM_BOX = dict(left=0.55, top=5.86, width=12.24, height=0.95)
+REF_BOX = dict(left=0.55, top=6.92, width=12.24, height=0.45)
 
 # table column widths (points) where the default split breaks at 18 pt
 GRIDS = {
@@ -533,29 +550,54 @@ def set_text(sp, paragraphs):
                 t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
 
 
-def raise_font_sizes(path, minimum=MIN_SZ):
-    """Raise every explicit run size on a slide to at least `minimum`.
+def apply_font_sizes(tree, ref_shape=None):
+    """Hold every run to the 18 pt floor, except the citation strip.
 
-    Applies to a:rPr, a:defRPr and a:endParaRPr alike, so a paragraph cannot
-    come back at 9 pt through its end-paragraph properties.  Sizes already at
-    or above the floor -- titles, the two large call-out numbers -- are left
-    exactly as they are.
+    Nothing projected may be smaller than MIN_SZ -- body text, table cells and
+    end-paragraph properties alike, since a paragraph can otherwise come back
+    at 9 pt through its end properties.  The one exemption is the citation
+    strip named by `ref_shape`: it exists for the record, not to be read from
+    the back of the room, so it is set to REF_SZ and buys the room that the
+    foot sentence needs.
     """
-    with open(path, encoding='utf-8') as fh:
-        xml = fh.read()
     raised = []
+    for sp in tree.getroot().iter():
+        if sp.tag not in (f'{{{P}}}sp', f'{{{P}}}graphicFrame'):
+            continue
+        cNvPr = sp.find(f'.//{{{P}}}cNvPr')
+        is_ref = cNvPr is not None and cNvPr.get('name') == ref_shape
+        for rPr in sp.iter():
+            if rPr.tag not in (f'{{{A}}}rPr', f'{{{A}}}defRPr',
+                               f'{{{A}}}endParaRPr'):
+                continue
+            if is_ref:
+                rPr.set('sz', str(REF_SZ))
+                continue
+            sz = rPr.get('sz')
+            if sz and int(sz) < MIN_SZ:
+                raised.append(int(sz) // 100)
+                rPr.set('sz', str(MIN_SZ))
+    return sorted(set(raised))
 
-    def bump(m):
-        val = int(m.group(1))
-        if val >= minimum:
-            return m.group(0)
-        raised.append(val)
-        return f'sz="{minimum}"'
 
-    xml = re.sub(r'sz="(\d+)"', bump, xml)
-    with open(path, 'w', encoding='utf-8') as fh:
-        fh.write(xml)
-    return sorted({v // 100 for v in raised})
+def add_bottom_note(tree, shapes, template_name, paragraphs):
+    """Clone the citation strip into a second box for the foot sentence."""
+    template = shapes[template_name]
+    note = copy.deepcopy(template)
+    cNvPr = note.find(f'.//{{{P}}}cNvPr')
+    cNvPr.set('name', 'BottomNote')
+    cNvPr.set('id', '90')
+    template.getparent().append(note)
+    set_geometry(note, **BOTTOM_BOX)
+    set_text(note, paragraphs)
+    # inherited from a 9 pt citation: bring the runs back to the floor first,
+    # the accent colour comes from the markup
+    for rPr in note.iter(f'{{{A}}}rPr'):
+        rPr.set('sz', str(MIN_SZ))
+        clr = rPr.find(f'{{{A}}}solidFill/{{{A}}}srgbClr')
+        if clr is not None and clr.get('val') != ACCENT:
+            clr.set('val', '101426')
+    return note
 
 
 def set_geometry(sp, left=None, top=None, width=None, height=None):
@@ -694,12 +736,17 @@ def main(src=DEFAULT_SRC, out=OUT):
             patch_runs(tree, PATCHES[pos])
         if pos in TABLES:
             set_table(tree, TABLES[pos])
+        if pos in BOTTOM:
+            add_bottom_note(tree, shapes, REFS[pos], BOTTOM[pos])
+        if pos in REFS:
+            set_geometry(shapes[REFS[pos]], **REF_BOX)
+
         if pos in PICTURES:
             fig = os.path.join(FIGS, PICTURES[pos])
             replace_picture(work, name, tree, fig,
                             new_media='image23.png' if pos == 8 else None)
+        raised = apply_font_sizes(tree, REFS.get(pos))
         save(tree, path)
-        raised = raise_font_sizes(path)
         if raised:
             print(f'  raised {raised} pt -> {MIN_SZ // 100} pt')
 
