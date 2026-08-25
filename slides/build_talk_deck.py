@@ -84,7 +84,7 @@ TITLES = {
     4: '120 GPa では吸収帯とイオン化端が同時に青へ動く',
     5: '最適波長を動かすのは光学入力だけである',
     6: '答えは点ではなく窓である — 463–488 nm',
-    7: '先行実験を再現し、73 GPa で符号が変わる',
+    7: '先行実験を 26/26 再現し、73 GPa で符号が変わる',
     8: '最適波長はパワーで青へ動く — ここは未校正である',
     9: '473 nm が成り立つ条件、成り立たない条件',
 }
@@ -98,64 +98,24 @@ BODY = {
         'Drozdov, Nature 525, 73 (2015); 569, 528 (2019); '
         'Salke, Nat. Commun. 10, 4453 (2019); Bi, ibid. 13, 5952 (2022).',
     ],
-    (3, 'TextBox 4'): [
-        'キュレット面の 50 nm 下の NV が、CeH₉ 上で **B/H = 0.67** の'
-        '局所磁束排除を ~10 µm の不均一まで捉えている。',
-    ],
     (3, 'TextBox 8'): [
         'Bhattacharyya, PhD thesis (2022) Fig. 7.2, 7.8; '
         'Bhattacharyya et al., Nature 627, 73 (2024); '
         'Barry et al., Rev. Mod. Phys. 92, 015004 (2020).',
     ],
-    (4, 'TextBox 3'): [
-        'ZPL が **+0.40 eV** 青方偏移し、'
-        'Huang–Rhys 因子が 3.08 → 4.61 に増える。',
-        'IP(³A₂) は **3.06 eV = 405 nm**。'
-        'これより青は NV⁻ を NV⁰ に変える。',
-        'η ∝ Δν/(C√R)。C に線形、光子レートに √。',
-    ],
     (4, 'TextBox 4'): [
         'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026).',
     ],
-    (5, 'TextBox 3'): [
-        'イオン化と再結合はどちらも σ_{abs} に比例し、f₋ から相殺する。'
-        'f₋ は窓の中で **0.2% しか動かない**。',
-        '最大の ±6.9 nm は測定値ではなく、'
-        '**我々の単一有効フォノン近似そのもの**である。',
-    ],
     (5, 'TextBox 4'): [
         'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026).',
-    ],
-    (6, 'TextBox 4'): [
-        '窓の中に市販線が 3 本 — 457 nm ×1.11、488 nm ×1.05。',
-        'λ_{opt} は **0.4–0.6 nm/GPa** で動く。100 GPa では 486 nm。',
-    ],
-    (7, 'TextBox 3'): [
-        '較正は Dai 2022 の 3 点だけ。'
-        '0–150 GPa・4 波長を **26/26 再現**する。',
-        '波長依存の系統誤差は圧力に依らない。'
-        '比が 1 を横切る位置は作れない。',
-        '##これが本研究を反証する測定である。##',
     ],
     (7, 'TextBox 4'): [
         'Bhattacharyya, PhD thesis (2022) Sec. 6.3; '
         'Dai et al., CPL 39, 117601 (2022); '
         'Hilberer et al., PRB 107, L220102 (2023).',
     ],
-    (8, 'TextBox 3'): [
-        '**向き**は 250 ドロー全部で一致するが、'
-        '**量は校正前のシナリオである**。',
-        '##次の一手：473 nm 単色でパワー掃引 1 本。##'
-        'R(I) の線形離脱点が「低励起」を実パワーに換算する。',
-    ],
     (8, 'TextBox 4'): [
         'J.-H. Dai et al., Chin. Phys. Lett. 39, 117601 (2022).',
-    ],
-    (9, 'TextBox 3'): [
-        '検出帯も ZPL とともに動く。常圧のパスバンドは 120 GPa で発光の 26% しか拾わない。'
-        '青励起にして初めてカットオンも動かせ、×1.6 が上乗せされる — 合計 ×4。',
-        '##120 GPa では 532 nm を 473 nm DPSS に替える。'
-        '同じ磁気マップが 1/6 の時間で撮れる。##',
     ],
 }
 
@@ -163,11 +123,15 @@ BODY = {
 # DOES show -- how to read it, and the fact it establishes -- goes here, as one
 # sentence across the foot of the slide, so the column stops narrating the plot.
 BOTTOM = {
+    2: ['pL の試料の決着をつけるのは、**局所・空間分解された磁気測定**である。'],
+    3: ['感度は、**分解能・視野・到達できる (P, T) 点数を買う通貨**である。'],
     4: ['120 GPa では σ(473) が σ(532) の **10 倍**になる。'],
-    5: ['**校正でフィットする現象論定数は 1 つも λopt を動かさない。**'],
+    5: ['最大の ±6.9 nm は測定値ではなく、**我々のモデル形**である。'],
     6: ['λopt の不確かさ ±5.5 nm は**許容窓の半分**を占める。'],
-    7: ['**青の優位が見つからなかったこと自体**が再現である。'],
-    8: ['既存実験がいる u ≲ 0.3 で **473 nm 固定は ×1.51** になる。'],
+    7: ['**これが本研究を反証する測定である。**'],
+    8: ['次の一手は **473 nm 単色のパワー掃引 1 本**である。'],
+    9: ['532 nm を 473 nm DPSS に替えれば、'
+        '同じマップが **1/6 の時間**で撮れる。'],
 }
 
 # the citation strip on each slide, exempt from the 18 pt floor
@@ -175,14 +139,25 @@ REFS = {2: 'TextBox 7', 3: 'TextBox 8', 4: 'TextBox 4', 5: 'TextBox 4',
         7: 'TextBox 4', 8: 'TextBox 4'}
 
 # slide 6 shows only our own calculation, so it cites nothing and its strip goes
-DROP = {(6, 'TextBox 5')}
+DROP = {
+    # the columns of prose beside a figure: a slide you read instead of look at
+    (2, 'TextBox 5'), (2, 'TextBox 6'), (2, 'TextBox 3'),
+    (3, 'TextBox 4'), (3, 'TextBox 6'),
+    (4, 'TextBox 3'), (5, 'TextBox 3'), (7, 'TextBox 3'), (8, 'TextBox 3'),
+    # slide 6: the table repeated what the plot now labels again
+    (6, 'TextBox 4'), (6, 'TextBox 5'), (6, 'Table 3'),
+    # slide 9: the detection-band aside is spoken
+    (9, 'TextBox 3'),
+}
 
-# what the foot is cloned from when the slide has no citation strip
-FOOT_TEMPLATE = {6: 'TextBox 4'}
+# Keep only the last N paragraphs of a shape, so runs that carry their own
+# styling -- the two large call-out numerals on slide 3 -- survive intact.
+KEEP_TAIL = {(3, 'TextBox 7'): 2}
 
 # Whole-string substitutions for shapes that only need a number changed.
 PATCHES = {
-    3: [('×2.7', '×2.5'), ('×7', '×6')],
+    3: [('×2.7', '×2.5'), ('×7', '×6'),
+        ('  マップ 1 枚の取得時間', '  マップ取得時間')],
 }
 
 # table cell -> new text  {slide: {(row, col): text}}
@@ -206,36 +181,31 @@ TABLES = {
 # Layout adjustments forced by the 18 pt floor.  Sizes are inches; a shape
 # listed here is moved/resized before its text is written.
 GEOMETRY = {
-    # the citation strips drop to 12 pt, so they stay where the draft had them
-    (2, 'TextBox 3'): dict(height=0.62),      # culet caption, now two lines
-    (3, 'TextBox 4'): dict(height=0.95),      # figure caption, now three lines
-    # the hydride table at 18 pt no longer fits three columns in 4.35 in
-    (2, 'Table 4'): dict(width=4.60),
-    # the generated figures are placed 1:1, so their boxes only set the top
-    (4, 'Picture 2'): dict(top=1.42),
-    (5, 'Picture 2'): dict(top=1.34),
-    (6, 'Picture 2'): dict(top=1.42),
-    (7, 'Picture 2'): dict(top=1.42),
-    (8, 'Picture 2'): dict(top=1.42),
-    # the right-hand column stops at the foot sentence
-    (4, 'TextBox 3'): dict(top=1.50, height=4.55),
-    (5, 'TextBox 3'): dict(top=1.50, height=4.55),
-    (6, 'TextBox 4'): dict(top=3.55, height=2.50),
-    (7, 'TextBox 3'): dict(top=1.50, height=4.55),
-    (8, 'TextBox 3'): dict(top=1.50, height=4.55),
-    (6, 'Table 3'): dict(top=1.42),
+    (2, 'Picture 2'): dict(left=1.30, top=1.35, height=4.30, width=2.33),
+    (2, 'Table 4'): dict(left=5.10, top=1.60, width=6.20),
+    (3, 'Picture 2'): dict(left=0.60, top=1.45, width=2.63, height=3.00),
+    (3, 'Picture 3'): dict(left=3.45, top=1.50, width=7.76, height=2.93),
+    (3, 'Rectangle 5'): dict(left=0.60, top=4.70),
+    (3, 'TextBox 7'): dict(left=6.30, top=4.45, width=5.60, height=1.45),
+    # the generated figures span the slide and are placed 1:1
+    (4, 'Picture 2'): dict(top=1.32),
+    (5, 'Picture 2'): dict(top=1.32),
+    (6, 'Picture 2'): dict(top=1.32),
+    (7, 'Picture 2'): dict(top=1.32),
+    (8, 'Picture 2'): dict(top=1.32),
+    (9, 'Table 2'): dict(top=1.45, height=4.30),
 }
 
 # the sentence across the foot, and the citation strip under it
 # The foot is one sentence, so it can be set larger than the body.  The size
 # is chosen per slide: the largest of these that still keeps it on one line.
 BOTTOM_SIZES = (2800, 2600, 2400, 2200, 2000)
-BOTTOM_BOX = dict(left=0.55, top=6.18, width=12.24, height=0.62)
+BOTTOM_BOX = dict(left=0.55, top=6.15, width=12.24, height=0.62)
 REF_BOX = dict(left=0.55, top=6.92, width=12.24, height=0.45)
 
 # table column widths (points) where the default split breaks at 18 pt
 GRIDS = {
-    (2, 'Table 4'): [115, 103, 113],
+    (2, 'Table 4'): [160, 140, 146],
 }
 
 NOTES = {
@@ -598,61 +568,33 @@ def apply_font_sizes(tree, ref_shape=None):
     return sorted(set(raised))
 
 
-def _fit_size(text, width_in):
-    """Largest of BOTTOM_SIZES that keeps the sentence on one line."""
-    units = sum(1.0 if unicodedata.east_asian_width(ch) in 'WF' else 0.5
-                for ch in re.sub(r'\*\*|##|_\{|\}', '', text))
-    room = width_in * 72 * 0.97
-    for sz in BOTTOM_SIZES:
-        if units * sz / 100 <= room:
-            return sz
-    return BOTTOM_SIZES[-1]
-
-
-def add_bottom_note(tree, shapes, template_name, paragraphs):
-    """Clone the citation strip into a second box for the foot sentence."""
-    template = shapes[template_name]
-    note = copy.deepcopy(template)
-    cNvPr = note.find(f'.//{{{P}}}cNvPr')
-    cNvPr.set('name', 'BottomNote')
-    cNvPr.set('id', '90')
-    template.getparent().append(note)
-    set_geometry(note, **BOTTOM_BOX)
-    set_text(note, paragraphs)
-
-    body = note.find(f'{{{P}}}txBody/{{{A}}}bodyPr')
-    body.set('anchor', 'ctr')
-    # inherited from a 9 pt citation: bring the runs back to the floor first,
-    # the accent colour comes from the markup
-    size = _fit_size(paragraphs[0], BOTTOM_BOX['width'])
-    for run in note.iter(f'{{{A}}}r'):
-        rPr = run.find(f'{{{A}}}rPr')
-        if rPr is None:
-            rPr = etree.Element(f'{{{A}}}rPr')
-            run.insert(0, rPr)
-        rPr.set('sz', str(size))
-        fill = rPr.find(f'{{{A}}}solidFill')
-        if fill is None:
-            fill = etree.SubElement(rPr, f'{{{A}}}solidFill')
-            etree.SubElement(fill, f'{{{A}}}srgbClr')
-        fill.find(f'{{{A}}}srgbClr').set('val', ACCENT)
-    return note
-
-
 def set_geometry(sp, left=None, top=None, width=None, height=None):
     """Move or resize a shape.  Values are inches; None leaves that edge."""
     xfrm = sp.find(f'{{{P}}}spPr/{{{A}}}xfrm')
-    if xfrm is None:                                   # tables, pictures
+    if xfrm is None:                                   # tables, placeholders
         xfrm = sp.find(f'{{{P}}}xfrm')
+    if xfrm is None:
+        spPr = sp.find(f'{{{P}}}spPr')
+        xfrm = etree.Element(f'{{{A}}}xfrm')
+        spPr.insert(0, xfrm)
     off, ext = xfrm.find(f'{{{A}}}off'), xfrm.find(f'{{{A}}}ext')
-    if left is not None:
-        off.set('x', str(int(left * EMU_IN)))
-    if top is not None:
-        off.set('y', str(int(top * EMU_IN)))
+    if off is None:
+        off = etree.SubElement(xfrm, f'{{{A}}}off')
+    if ext is None:
+        ext = etree.SubElement(xfrm, f'{{{A}}}ext')
+    for key, attr, val in (('x', 'x', left), ('y', 'y', top)):
+        if val is not None:
+            off.set(attr, str(int(val * EMU_IN)))
     if width is not None:
         ext.set('cx', str(int(width * EMU_IN)))
     if height is not None:
         ext.set('cy', str(int(height * EMU_IN)))
+    for attr in ('x', 'y'):
+        if off.get(attr) is None:
+            off.set(attr, '0')
+    for attr in ('cx', 'cy'):
+        if ext.get(attr) is None:
+            ext.set(attr, '0')
 
 
 def set_grid(sp, widths_pt):
@@ -664,6 +606,65 @@ def set_grid(sp, widths_pt):
         col.set('w', str(int(w * EMU_IN / 72)))
 
 
+def _fit_size(text, width_in):
+    """Largest of BOTTOM_SIZES that keeps the sentence on one line."""
+    units = sum(1.0 if unicodedata.east_asian_width(ch) in 'WF' else 0.5
+                for ch in re.sub(r'\*\*|##|_\{|\}', '', text))
+    room = width_in * 72 * 0.97
+    for sz in BOTTOM_SIZES:
+        if units * sz / 100 <= room:
+            return sz
+    return BOTTOM_SIZES[-1]
+
+
+def add_bottom_note(tree, shapes, paragraphs):
+    """Build the foot sentence as a fresh text box.
+
+    It is built rather than cloned so that it does not depend on a slide having
+    a citation strip to copy -- two slides now cite nothing at all.
+    """
+    spTree = tree.getroot().find(f'.//{{{P}}}spTree')
+    sp = etree.SubElement(spTree, f'{{{P}}}sp')
+    nv = etree.SubElement(sp, f'{{{P}}}nvSpPr')
+    cNvPr = etree.SubElement(nv, f'{{{P}}}cNvPr')
+    cNvPr.set('id', '90')
+    cNvPr.set('name', 'BottomNote')
+    etree.SubElement(nv, f'{{{P}}}cNvSpPr').set('txBox', '1')
+    etree.SubElement(nv, f'{{{P}}}nvPr')
+
+    spPr = etree.SubElement(sp, f'{{{P}}}spPr')
+    xfrm = etree.SubElement(spPr, f'{{{A}}}xfrm')
+    etree.SubElement(xfrm, f'{{{A}}}off')
+    etree.SubElement(xfrm, f'{{{A}}}ext')
+    etree.SubElement(spPr, f'{{{A}}}prstGeom').set('prst', 'rect')
+    etree.SubElement(spPr, f'{{{A}}}noFill')
+
+    tx = etree.SubElement(sp, f'{{{P}}}txBody')
+    bodyPr = etree.SubElement(tx, f'{{{A}}}bodyPr')
+    bodyPr.set('wrap', 'square')
+    for k in ('lIns', 'rIns', 'tIns', 'bIns'):
+        bodyPr.set(k, '0')
+    bodyPr.set('anchor', 'ctr')
+    etree.SubElement(tx, f'{{{A}}}lstStyle')
+
+    size = _fit_size(paragraphs[0], BOTTOM_BOX['width'])
+    seed = etree.SubElement(tx, f'{{{A}}}p')
+    run = etree.SubElement(seed, f'{{{A}}}r')
+    rPr = etree.SubElement(run, f'{{{A}}}rPr')
+    rPr.set('sz', str(size))
+    rPr.set('b', '0')
+    fill = etree.SubElement(rPr, f'{{{A}}}solidFill')
+    etree.SubElement(fill, f'{{{A}}}srgbClr').set('val', ACCENT)
+    for tag in ('latin', 'ea', 'cs'):
+        etree.SubElement(rPr, f'{{{A}}}{tag}').set('typeface', 'Yu Gothic')
+    etree.SubElement(run, f'{{{A}}}t').text = 'x'
+
+    set_geometry(sp, **BOTTOM_BOX)
+    set_text(sp, paragraphs)
+    shapes['BottomNote'] = sp
+    return sp
+
+
 def shapes_by_name(tree):
     out = {}
     for sp in tree.getroot().iter():
@@ -672,6 +673,14 @@ def shapes_by_name(tree):
             if cNvPr is not None:
                 out[cNvPr.get('name')] = sp
     return out
+
+
+def keep_tail(sp, n):
+    """Delete all but the last n paragraphs of a shape."""
+    tx = sp.find(f'{{{P}}}txBody')
+    paras = tx.findall(f'{{{A}}}p')
+    for para in paras[:-n]:
+        tx.remove(para)
 
 
 def patch_runs(tree, pairs):
@@ -720,7 +729,7 @@ def replace_picture(work, slide_name, tree, png, new_media=None):
     iw, ih = Image.open(png).size
     ext.set('cx', str(int(iw / FIG_DPI * EMU_IN)))
     ext.set('cy', str(int(ih / FIG_DPI * EMU_IN)))
-    off.set('x', str(int(0.45 * EMU_IN)))
+    off.set('x', str(int(0.55 * EMU_IN)))
 
     descr = pic.find(f'.//{{{P}}}cNvPr')
     descr.set('descr', os.path.basename(png))
@@ -771,6 +780,9 @@ def main(src=DEFAULT_SRC, out=OUT):
         for (sp_pos, sp_name), paras in BODY.items():
             if sp_pos == pos:
                 set_text(shapes[sp_name], paras)
+        for (sp_pos, sp_name), n in KEEP_TAIL.items():
+            if sp_pos == pos:
+                keep_tail(shapes[sp_name], n)
         if pos in PATCHES:
             patch_runs(tree, PATCHES[pos])
         if pos in TABLES:
@@ -780,8 +792,7 @@ def main(src=DEFAULT_SRC, out=OUT):
                 sp = shapes.pop(sp_name)
                 sp.getparent().remove(sp)
         if pos in BOTTOM:
-            add_bottom_note(tree, shapes,
-                            REFS.get(pos) or FOOT_TEMPLATE[pos], BOTTOM[pos])
+            add_bottom_note(tree, shapes, BOTTOM[pos])
         if pos in REFS:
             set_geometry(shapes[REFS[pos]], **REF_BOX)
 

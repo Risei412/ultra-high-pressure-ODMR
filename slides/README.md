@@ -51,17 +51,19 @@ the option being argued against, and no third colour.
 
 ## Where text goes
 
-On a figure slide the right-hand column had been narrating the plot. It now
-carries only what the figure cannot show, in 50-90 Japanese characters; the
-fact the figure establishes is
+A figure slide is a title, one figure across the full width, and one sentence.
+There is no column of prose beside the figure -- a column that has to be read
+turns a slide you look at into a slide you read, and in practice it was
+restating what the plot already showed. What the figure cannot say, the speaker
+says. The fact the figure establishes is
 **one sentence** across the foot (`BOTTOM`), in navy, at the largest of
 28/26/24/22/20 pt that still keeps it on one line -- which is what makes the
 sentences short. The title already carries the headline, so the foot carries
 the number. The citation sits at 12 pt beneath it. One sentence is the rule, not a target: anything the sentence
 does not need in order to carry the claim -- a legend gloss, a value already
 labelled on the plot, a definition the axis already gives -- comes out of the
-foot. The grey strip is references and nothing else -- annotations that used
-to hide there are said out loud instead. Raising the body to 18 pt costs room, so phrasing was
+foot. The grey strip is references and nothing else. Slides 4-8 carry 18-24
+Japanese characters of body text each, down from 130-200. Raising the body to 18 pt costs room, so phrasing was
 tightened throughout -- but no claim was dropped. The qualifiers that carry one
 (`micropillar は前提条件`, `1 件は OPEN と申告`, the 50 GPa caveat on the
 ambient absorption curve, the power penalty in the conditions table) are all

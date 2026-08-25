@@ -54,7 +54,7 @@ BAND   = '#c9d2e6'
 
 JP = ['IPAGothic', 'IPAPGothic', 'DejaVu Sans']
 BASE = 18.0                 # the floor: nothing on a slide may be smaller
-FIGW = 7.70                 # inches; the width of the picture box in the deck
+FIGW = 11.60                # inches; the figure now spans the slide
 rcParams.update({
     'font.family': JP,
     'font.size': BASE,
@@ -108,7 +108,7 @@ def fig4_absorption():
     pk0 = lam[s0.argmax()]
     pk120 = lam[s120.argmax()]
 
-    fig, ax = plt.subplots(figsize=(FIGW, 4.30), layout='constrained')
+    fig, ax = plt.subplots(figsize=(FIGW, 4.55), layout='constrained')
     _frame(ax)
 
     ax.fill_between(lam, 0, s0, color=GREY, alpha=0.20, lw=0)
@@ -199,7 +199,7 @@ def _tornado_rows():
 def fig5_tornado():
     ref, rows = _tornado_rows()
     n = len(rows)
-    fig, ax = plt.subplots(figsize=(FIGW, 4.45), layout='constrained')
+    fig, ax = plt.subplots(figsize=(FIGW, 4.55), layout='constrained')
 
     ys = np.arange(n)[::-1]
     span = max(max(abs(r[1]), abs(r[2])) for r in rows)
@@ -262,7 +262,7 @@ def fig6_window(n_mc=200):
     opts = np.array([default_randomiser(rng).lambda_opt(P0) for _ in range(n_mc)])
     q16, q84 = np.percentile(opts, [16, 84])
 
-    fig, ax = plt.subplots(figsize=(FIGW, 4.30), layout='constrained')
+    fig, ax = plt.subplots(figsize=(FIGW, 4.55), layout='constrained')
     _frame(ax)
     ax.set_ylim(0.95, 4.2)
     ax.set_xlim(400, 560)
@@ -281,20 +281,23 @@ def fig6_window(n_mc=200):
     ax.text((lo_w + hi_w) / 2, 4.12, '5% 許容窓',
             color=NAVY, ha='center', va='top', fontsize=BASE)
 
-    for x, lab, xt, yt, ha in ((405.0, '405 nm', 410, 3.55, 'left'),
+    for x, lab, xt, yt, ha in ((405.0, '405 nm', 410, 3.10, 'left'),
                                (532.0, '532 nm', 528, 2.95, 'right')):
         y = float(np.asarray(m.eta_lambda(x, P0)[0])) / eopt
         ax.plot([x], [y], marker='o', ms=11, color=GREY, zorder=5)
         ax.axvline(x, color=GREY, lw=1.6, ls=(0, (5, 4)))
-        ax.text(xt, yt, lab, color=GREY, ha=ha, va='center', fontsize=BASE)
+        ax.text(xt, yt, f'{lab}  ×{y:.1f}', color=GREY, ha=ha, va='center',
+                fontsize=BASE)
 
     y473 = float(np.asarray(m.eta_lambda(473.0, P0)[0])) / eopt
     ax.plot([473.0], [y473], marker='o', ms=13, color=NAVY, zorder=6)
-    ax.annotate('473 nm', xy=(473.0, y473), xytext=(452, 1.30),
+    ax.annotate('473 nm  ×1.002', xy=(473.0, y473), xytext=(462, 2.05),
                 color=NAVY, ha='right', va='center', fontsize=BASE,
                 arrowprops=dict(arrowstyle='-', color=NAVY, lw=1.6,
-                                shrinkA=3, shrinkB=8))
+                                shrinkA=4, shrinkB=8))
 
+    ax.text(428, 3.95, '$\\eta \\propto \\Delta\\nu/(C\\sqrt{R})$',
+            color=NAVY, ha='left', va='top', fontsize=BASE)
     ax.set_xlabel('励起波長  $\\lambda$  (nm)')
     ax.set_ylabel('$\\eta/\\eta_{\\mathrm{opt}}$  (小さいほど良い)')
     return _save(fig, 'fig6_window.png')
@@ -318,7 +321,7 @@ def fig7_crossover(n_mc=120):
                          lambda mm: np.array([_ratio(mm, p) for p in P]),
                          n=n_mc, seed=5)
 
-    fig, ax = plt.subplots(figsize=(FIGW, 4.30), layout='constrained')
+    fig, ax = plt.subplots(figsize=(FIGW, 4.55), layout='constrained')
     _frame(ax)
     ax.set_yscale('log')
     ax.set_xlim(15, 150)
@@ -376,7 +379,7 @@ def fig8_power(n_mc=60):
     lo_r = ridge(m)
     lo_b, hi_b = mc_band(default_randomiser_power, ridge, n=n_mc, seed=11)
 
-    fig, ax = plt.subplots(figsize=(FIGW, 4.30), layout='constrained')
+    fig, ax = plt.subplots(figsize=(FIGW, 4.55), layout='constrained')
     _frame(ax)
     ax.set_xscale('log')
     ax.set_xlim(u[0], u[-1])
@@ -397,11 +400,14 @@ def fig8_power(n_mc=60):
     ax.text(np.sqrt(0.1 * 0.3), 497, '既存実験はここ', color=NAVY,
             ha='center', va='top', fontsize=BASE)
 
-    # the marker alone: the foot sentence of the slide carries the number
     mp = NVModelPower()
     e = np.asarray(mp.eta_lambda_u(lam, P0, 0.3)[0])
-    ax.plot([0.3], [lam[int(np.nanargmin(e))]], marker='o', ms=11,
-            color=NAVY, zorder=5)
+    best = lam[int(np.nanargmin(e))]
+    pen = (float(np.asarray(mp.eta_lambda_u(473.0, P0, 0.3)[0]))
+           / float(np.nanmin(e)))
+    ax.plot([0.3], [best], marker='o', ms=11, color=NAVY, zorder=5)
+    ax.text(0.26, best - 4, f'$u$=0.3: {best:.0f} nm\n473 固定 ×{pen:.2f}',
+            color=NAVY, ha='right', va='top', fontsize=BASE, linespacing=1.25)
 
     ax.set_xlabel('規格化強度  $u = I/I_{1/2}$')
     ax.set_ylabel('最適励起波長  (nm)')
