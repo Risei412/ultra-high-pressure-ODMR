@@ -113,7 +113,8 @@ BODY = {
         '釣り合いの位置は量的問題である。',
     ],
     (4, 'TextBox 4'): [
-        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026) — DFT + DAC。',
+        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026) — DFT + DAC。'
+        '灰色の常圧曲線は単一有効フォノン近似（50 GPa 以下では粗い）。',
     ],
     (5, 'TextBox 3'): [
         '励起状態イオン化と再結合はどちらも σ_{abs} に比例し、'
@@ -123,7 +124,9 @@ BODY = {
         '##だから答えは一点ではなく窓で述べる。##',
     ],
     (5, 'TextBox 4'): [
-        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026)。',
+        'K. O. Ho, C. Dailledouze et al., arXiv:2606.02399 (2026)。'
+        '等パワー比較では光子束 ∝ λ なので、'
+        '最適は σabs 極大 474.0 nm ではなく λσabs 極大 475.5 nm。',
     ],
     (6, 'TextBox 4'): [
         '457 nm ×1.11、488 nm ×1.05 — 窓の中には市販線が 3 本ある。',
@@ -154,6 +157,7 @@ BODY = {
         '2 ビーム掃引よりずっと安く、波長比較より先にやる。',
     ],
     (8, 'TextBox 4'): [
+        'u = 1 は λopt における NV⁻ 遷移の半飽和強度。'
         '未校正の量は docs/next_step_power_dependence_experiment.md の '
         'Stage 1–3 で決める。',
     ],
@@ -169,25 +173,16 @@ BODY = {
 # DOES show -- how to read it, and the fact it establishes -- goes here, as one
 # sentence across the foot of the slide, so the column stops narrating the plot.
 BOTTOM = {
-    4: ['図: 常圧（灰）と 120 GPa（紺）の吸収帯。'
-        '吸収極大とイオン化端が同時に青へ動き、'
-        '120 GPa では σ(473) が σ(532) の **10 倍**になる。'
-        '常圧曲線は単一有効フォノン近似で、50 GPa 以下では粗い。'],
-    5: ['図: 各入力を MC 範囲の端に振ったときの λopt の変化。'
-        '動かすのは光学入力 3 つだけで、'
-        '**校正でフィットする現象論定数は 1 つも動かさない**。'
-        '等パワー比較では光子束 ∝ λ なので、'
-        '最適は σabs 極大 474.0 nm ではなく λσabs 極大 475.5 nm。'],
-    6: ['図: 帯は入力の MC 16–84%。λopt = 475.5 +5.6 / −5.3 nm は '
-        '5% 許容窓 463–488 nm の半分を占める。'
-        '**市販の 473 nm DPSS はその窓の中で、最適の 0.2% 落ちにすぎない。**'],
-    7: ['図: 50 GPa の既報は**青の優位を見つけなかった**。'
-        'モデルはそこで 0.56、緑が有利と答える。'
-        '見つからなかったことが再現になっている。'],
-    8: ['図: u = 1 は λopt での NV⁻ 遷移の半飽和強度。'
-        '稜線は 475.5 nm (u→0) から 405 nm のイオン化端まで走る。'
-        'Dai 2022 の線形 PL が置く u ≲ 0.3 では 473 nm 固定のコストが ×1.51 に達し、'
-        '**緑に対する ×2.5 の大半を食う。**'],
+    4: ['吸収極大とイオン化端が同時に青へ動き、'
+        '120 GPa では σ(473) が σ(532) の **10 倍**になる。'],
+    5: ['動かすのは光学入力 3 つだけで、'
+        '**校正でフィットする現象論定数は 1 つも λopt を動かさない**。'],
+    6: ['λopt の不確かさ ±5.5 nm は 5% 許容窓の半分を占める — '
+        '**答えは点ではなく窓である**。'],
+    7: ['50 GPa の既報が**青の優位を見つけなかったこと自体**が、'
+        'モデルの再現になっている。'],
+    8: ['既存実験がいる u ≲ 0.3 では 473 nm 固定が ×1.51 になり、'
+        '**緑への ×2.5 の大半を食う**。'],
 }
 
 # the citation strip on each slide, exempt from the 18 pt floor
@@ -232,16 +227,17 @@ GEOMETRY = {
     (7, 'Picture 2'): dict(top=1.42),
     (8, 'Picture 2'): dict(top=1.42),
     # the right-hand column stops at the foot sentence
-    (4, 'TextBox 3'): dict(top=1.50, height=4.20),
-    (5, 'TextBox 3'): dict(top=1.50, height=4.20),
-    (6, 'TextBox 4'): dict(top=3.55, height=2.15),
-    (7, 'TextBox 3'): dict(top=1.50, height=4.20),
-    (8, 'TextBox 3'): dict(top=1.50, height=4.20),
+    (4, 'TextBox 3'): dict(top=1.50, height=4.55),
+    (5, 'TextBox 3'): dict(top=1.50, height=4.55),
+    (6, 'TextBox 4'): dict(top=3.55, height=2.50),
+    (7, 'TextBox 3'): dict(top=1.50, height=4.55),
+    (8, 'TextBox 3'): dict(top=1.50, height=4.55),
     (6, 'Table 3'): dict(top=1.42),
 }
 
 # the sentence across the foot, and the citation strip under it
-BOTTOM_BOX = dict(left=0.55, top=5.86, width=12.24, height=0.95)
+BOTTOM_SZ = 2000           # the foot is one sentence; give it the emphasis
+BOTTOM_BOX = dict(left=0.55, top=6.25, width=12.24, height=0.45)
 REF_BOX = dict(left=0.55, top=6.92, width=12.24, height=0.45)
 
 # table column widths (points) where the default split breaks at 18 pt
@@ -573,6 +569,8 @@ def apply_font_sizes(tree, ref_shape=None):
             if is_ref:
                 rPr.set('sz', str(REF_SZ))
                 continue
+            if cNvPr is not None and cNvPr.get('name') == 'BottomNote':
+                continue
             sz = rPr.get('sz')
             if sz and int(sz) < MIN_SZ:
                 raised.append(int(sz) // 100)
@@ -593,7 +591,7 @@ def add_bottom_note(tree, shapes, template_name, paragraphs):
     # inherited from a 9 pt citation: bring the runs back to the floor first,
     # the accent colour comes from the markup
     for rPr in note.iter(f'{{{A}}}rPr'):
-        rPr.set('sz', str(MIN_SZ))
+        rPr.set('sz', str(BOTTOM_SZ))
         clr = rPr.find(f'{{{A}}}solidFill/{{{A}}}srgbClr')
         if clr is not None and clr.get('val') != ACCENT:
             clr.set('val', '101426')
