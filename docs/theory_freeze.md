@@ -4,7 +4,10 @@ The model is frozen here. Everything below is a **prediction made before the
 measurement**, which is the only thing that makes the comparison worth
 anything: a model improved after seeing the data can always be made to agree.
 
-Frozen at commit `0fd410f`, tag `theory-freeze-2026-08-26`.
+Frozen at commit `ab5b4f3` on branch `claude/repository-theory-presentation-rm3txv`.
+(A `theory-freeze-2026-08-26` tag was cut locally but the remote refused the tag
+ref, so the commit hash is the marker. Re-cut the tag from a machine with direct
+push access if a tag is wanted.)
 
 ## Why freeze rather than develop
 
