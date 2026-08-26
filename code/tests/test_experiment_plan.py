@@ -91,3 +91,48 @@ def test_a_sweep_that_never_saturates_says_so():
     R = np.array([float(np.asarray(mp.eta_lambda_u(473., 120., uu)[2]))
                   for uu in u])
     assert np.isnan(analyse_power_sweep(u, R, 473., 120.)['knee_power'])
+
+
+# ------------------------------------------------- temperature invariance
+# The Meissner measurements happen below Tc, not at room temperature, so the
+# recommendation has to survive being cooled.  It does: T enters the model only
+# through the Franck-Condon envelope, which broadens symmetrically and leaves
+# the peak where it is.
+def test_the_optimum_is_temperature_independent():
+    cold = NVModel(T=4.0).lambda_opt(120.)
+    warm = NVModel(T=300.0).lambda_opt(120.)
+    assert abs(cold - warm) < 1.0
+    assert cold == pytest.approx(476.1, abs=0.3)
+
+
+def test_473_stays_optimal_at_every_temperature():
+    for T in (4.0, 77.0, 150.0, 200.0, 300.0):
+        m = NVModel(T=T)
+        opt = m.lambda_opt(120.)
+        pen = (float(np.asarray(m.eta_lambda(473., 120.)[0]))
+               / float(np.asarray(m.eta_lambda(opt, 120.)[0])))
+        assert pen < 1.01, f'473 nm costs {pen:.3f} at {T} K'
+
+
+def test_cooling_widens_the_gap_to_green():
+    """The sideband narrows, so 532 nm on the far red flank falls further."""
+    def green(T):
+        m = NVModel(T=T)
+        return (float(np.asarray(m.eta_lambda(532., 120.)[0]))
+                / float(np.asarray(m.eta_lambda(m.lambda_opt(120.), 120.)[0])))
+    assert green(4.0) > green(77.0) > green(150.0) > green(300.0)
+    assert green(300.0) == pytest.approx(2.53, abs=0.05)
+    assert green(4.0) == pytest.approx(4.89, abs=0.15)
+
+
+def test_the_tolerance_window_barely_moves_with_temperature():
+    def window(T):
+        m = NVModel(T=T)
+        lam = np.arange(402., 640., 0.05)
+        e = (np.asarray(m.eta_lambda(lam, 120.)[0])
+             / float(np.asarray(m.eta_lambda(m.lambda_opt(120.), 120.)[0])))
+        inside = lam[e <= 1.05]
+        return inside[0], inside[-1]
+    lo_c, hi_c = window(4.0)
+    lo_w, hi_w = window(300.0)
+    assert abs(lo_c - lo_w) < 3.0 and abs(hi_c - hi_w) < 3.0

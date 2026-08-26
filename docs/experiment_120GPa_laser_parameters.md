@@ -130,6 +130,26 @@ With those, the power-dependence result stops being a pre-calibration scenario.
 
 ---
 
+## Cooling does not change the answer
+
+The run will be cold, not at room temperature. λ_opt moves **0.6 nm between
+4 K and 300 K**, so nothing in steps 1 and 2 has to be redone on cooling: pick
+the line warm, and it is still the right line cold.
+
+The margin gets better, not worse. The sideband narrows as the anti-Stokes wing
+freezes out, so 532 nm on the far red flank falls further while the peak stays:
+
+| T | η(532)/η_opt |
+|---|---|
+| 300 K | 2.53 |
+| 150 K | 3.39 |
+| 77 K | 4.10 |
+| 4 K | 4.89 |
+
+**The ×2.5 quoted at room temperature is conservative for the measurement that
+will actually be made.** If step ③ is run both warm and cold, the growth of
+that ratio is itself a prediction being tested.
+
 ## What this does not give
 
 - **Absolute mW.** By construction. Step 2 returns a multiple of a measured

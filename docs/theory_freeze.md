@@ -63,8 +63,33 @@ At 120 GPa, room temperature, near-hydrostatic (α = 0.95) unless stated.
 | 473 nm penalty at u = 0.2 / 0.3 | ×1.22 / ×1.51 |
 | ZPL range for which 473 nm holds | **512–541 nm** |
 | power recipe | operate at **1.9 ×** the 10% knee (u: 0.060 → 0.114) |
+| λ_opt(4 K) − λ_opt(300 K) | **+0.6 nm** |
+| η(532)/η_opt at 4 / 77 / 150 / 300 K | **4.89 / 4.10 / 3.39 / 2.53** |
+| 5% window at 4 K | 465–487 nm (300 K: 463–488) |
 
 Reproduce with `python repro_literature.py` and `python experiment_plan.py`.
+
+## Temperature
+
+The Meissner measurements happen below T_c, not at room temperature, so the
+recommendation has to survive being cooled. It does, and not by assumption:
+temperature enters the model only through the Franck–Condon envelope, which
+broadens symmetrically and leaves its peak where it is. **λ_opt moves 0.6 nm
+between 4 K and 300 K**, against a ±5.5 nm uncertainty and a 25 nm window.
+
+Cooling in fact *strengthens* the case. The anti-Stokes wing disappears, the
+sideband narrows, and 532 nm — which sits on the far red flank — falls further
+while the peak does not move: the green penalty rises from ×2.53 at 300 K to
+×4.89 at 4 K. **The headline ×2.5 is the room-temperature value and is
+conservative for the experiment that will actually be run.**
+
+Two things the model does not carry here. The real NV⁻ ZPL shifts by roughly
+15 meV over 4–300 K through thermal expansion and electron–phonon coupling,
+which the model's ZPL does not; at −0.18 nm of λ_opt per meV that is about
+3 nm, larger than the 0.6 nm above but still well inside the window. And C₀ is
+temperature dependent in reality, which moves the absolute sensitivity — but
+C₀ is wavelength independent and therefore cannot move λ_opt at all, which
+`test_freeze.py` asserts.
 
 ## What each prediction is exposed to
 
@@ -74,6 +99,7 @@ Reproduce with `python repro_literature.py` and `python experiment_plan.py`.
 | the ZPL range for 473 nm | step ① — one PL spectrum |
 | the power ridge and its penalties | step ② — the 473 nm power sweep |
 | the 73 GPa crossover and the ×5.8 swing | step ④ — a 40 → 120 GPa sweep with both lines |
+| the temperature invariance | step ③, if the A/B is repeated warm and cold |
 | ħω, the dominant uncertainty | **nothing in this protocol.** Only a direct σ_abs(λ) measurement at pressure |
 
 Steps ① – ④ are `docs/experiment_120GPa_laser_parameters.md`.
