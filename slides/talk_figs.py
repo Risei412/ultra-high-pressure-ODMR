@@ -23,6 +23,7 @@ Out:
     slides/figs/fig4_absorption.png   sigma_abs at 0 and 120 GPa
     slides/figs/fig5_tornado.png      d(lambda_opt): the inputs that move it
     slides/figs/fig5_tornado_full.png every input, labelled (supplementary)
+    slides/figs/fig7b_contrast.png   measured vs modelled ODMR contrast
     slides/figs/fig6_window.png       eta / eta_opt vs wavelength
     slides/figs/fig7_crossover.png    eta(532) / eta(473) vs pressure
     slides/figs/fig8_power.png        optimal wavelength vs intensity
@@ -302,9 +303,71 @@ def fig8_power():
     return _save(ax.figure, 'fig8_power.png')
 
 
+# --------------------------------------------------------------------------
+# slide 7 (alternative) -- measured against modelled ODMR contrast
+# --------------------------------------------------------------------------
+# (pressure GPa, excitation nm, measured contrast, micropillar?, calibration?)
+CONTRAST = [
+    (0.0,   532.0, 0.140, False, True),    # Dai 2022, Fig. 3A -- the C0 anchor
+    (102.0, 532.0, 0.030, False, True),
+    (138.0, 532.0, 0.012, False, True),
+    (73.0,  457.0, 0.050, True,  False),   # Hilberer 2023, Fig. 3b -- independent
+    (103.0, 457.0, 0.030, True,  False),
+    (131.0, 405.0, 0.015, True,  False),
+]
+
+
+def fig7b_contrast():
+    """Measured ODMR contrast against the modelled contrast, point by point.
+
+    The reproduction claim needs a plot in which measurement and calculation
+    appear together; the crossover curve has no measured counterpart to show.
+    Each point is evaluated at its own pressure, excitation wavelength and
+    anvil geometry, so the parity line is the whole content: on it means
+    reproduced.  Open markers are the three points C0 was calibrated to and
+    prove nothing; the filled ones are independent.
+    """
+    meas, model, free = [], [], []
+    for P, lam, c, pillar, cal in CONTRAST:
+        mm = NVModel(T=300.0, alpha=0.95) if pillar else NVModel(T=300.0)
+        meas.append(c * 100)
+        model.append(float(np.asarray(mm.eta_lambda(lam, P)[3])) * 100)
+        free.append(not cal)
+
+    ax = _axes()
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    lim = (0.8, 25)
+    ax.plot(lim, lim, color=DARK, lw=1.6, zorder=1)
+    for x, y, f in zip(meas, model, free):
+        if f:
+            ax.plot([x], [y], marker='o', ms=15, color=NAVY, zorder=3)
+        else:
+            ax.plot([x], [y], marker='o', ms=15, mfc='white', mew=2.6,
+                    mec=GREY, zorder=3)
+    ax.set_xlim(*lim)
+    ax.set_ylim(*lim)
+    for axis in (ax.xaxis, ax.yaxis):
+        axis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+        axis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+    ax.set_xticks([1, 2, 5, 10, 20])
+    ax.set_yticks([1, 2, 5, 10, 20])
+    ax.set_aspect('equal')
+    ax.set_xlabel('実測 ODMR コントラスト  (%)')
+    ax.set_ylabel('モデル  (%)')
+
+    print('  fig7b measured vs model:')
+    for (P, lam, c, _p, cal), g in zip(CONTRAST, model):
+        print(f'    {P:5.0f} GPa  {lam:.0f} nm   実測 {c*100:4.1f}%   '
+              f'モデル {g:4.1f}%   比 {g/(c*100):.2f}'
+              f'{"   [較正点]" if cal else ""}')
+    return _save(ax.figure, 'fig7b_contrast.png')
+
+
 FIGS = {4: fig4_absorption, 5: fig5_tornado, 6: fig6_window,
         7: fig7_crossover, 8: fig8_power,
-        55: fig5_tornado_full}      # supplementary: the full breakdown
+        55: fig5_tornado_full,      # supplementary: the full breakdown
+        77: fig7b_contrast}         # measured vs modelled contrast
 
 if __name__ == '__main__':
     want = [int(a) for a in sys.argv[1:]] or sorted(FIGS)
