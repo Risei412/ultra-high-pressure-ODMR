@@ -5,9 +5,10 @@ Figures for the 8-minute internal talk, generated from the frozen model in
 ``code/nv_model.py`` / ``code/nv_model_power.py`` so that every number on a
 slide comes from the same source as the manuscript.
 
-These are deliberately BARE: axes, ticks, axis labels and the data, and nothing
-else.  No call-outs, no reference lines, no shaded regions, no legends, no
-titles.  Everything that explains a plot is added in PowerPoint afterwards,
+These are deliberately BARE: axes, ticks, axis labels and the plotted line, and
+nothing else.  No call-outs, no reference lines, no legends, no titles, and no
+Monte Carlo band -- the uncertainty is described in the supplementary material
+rather than drawn here.  Everything that explains a plot is added in PowerPoint afterwards,
 where it can be moved and reworded without regenerating anything.  (The earlier
 annotated versions are in git history, at commit dc17a85.)
 
@@ -36,8 +37,8 @@ from matplotlib import rcParams
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 '..', 'code'))
-from nv_model import NVModel, nm2eV, mc_band, default_randomiser   # noqa: E402
-from nv_model_power import (NVModelPower, default_randomiser_power)  # noqa: E402
+from nv_model import NVModel, nm2eV        # noqa: E402
+from nv_model_power import NVModelPower     # noqa: E402
 
 # --------------------------------------------------------------------------
 # house style -- Institute of Science Tokyo navy, one neutral grey, nothing else
@@ -196,19 +197,13 @@ def fig5_tornado():
 # --------------------------------------------------------------------------
 # slide 6 -- sensitivity against excitation wavelength
 # --------------------------------------------------------------------------
-def fig6_window(n_mc=200):
+def fig6_window():
     m = NVModel()
     lam = np.arange(400.0, 561.0, 0.25)
     eopt = float(np.asarray(m.eta_lambda(m.lambda_opt(P0), P0)[0]))
     rel = np.asarray(m.eta_lambda(lam, P0)[0]) / eopt
 
-    def norm(mm):
-        e0 = float(np.asarray(mm.eta_lambda(mm.lambda_opt(P0), P0)[0]))
-        return np.asarray(mm.eta_lambda(lam, P0)[0]) / e0
-    lo, hi = mc_band(default_randomiser, norm, n=n_mc, seed=3)
-
     ax = _axes()
-    ax.fill_between(lam, lo, hi, color=NAVY, alpha=0.13, lw=0)
     ax.plot(lam, rel, color=NAVY, lw=4.2)
     ax.set_xlim(400, 560)
     ax.set_ylim(0.95, 4.2)
@@ -225,17 +220,13 @@ def _ratio(m, P, blue=473.0):
             / float(np.asarray(m.eta_lambda(blue, P)[0])))
 
 
-def fig7_crossover(n_mc=120):
+def fig7_crossover():
     m = NVModel()
     P = np.linspace(15, 150, 400)
     r = np.array([_ratio(m, p) for p in P])
-    lo, hi = mc_band(default_randomiser,
-                     lambda mm: np.array([_ratio(mm, p) for p in P]),
-                     n=n_mc, seed=5)
 
     ax = _axes()
     ax.set_yscale('log')
-    ax.fill_between(P, lo, hi, color=NAVY, alpha=0.13, lw=0)
     ax.plot(P, r, color=NAVY, lw=4.2)
     ax.set_xlim(15, 150)
     ax.set_ylim(0.22, 5.0)
@@ -250,20 +241,16 @@ def fig7_crossover(n_mc=120):
 # --------------------------------------------------------------------------
 # slide 8 -- the optimal wavelength against excitation intensity
 # --------------------------------------------------------------------------
-def fig8_power(n_mc=60):
+def fig8_power():
     m = NVModelPower()
     lam = np.linspace(402, 560, 700)
     u = np.logspace(-2.3, 1.0, 90)
-
-    def ridge(mm):
-        e = np.array([np.asarray(mm.eta_lambda_u(lam, P0, uu)[0]) for uu in u])
-        return lam[np.nanargmin(e, axis=1)]
-    lo, hi = mc_band(default_randomiser_power, ridge, n=n_mc, seed=11)
+    e = np.array([np.asarray(m.eta_lambda_u(lam, P0, uu)[0]) for uu in u])
+    ridge = lam[np.nanargmin(e, axis=1)]
 
     ax = _axes()
     ax.set_xscale('log')
-    ax.fill_between(u, lo, hi, color=NAVY, alpha=0.16, lw=0)
-    ax.plot(u, ridge(m), color=NAVY, lw=4.2)
+    ax.plot(u, ridge, color=NAVY, lw=4.2)
     ax.set_xlim(u[0], u[-1])
     ax.set_ylim(398, 500)
     ax.set_xlabel('規格化強度  $u = I/I_{1/2}$')
