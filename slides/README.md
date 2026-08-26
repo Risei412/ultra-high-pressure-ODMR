@@ -1,5 +1,12 @@
 # 8-minute internal talk
 
+The figures are deliberately bare -- axes, ticks, axis labels and the data,
+nothing else. Call-outs, reference lines, shaded regions and legends are added
+in PowerPoint, where they can be moved and reworded without regenerating
+anything. Because each figure is drawn at the exact size it occupies on the
+slide, text added in PowerPoint at 18 pt matches the tick labels. The annotated
+versions of these figures are in git history at commit dc17a85.
+
 `odmr_473nm_talk.pptx` is the talk deck. It is generated, not hand-edited:
 
 ```bash
