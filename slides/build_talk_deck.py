@@ -86,7 +86,7 @@ TITLES = {
     6: '答えは点ではなく窓である — 463–488 nm',
     7: '先行実験を 26/26 再現し、73 GPa で符号が変わる',
     8: '最適波長はパワーで青へ動く — ここは未校正である',
-    9: '473 nm が成り立つ条件、成り立たない条件',
+    9: '理論はここで凍結する — 次は測る',
 }
 
 BODY = {
@@ -122,7 +122,9 @@ BODY = {
 
 # slides with no citation strip in the draft, but a source to credit
 EXTRA_REFS = {
-    9: ['A. Hilberer et al., Phys. Rev. B 107, L220102 (2023).'],
+    # why step 1 exists: the (111) geometry the run will use
+    9: ['P. Bhattacharyya et al., Nature 627, 73 (2024); '
+        'B. Huang et al., arXiv:2511.20750 (2025).'],
 }
 
 # The right-hand column states what the figure cannot show.  What the figure
@@ -136,8 +138,7 @@ BOTTOM = {
     6: ['λopt の不確かさ ±5.5 nm は**許容窓の半分**を占める。'],
     7: ['**これが本研究を反証する測定である。**'],
     8: ['次の一手は **473 nm 単色のパワー掃引 1 本**である。'],
-    9: ['532 nm を 473 nm DPSS に替えれば、'
-        '同じマップが **1/6 の時間**で撮れる。'],
+    9: ['**予言を凍結したから、実験は検証になる。**'],
 }
 
 # the citation strip on each slide, exempt from the 18 pt floor
@@ -175,13 +176,16 @@ TABLES = {
         (3, 1): '2.53',
     },
     9: {
-        (1, 2): '平坦キュレット (α = 0.56) なら 510 nm。'
-                'その形状は 40–50 GPa で ODMR コントラストを失う — '
-                'micropillar は前提条件',
-        (2, 1): '約 73 GPa 以上',
-        (3, 2): '未校正（前ページ）。u = 0.3 では最適が 447 nm へ動き、'
-                '473 nm 固定は ×1.51',
-    },
+        (0, 0): '手順', (0, 1): '測るもの', (0, 2): '決まること',
+        (1, 0): '①', (1, 1): '120 GPa の PL スペクトル',
+        (1, 2): '励起波長。473 nm は ZPL 512–541 nm なら有効',
+        (2, 0): '②', (2, 1): '473 nm のパワー掃引',
+        (2, 2): '運用パワー（膝の 1.9 倍）、C(I)、Δν(I)',
+        (3, 0): '③', (3, 1): 'その運用点で 532 nm と A/B',
+        (3, 2): 'この装置での実効利得 — 論文の主結果',
+        (4, 0): '④', (4, 1): '40→120 GPa 掃引（相乗り）',
+        (4, 2): '反証条件。比は ×5.8 振れて 1 を横切る',
+    }
 }
 
 # Layout adjustments forced by the 18 pt floor.  Sizes are inches; a shape
@@ -212,6 +216,8 @@ REF_BOX = dict(left=0.55, top=6.92, width=12.24, height=0.45)
 # table column widths (points) where the default split breaks at 18 pt
 GRIDS = {
     (2, 'Table 4'): [160, 140, 146],
+    # the step column is now just a numeral, so the width goes to the content
+    (9, 'Table 2'): [55, 300, 524],
 }
 
 NOTES = {
@@ -237,8 +243,13 @@ NOTES = {
     8: '5:55–6:50  未解決。向きは頑健、量は未校正。'
        '既存実験がいる u ≲ 0.3 でコストが ×1.5 に達することを言い、'
        '473 nm 単色パワー掃引 1 本という次の一手に落とす。',
-    9: '6:50–7:35  適用条件とまとめ。校正は 473 nm の検証ではなく、'
-       '絶対感度・パワー依存・f₋ の直接測定のために行う。',
+    9: '6:50–7:35  理論を凍結し、次の一手に渡す。'
+       '①は (111) アンビルでアンカーが移るため必須。'
+       'α や micropillar を前提にせず、測った ZPL で読み替える。'
+       '適用条件は口頭で: 73 GPa 以上でのみ青が有利、'
+       'type Ib バルクは 500 nm 以下を吸うので低窒素アンビルが要る。'
+       '②で C(I)・Δν(I) を同時に取れば、パワー依存が'
+       '「校正前のシナリオ」から結果に変わる。',
 }
 
 # figure for each slide position
