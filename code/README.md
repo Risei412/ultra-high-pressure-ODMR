@@ -15,6 +15,10 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   sensitivity `eta ∝ Δν/(C√R)`; also Monte-Carlo band helper.
 - `fig1_green_blue_mix.py` — sensitivity of green(532)/blue(457)/mix vs pressure
   → `sensitivity_green_blue_mix.png`.
+- `experiment_plan.py` — the two laser parameters for a run, from measurements
+  the cell can supply: the excitation line from a measured ZPL, and the
+  operating power from the knee of the saturation curve. Neither needs the
+  uncalibrated intensity scale. See `docs/experiment_120GPa_laser_parameters.md`.
 - `fig2_blue_wavelength_sweep.py` — blue-wavelength sweep at a chosen pressure
   (optimum, mechanism, optimum-vs-pressure)
   → `blue_wavelength_sensitivity_<P>GPa.png`.
