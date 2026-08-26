@@ -7,6 +7,16 @@ anything. Because each figure is drawn at the exact size it occupies on the
 slide, text added in PowerPoint at 18 pt matches the tick labels. The annotated
 versions of these figures are in git history at commit dc17a85.
 
+Two kinds of shading survive, and they are not the same thing. On figs 6, 7
+and 8 the pale band hugging the curve is the **Monte Carlo 16-84% band** from
+`mc_band` -- the model re-evaluated over randomised inputs, so it is data. On
+fig 4 the wash under each curve is only an area fill, drawn to tell two
+overlapping envelopes apart.
+
+`fig5_tornado.png` has no row labels: they are typed in PowerPoint. The script
+prints where each row sits, in inches from the top of the placed figure, and
+holds the left 23.5% of the width open for them.
+
 `odmr_473nm_talk.pptx` is the talk deck. It is generated, not hand-edited:
 
 ```bash

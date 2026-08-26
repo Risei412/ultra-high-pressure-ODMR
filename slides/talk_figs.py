@@ -69,8 +69,18 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'figs')
 DPI = 200
 
 
-def _axes():
-    ax = plt.subplots(figsize=(FIGW, FIGH), layout='constrained')[1]
+def _axes(margins=None):
+    """A bare axis frame at the exact slide size.
+
+    `margins` pins the axes rectangle instead of letting the layout engine
+    choose it, which is what keeps the plot area in place on a figure whose
+    tick labels have been removed so they can be typed in PowerPoint.
+    """
+    if margins is None:
+        ax = plt.subplots(figsize=(FIGW, FIGH), layout='constrained')[1]
+    else:
+        fig, ax = plt.subplots(figsize=(FIGW, FIGH))
+        fig.subplots_adjust(**margins)
     for side in ('top', 'right'):
         ax.spines[side].set_visible(False)
     ax.grid(True, color='#e8ebf2', lw=1.0)
@@ -144,7 +154,9 @@ def fig5_tornado():
         rows.append((label, min(lo, hi), max(lo, hi), optical))
     rows.sort(key=lambda r: max(abs(r[1]), abs(r[2])), reverse=True)
 
-    ax = _axes()
+    # the left margin is held open for the text boxes that will carry the row
+    # labels; without it the layout engine would reclaim the space
+    ax = _axes(dict(left=0.235, right=0.99, top=0.98, bottom=0.20))
     ys = np.arange(len(rows))[::-1]
     for y, (_, neg, pos, optical) in zip(ys, rows):
         colour = NAVY if optical else GREY
@@ -158,12 +170,26 @@ def fig5_tornado():
     span = max(max(abs(r[1]), abs(r[2])) for r in rows)
     ax.set_xlim(-span - 1.0, span + 1.0)
     ax.set_ylim(-0.8, len(rows) - 0.2)
-    ax.set_yticks(ys)
-    ax.set_yticklabels([r[0] for r in rows], fontsize=BASE)
+    ax.set_yticks([])
     ax.spines['left'].set_visible(False)
     ax.grid(False, axis='y')
     ax.set_xlabel(f'$\\lambda_{{\\mathrm{{opt}}}}$ の変化  (nm)   '
                   f'[基準 {ref:.1f} nm]')
+
+    # the row labels are typed in PowerPoint, so report where each row sits:
+    # inches from the top-left of the placed figure
+    bbox = ax.get_position()
+    top_in = (1 - bbox.y1) * FIGH
+    row_in = bbox.height * FIGH / len(rows)
+    print(f'  fig5 rows (inches from the figure top, row height '
+          f'{row_in:.2f} in):')
+    for k, (label, neg, pos, _) in enumerate(rows):
+        centre = top_in + row_in * (k + 0.5)
+        plain = (label.replace('$', '').replace('\\mathrm', '')
+                 .replace('\\hbar\\omega', 'hw').replace('{', '')
+                 .replace('}', '').replace('_', ''))
+        print(f'    {centre:5.2f} in  {plain:<28} '
+              f'{"±%.1f nm" % max(abs(neg), abs(pos))}')
     return _save(ax.figure, 'fig5_tornado.png')
 
 
