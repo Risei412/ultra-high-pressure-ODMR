@@ -96,7 +96,8 @@ BODY = {
     (2, 'TextBox 7'): [
         'Bhattacharyya, PhD thesis (2022) Fig. 2.2; '
         'Drozdov, Nature 525, 73 (2015); 569, 528 (2019); '
-        'Salke, Nat. Commun. 10, 4453 (2019); Bi, ibid. 13, 5952 (2022).',
+        'Salke, Nat. Commun. 10, 4453 (2019); Chen, PRL 127, 117001 (2021); '
+        'Bi, Nat. Commun. 13, 5952 (2022).',
     ],
     (3, 'TextBox 8'): [
         'Bhattacharyya, PhD thesis (2022) Fig. 7.2, 7.8; '
@@ -117,6 +118,11 @@ BODY = {
     (8, 'TextBox 4'): [
         'J.-H. Dai et al., Chin. Phys. Lett. 39, 117601 (2022).',
     ],
+}
+
+# slides with no citation strip in the draft, but a source to credit
+EXTRA_REFS = {
+    9: ['A. Hilberer et al., Phys. Rev. B 107, L220102 (2023).'],
 }
 
 # The right-hand column states what the figure cannot show.  What the figure
@@ -215,7 +221,12 @@ NOTES = {
     3: '1:35–2:20  探針はアンビル内。既に撮れている実測を見せ、'
        'マップ時間 ∝ 画素数/η² で感度が通貨だと言う。',
     4: '2:20–3:20  2 つの端が窓を挟み込む。常圧曲線は単一有効フォノン近似が粗い旨を'
-       '先に断る（次ページの伏線）。',
+       '先に断る（次ページの伏線）。'
+       '［想定質問・軽微］なぜ二光子励起ではなく青色単光子か: '
+       '二光子励起は CW ロックインと両立せず、必要なピーク強度は DAC の熱制約に触れる。'
+       '本研究は既存の CW-ODMR 装置で波長を替えるだけで得られる利得を扱う。'
+       'なおモデル内の二光子過程は信号源ではなく、'
+       '高強度でのイオン化損失としてのみ入っている（8 枚目）。',
     5: '3:20–3:55  相殺 → 現象論非依存。ゼロが並ぶ絵が主張。'
        'ただし上の 3 本のうち最大は自分のモデル形であることを言い、'
        '「点ではなく窓」へ渡す。λσ の 1.5 nm は聞かれたら答える程度に留める。',
@@ -522,7 +533,7 @@ def apply_colours(tree, ref_shape=None):
             continue
         cNvPr = sp.find(f'.//{{{P}}}cNvPr')
         name = cNvPr.get('name') if cNvPr is not None else ''
-        if name == ref_shape:
+        if name == ref_shape or name == 'RefNote':
             colour = REF_CLR
         else:
             colour = BODY_CLR
@@ -551,7 +562,8 @@ def apply_font_sizes(tree, ref_shape=None):
         if sp.tag not in (f'{{{P}}}sp', f'{{{P}}}graphicFrame'):
             continue
         cNvPr = sp.find(f'.//{{{P}}}cNvPr')
-        is_ref = cNvPr is not None and cNvPr.get('name') == ref_shape
+        name = cNvPr.get('name') if cNvPr is not None else ''
+        is_ref = name in (ref_shape, 'RefNote')
         for rPr in sp.iter():
             if rPr.tag not in (f'{{{A}}}rPr', f'{{{A}}}defRPr',
                                f'{{{A}}}endParaRPr'):
@@ -617,18 +629,20 @@ def _fit_size(text, width_in):
     return BOTTOM_SIZES[-1]
 
 
-def add_bottom_note(tree, shapes, paragraphs):
-    """Build the foot sentence as a fresh text box.
+def add_bottom_note(tree, shapes, paragraphs, name='BottomNote',
+                    box=None, size=None, colour=None):
+    """Build a text box from scratch.
 
-    It is built rather than cloned so that it does not depend on a slide having
-    a citation strip to copy -- two slides now cite nothing at all.
+    Built rather than cloned so that it does not depend on the slide already
+    having a strip to copy: two slides carry no citation in the draft, and one
+    of them still needs to credit a source.
     """
     spTree = tree.getroot().find(f'.//{{{P}}}spTree')
     sp = etree.SubElement(spTree, f'{{{P}}}sp')
     nv = etree.SubElement(sp, f'{{{P}}}nvSpPr')
     cNvPr = etree.SubElement(nv, f'{{{P}}}cNvPr')
     cNvPr.set('id', '90')
-    cNvPr.set('name', 'BottomNote')
+    cNvPr.set('name', name)
     etree.SubElement(nv, f'{{{P}}}cNvSpPr').set('txBox', '1')
     etree.SubElement(nv, f'{{{P}}}nvPr')
 
@@ -647,21 +661,22 @@ def add_bottom_note(tree, shapes, paragraphs):
     bodyPr.set('anchor', 'ctr')
     etree.SubElement(tx, f'{{{A}}}lstStyle')
 
-    size = _fit_size(paragraphs[0], BOTTOM_BOX['width'])
+    box = box or BOTTOM_BOX
+    size = size or _fit_size(paragraphs[0], box['width'])
     seed = etree.SubElement(tx, f'{{{A}}}p')
     run = etree.SubElement(seed, f'{{{A}}}r')
     rPr = etree.SubElement(run, f'{{{A}}}rPr')
     rPr.set('sz', str(size))
     rPr.set('b', '0')
     fill = etree.SubElement(rPr, f'{{{A}}}solidFill')
-    etree.SubElement(fill, f'{{{A}}}srgbClr').set('val', ACCENT)
+    etree.SubElement(fill, f'{{{A}}}srgbClr').set('val', colour or ACCENT)
     for tag in ('latin', 'ea', 'cs'):
         etree.SubElement(rPr, f'{{{A}}}{tag}').set('typeface', 'Yu Gothic')
     etree.SubElement(run, f'{{{A}}}t').text = 'x'
 
-    set_geometry(sp, **BOTTOM_BOX)
+    set_geometry(sp, **box)
     set_text(sp, paragraphs)
-    shapes['BottomNote'] = sp
+    shapes[name] = sp
     return sp
 
 
@@ -793,6 +808,9 @@ def main(src=DEFAULT_SRC, out=OUT):
                 sp.getparent().remove(sp)
         if pos in BOTTOM:
             add_bottom_note(tree, shapes, BOTTOM[pos])
+        if pos in EXTRA_REFS:
+            add_bottom_note(tree, shapes, EXTRA_REFS[pos], name='RefNote',
+                            box=REF_BOX, size=REF_SZ, colour=REF_CLR)
         if pos in REFS:
             set_geometry(shapes[REFS[pos]], **REF_BOX)
 
