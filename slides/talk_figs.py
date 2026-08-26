@@ -21,7 +21,8 @@ Run:
     python talk_figs.py 4 7        # only the figures for slides 4 and 7
 Out:
     slides/figs/fig4_absorption.png   sigma_abs at 0 and 120 GPa
-    slides/figs/fig5_tornado.png      d(lambda_opt) for each input
+    slides/figs/fig5_tornado.png      d(lambda_opt): the inputs that move it
+    slides/figs/fig5_tornado_full.png every input, labelled (supplementary)
     slides/figs/fig6_window.png       eta / eta_opt vs wavelength
     slides/figs/fig7_crossover.png    eta(532) / eta(473) vs pressure
     slides/figs/fig8_power.png        optimal wavelength vs intensity
@@ -146,7 +147,7 @@ TORNADO = [
 ]
 
 
-def fig5_tornado():
+def _tornado_rows():
     ref = NVModel().lambda_opt(P0)
     rows = []
     for label, lo_kw, hi_kw, optical in TORNADO:
@@ -154,10 +155,67 @@ def fig5_tornado():
         hi = NVModel(**hi_kw).lambda_opt(P0) - ref
         rows.append((label, min(lo, hi), max(lo, hi), optical))
     rows.sort(key=lambda r: max(abs(r[1]), abs(r[2])), reverse=True)
+    return ref, rows
 
-    # the left margin is held open for the text boxes that will carry the row
-    # labels; without it the layout engine would reclaim the space
-    ax = _axes(dict(left=0.235, right=0.99, top=0.98, bottom=0.20))
+
+def _plain(label):
+    for a, b in (('$', ''), ('\\mathrm', ''), ('\\hbar\\omega', 'hw'),
+                 ('\\Delta', 'd'), ('\\sigma', 'sigma'),
+                 ('{', ''), ('}', ''), ('_', '')):
+        label = label.replace(a, b)
+    return label
+
+
+def _report_rows(ax, labels, name):
+    """Where each row sits, in inches from the top of the placed figure."""
+    bbox = ax.get_position()
+    top_in = (1 - bbox.y1) * FIGH
+    row_in = bbox.height * FIGH / len(labels)
+    print(f'  {name}: row height {row_in:.2f} in')
+    for k, text in enumerate(labels):
+        print(f'    {top_in + row_in * (k + 0.5):5.2f} in  {text}')
+
+
+def fig5_tornado():
+    """The talk version: the inputs that move the optimum, and one row standing
+    for everything that does not.
+
+    Twelve labelled rows would need twelve constants explained from the podium;
+    the argument only needs the count.  The full breakdown, labelled, is
+    fig5_tornado_full.png.
+    """
+    ref, rows = _tornado_rows()
+    movers = [r for r in rows if max(abs(r[1]), abs(r[2])) >= 0.02]
+    n_flat = len(rows) - len(movers)
+
+    ax = _axes(dict(left=0.235, right=0.99, top=0.96, bottom=0.20))
+    ys = np.arange(len(movers) + 1)[::-1]
+    for y, (_, neg, pos, _o) in zip(ys, movers):
+        ax.barh(y, neg, color=NAVY, height=0.55, zorder=2)
+        ax.barh(y, pos, color=NAVY, height=0.55, zorder=2)
+    ax.plot([0], [ys[-1]], marker='o', ms=13, color=GREY, zorder=3)
+
+    ax.axvline(0, color=DARK, lw=2.0, zorder=4)
+    span = max(max(abs(r[1]), abs(r[2])) for r in rows)
+    ax.set_xlim(-span - 1.0, span + 1.0)
+    ax.set_ylim(-0.7, len(movers) + 0.6)
+    ax.set_yticks([])
+    ax.spines['left'].set_visible(False)
+    ax.grid(False, axis='y')
+    ax.set_xlabel(f'$\\lambda_{{\\mathrm{{opt}}}}$ の変化  (nm)   '
+                  f'[基準 {ref:.1f} nm]')
+
+    labels = [f'{_plain(r[0])}  ±{max(abs(r[1]), abs(r[2])):.1f} nm'
+              for r in movers]
+    labels.append(f'他 {n_flat} 個  すべて 0.00 nm')
+    _report_rows(ax, labels, 'fig5')
+    return _save(ax.figure, 'fig5_tornado.png')
+
+
+def fig5_tornado_full():
+    """The supplementary version: every input, labelled on the axis."""
+    ref, rows = _tornado_rows()
+    ax = _axes()
     ys = np.arange(len(rows))[::-1]
     for y, (_, neg, pos, optical) in zip(ys, rows):
         colour = NAVY if optical else GREY
@@ -171,27 +229,13 @@ def fig5_tornado():
     span = max(max(abs(r[1]), abs(r[2])) for r in rows)
     ax.set_xlim(-span - 1.0, span + 1.0)
     ax.set_ylim(-0.8, len(rows) - 0.2)
-    ax.set_yticks([])
+    ax.set_yticks(ys)
+    ax.set_yticklabels([r[0] for r in rows], fontsize=BASE)
     ax.spines['left'].set_visible(False)
     ax.grid(False, axis='y')
     ax.set_xlabel(f'$\\lambda_{{\\mathrm{{opt}}}}$ の変化  (nm)   '
                   f'[基準 {ref:.1f} nm]')
-
-    # the row labels are typed in PowerPoint, so report where each row sits:
-    # inches from the top-left of the placed figure
-    bbox = ax.get_position()
-    top_in = (1 - bbox.y1) * FIGH
-    row_in = bbox.height * FIGH / len(rows)
-    print(f'  fig5 rows (inches from the figure top, row height '
-          f'{row_in:.2f} in):')
-    for k, (label, neg, pos, _) in enumerate(rows):
-        centre = top_in + row_in * (k + 0.5)
-        plain = (label.replace('$', '').replace('\\mathrm', '')
-                 .replace('\\hbar\\omega', 'hw').replace('{', '')
-                 .replace('}', '').replace('_', ''))
-        print(f'    {centre:5.2f} in  {plain:<28} '
-              f'{"±%.1f nm" % max(abs(neg), abs(pos))}')
-    return _save(ax.figure, 'fig5_tornado.png')
+    return _save(ax.figure, 'fig5_tornado_full.png')
 
 
 # --------------------------------------------------------------------------
@@ -259,7 +303,8 @@ def fig8_power():
 
 
 FIGS = {4: fig4_absorption, 5: fig5_tornado, 6: fig6_window,
-        7: fig7_crossover, 8: fig8_power}
+        7: fig7_crossover, 8: fig8_power,
+        55: fig5_tornado_full}      # supplementary: the full breakdown
 
 if __name__ == '__main__':
     want = [int(a) for a in sys.argv[1:]] or sorted(FIGS)

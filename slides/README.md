@@ -13,7 +13,11 @@ each curve on fig 4, which exists to tell two overlapping envelopes apart.
 
 `fig5_tornado.png` has no row labels: they are typed in PowerPoint. The script
 prints where each row sits, in inches from the top of the placed figure, and
-holds the left 23.5% of the width open for them.
+holds the left 23.5% of the width open for them. It also collapses the nine
+rows that come out at zero into one, because twelve labelled rows would oblige
+the speaker to explain twelve constants to make a point that only needs their
+count. The full labelled breakdown is `fig5_tornado_full.png`, for the
+supplementary material -- `python talk_figs.py 55`.
 
 `odmr_473nm_talk.pptx` is the talk deck. It is generated, not hand-edited:
 
