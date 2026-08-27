@@ -71,15 +71,50 @@ python fig2_blue_wavelength_sweep.py              # blue sweep @120 GPa (compare
 python fig2_blue_wavelength_sweep.py 100 75 125   # blue sweep @100 GPa (compare 75,125)
 ```
 
-## Key numbers reproduced
+## Key numbers
+
+**Two chains, two answers.**  Every number below is labelled with the chain that
+produced it.  Do not quote a v1 number as a v3 result -- they differ by 34.87 nm
+at 120 GPa, more than twice the half-width of the 5 % tolerance band.
+
+### v1 chain — phenomenological Franck–Condon envelope (`nv_model.py`)
+
+Internally consistent, and pinned by `tests/test_freeze.py`, but **superseded as
+a statement about the physics**: this envelope is unimodal at every pressure, so
+it cannot represent the zero-phonon-line / sideband branch structure.
+
 | Quantity | Value |
 |---|---|
 | green/blue crossover (457 nm fixed) | ~86 GPa |
 | optimal blue λ @100 GPa | 487 nm (η(457)/opt = 1.35) |
-| optimal blue λ @120 GPa | 475.5 nm at equal optical power (473 nm penalty = 0.2%) |
-| optimal blue λ tracking | ~0.6–0.7 nm/GPa (follows ZPL / sideband edge) |
+| optimal blue λ @120 GPa | 475.5 nm (473 nm penalty = 0.2%) |
+| optimal blue λ tracking | ~0.6–0.7 nm/GPa |
 
-## Model summary
+The ~86 GPa crossover is **not** the branch exchange of Addendum A3, despite
+the numerical proximity to 87.9 GPa.  It is the geometry of one unimodal peak
+sweeping past the midpoint of 457 and 532 nm (494.5 nm); the same test on the
+Ho kernel lands at 51.4 GPa.  See `docs/novelty_and_exponent_audit.md` §4.
+
+### v3 chain — Ho published kernel (`ho_spectrum_model.py`), frozen
+
+| Quantity | Value |
+|---|---|
+| optimal λ @120 GPa | **440.65 nm** |
+| 5 % tolerance band @120 GPa | **[426.43, 457.90] nm** (asymmetric) |
+| penalty at 457 nm | ×1.04494 |
+| penalty at 473 nm | ×1.2054 (**not** 0.2 %) |
+| penalty at 514.5 nm (ZPL) | ×1.2006 |
+| penalty at 532 nm | ×12.53 — but see erratum E1, it is an interpolation artefact |
+
+### Anchors taken from published measurements
+
+| Quantity | Value | Source |
+|---|---|---|
+| splitting exponent | E = 3, n = 2, ρ\* = 1/5 | Dréau et al., PRB 84, 195204 |
+| S_abs vs pressure | 3.023 → 4.554 (+51 %, monotone) | source Fig. 1(b) |
+| DWF_abs vs pressure | 0.0205 → 0.00226 (×9.07, monotone) | source Fig. 1(c) |
+
+## Model summary (v1 chain)
 ```
 eta ∝ Δν / (C √R)                      # lower = better
   C = C0 · f₋/(f₋ + w0(1−f₋))          # contrast, diluted by NV0 background
