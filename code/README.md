@@ -33,6 +33,12 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   absolute calibration) and the gauge-degeneracy theorem (η sees the response
   only through `E = 2c + s + 2w`).  Write-up in `docs/theory_a2_multiplicity.md`.
 - `fig6_a2_multiplicity.py` — figures for A2 → `a2_multiplicity_120GPa.png`.
+- `theory_a3_branch_exchange.py` — Addendum A3, pressure-driven branch exchange:
+  the ZPL and phonon-sideband branches scale differently with the Huang-Rhys
+  factor, so pressure exchanges which one carries the global optimum.  Branches
+  are identified in the **raw extracted samples**, not in the pressure
+  interpolation.  Write-up in `docs/theory_a3_branch_exchange.md`.
+- `fig7_a3_branch_exchange.py` — figures for A3 → `a3_branch_exchange.png`.
 - `dreau_exponent.py` — reads A2's splitting exponent off the published CW-ODMR
   model of Dréau et al., PRB 84, 195204 (2011): `E = 3`, pump nonlinearity
   `n = 2`, so `E n = 6 > 1` and `rho* = 1/5`, independent of the microwave

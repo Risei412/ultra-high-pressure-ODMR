@@ -509,3 +509,85 @@ list without it cannot see the effect at all. The \(N=6\) plateau spans only
 ×1.23, ×1.93 and ×1.19. These *values* are conditional on the Fig. 1(e)
 reconstruction — the *structure* is what A2 freezes.
 
+---
+
+# Addendum A3 — pressure-driven branch exchange of the optimum
+
+Date: 2026-08-27. Appended under the v3 immutability rule as a **theory-only**
+extension, like A1 and A2. It introduces no measurement and no fitted value.
+Full derivations, numerical verification and pre-registered tests:
+`docs/theory_a3_branch_exchange.md` (`code/theory_a3_branch_exchange.py`,
+12 regression tests).
+
+A2 asked what *power* does to the optimum at one pressure. A3 asks the
+orthogonal question, and finds something A2's ladder cannot produce. An
+absorption spectrum built on a Franck–Condon progression carries two
+structurally distinct branches — the zero-phonon line and the phonon sideband —
+whose peak heights scale differently with the Huang–Rhys factor \(S\). Pressure
+raises \(S\), the branches move relative to one another, and where their
+weighted peaks cross the global optimum **switches branch discontinuously**.
+
+**Theorem X (branch exchange).** With \(A=\lambda\sigma_{\rm abs}\) the
+fixed-power figure of merit and \(D(P)=\ln(A_{\rm SB}/A_{\rm ZPL})\), the global
+optimum exchanges branch wherever \(D\) changes sign, and the optimal wavelength
+jumps from \(\lambda_{\rm ZPL}(P^*)\) to \(\lambda_{\rm SB}(P^*)\) taking no
+intermediate value. For a Franck–Condon pair
+\(A_{\rm ZPL}\sim e^{-S}/\Gamma_{\rm ZPL}\) and
+\(A_{\rm SB}\sim(1-e^{-S})/\Gamma_{\rm SB}\), so
+
+\[
+\frac{\mathrm{d}D}{\mathrm{d}P}
+=\frac{\mathrm{d}S}{\mathrm{d}P}
++\frac{\mathrm{d}}{\mathrm{d}P}\ln\frac{\Gamma_{\rm ZPL}}{\Gamma_{\rm SB}}+\cdots>0
+\]
+
+whenever pressure strengthens the electron–phonon coupling and broadens the ZPL
+at least as fast as the sideband. \(D\) is then monotone and **the crossing is
+unique**: a generic, once-only exchange rather than an accident of one material.
+Both antecedents are generic for a colour centre under compression, so what
+varies between materials is only where \(P^*\) falls inside the accessible
+range — not whether an exchange occurs. That is the general condition for
+high-pressure optical sensing.
+
+**Two degeneracies, not one.** A2's ladder is driven by power and needs
+\(I>I_c\); A3's pair is driven by pressure and exists at **zero power**. At
+\(P^*\) the low-power optimum is already twofold, before any power-induced
+structure appears — which is what makes the two separable in practice. Together
+they give the full \((P,I)\) phase diagram: A3 selects the branch, A2 splits it.
+
+**Verification, in the raw samples rather than the interpolation.** Because E2
+established that this kernel's pressure interpolation is unreliable, A3
+identifies both branches as local maxima of the *extracted samples themselves*.
+Both are present at all seven published pressures. The ZPL branch at 0 GPa lands
+at **637.1 nm (1.945 eV)** — the NV⁻ ZPL, a value fitted nowhere in the
+pipeline and therefore an independent check that the extraction is anchored
+correctly. \(\ln(A_{\rm SB}/A_{\rm ZPL})\) rises monotonically at all seven
+points, by ×4.33 in total, with exactly one sign change.
+
+**Worked example, conditional on the reconstruction.** At fixed incident optical
+power \(P^*=87.9\) GPa, where the ZPL branch sits at 534.8 nm and the sideband at
+463.5 nm: the optimum jumps **71.3 nm**. At fixed incident photon flux
+\(P^*=75.6\) GPa instead, so the power convention must be stated whenever
+\(P^*\) is quoted. The driver is visible directly: the Franck–Condon
+displacement \(S\hbar\omega\) grows from 0.232 to 0.404 eV (+74 %, monotone,
+1.27 meV/GPa), the ZPL cross-section falls by ×6.04 over 0–120 GPa while the
+sideband falls by only ×1.34, and the two branches carry different pressure
+coefficients (3.83 against 5.11 meV/GPa).
+
+**What this is not.** The 457/532 fixed-wavelength ranking crossover sits at
+51.4 GPa in the same kernel, 36 GPa away: that crossover is the geometry of one
+unimodal peak sweeping past the midpoint of two probes and needs no branch
+structure at all. The v1 Franck–Condon envelope has exactly one local maximum at
+every pressure and so cannot show this effect; its "green/blue crossover
+≈ 86 GPa" is unrelated, and its numerical closeness to 87.9 GPa is a coincidence
+(`docs/novelty_and_exponent_audit.md` §4).
+
+**Pre-registered tests.** T8 (track \(\lambda_{\rm PL}(P)\) at low power through
+\(P^*\); a jump confirms Theorem X), T9 (check both branches coexist either side
+of \(P^*\), distinguishing exchange from branch disappearance), T10 (compare the
+two wavelengths at low power, separating A3's zero-power degeneracy from A2's
+ladder), T11 (measure the branch separation \(S\hbar\omega\) against pressure).
+T11 is the cheapest and most decisive: it needs neither absolute nor intensity
+calibration, only two peak positions per pressure, and if the separation does
+not grow the antecedent fails and no exchange is predicted.
+
