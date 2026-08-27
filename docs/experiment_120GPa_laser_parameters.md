@@ -1,5 +1,14 @@
 # Laser parameters for the 120 GPa run
 
+> **2026-08-27 — read `docs/sanity_check_pl_yield.md` first.** Measured PL yield
+> versus pressure puts the absorption maximum about 20 nm bluer at 120 GPa than
+> the anchor these tables were built on. Re-anchored, λ_opt(120 GPa) is 450 nm
+> and the line is **457 nm**, not 473 nm. The *procedure* below is unchanged and
+> is in fact what catches this: step ① measures the ZPL and reads the line off
+> it, and a ZPL near 497 nm falls outside the 512–541 nm range in which 473 nm
+> holds. Treat every 473 nm in this document as "the line step ① selects".
+
+
 Two numbers have to be fixed before the cell is loaded: **which line** and
 **how much power**. Both are decided by measurements made in the cell itself,
 not by the frozen model alone — the model supplies the rule, the cell supplies

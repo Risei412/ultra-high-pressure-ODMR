@@ -40,6 +40,24 @@ from a scenario into a result.
   was fixed and the golden values need updating with a stated reason, or the
   freeze was broken.
 
+---
+
+## Addendum, 2026-08-27 — the freeze was tested and one branch failed
+
+The predictions above were compared with measured PL yield versus pressure at
+532 and 457 nm (Ho *et al.* 2026, Fig. 5b; 61 points). The 532 nm branch is
+reproduced to 13 %. The **457 nm branch is not**: the frozen model has no
+maximum below 120 GPa and the data peak at 82 GPa.
+
+Re-anchoring the ZPL shift at 120 GPa, 400 → 550 meV, fixes both branches and
+moves **λ_opt from 475.5 nm to 449.6 nm**, so the recommended line becomes
+457 nm rather than 473 nm and the green penalty grows from ×2.5 to ×11.7.
+
+The table above is left exactly as it was frozen. It is the pre-registration,
+and rewriting it after the comparison would destroy the only thing that makes
+the comparison worth anything. `docs/sanity_check_pl_yield.md` has the
+comparison, the caveats, and the re-anchored numbers.
+
 ## The frozen predictions
 
 At 120 GPa, room temperature, near-hydrostatic (α = 0.95) unless stated.

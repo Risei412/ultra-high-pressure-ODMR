@@ -27,6 +27,7 @@ Out:
     slides/figs/fig6_window.png       eta / eta_opt vs wavelength
     slides/figs/fig7_crossover.png    eta(532) / eta(473) vs pressure
     slides/figs/fig8_power.png        optimal wavelength vs intensity
+    slides/figs/fig9_yield.png        PL yield vs pressure, model vs measured
 """
 import os
 import sys
@@ -41,6 +42,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 '..', 'code'))
 from nv_model import NVModel, nm2eV        # noqa: E402
 from nv_model_power import NVModelPower     # noqa: E402
+from repro_yield import (load as load_yield, predict as predict_yield,
+                         fit_dE120)         # noqa: E402
 
 # --------------------------------------------------------------------------
 # house style -- Institute of Science Tokyo navy, one neutral grey, nothing else
@@ -364,10 +367,49 @@ def fig7b_contrast():
     return _save(ax.figure, 'fig7b_contrast.png')
 
 
+# --------------------------------------------------------------------------
+# the sanity check -- measured PL yield vs pressure at a fixed line
+# --------------------------------------------------------------------------
+def fig9_yield():
+    """The reproduction figure: the absorption band sweeping past two lasers.
+
+    At constant power and integration time, the yield at a fixed line rises,
+    peaks and falls as the ZPL blue shifts the absorption band past it.  The
+    peak pressure is a direct read-out of where the absorption maximum is and
+    is invariant under the arbitrary vertical scale of the measurement, which
+    is what makes this a test of the wavelength claim rather than of the
+    sensitivity scale.  Two curves are drawn: the frozen anchor and the anchor
+    re-fitted to these data.
+    """
+    data = load_yield()
+    frozen = NVModel(T=300.0)
+    dE, refit, _ = fit_dE120(data, T=300.0)
+    P = np.linspace(0.0, 120.0, 241)
+
+    ax = _axes()
+    for lam, colour, marker in ((532.0, GREY, 'o'), (457.0, NAVY, 's')):
+        px, py = data['expt%d' % lam]
+        ax.plot(px, py, marker, ms=9, mfc='none', mec=colour, mew=2.0,
+                ls='none')
+        for m, style in ((frozen, dict(lw=2.4, ls=(0, (5, 3)))),
+                         (refit, dict(lw=4.2, ls='-'))):
+            y = predict_yield(m, lam, P)
+            k = np.sum(predict_yield(m, lam, px) * py) / \
+                np.sum(predict_yield(m, lam, px) ** 2)
+            ax.plot(P, k * y, color=colour, **style)
+
+    ax.set_xlim(0, 120)
+    ax.set_ylim(0, 6.5)
+    ax.set_xlabel('圧力  (GPa)')
+    ax.set_ylabel('積分 PL 収量  (a.u.)')
+    return _save(ax.figure, 'fig9_yield.png')
+
+
 FIGS = {4: fig4_absorption, 5: fig5_tornado, 6: fig6_window,
         7: fig7_crossover, 8: fig8_power,
         55: fig5_tornado_full,      # supplementary: the full breakdown
-        77: fig7b_contrast}         # measured vs modelled contrast
+        77: fig7b_contrast,        # measured vs modelled contrast
+        9: fig9_yield}              # the sanity check that tests lambda
 
 if __name__ == '__main__':
     want = [int(a) for a in sys.argv[1:]] or sorted(FIGS)
