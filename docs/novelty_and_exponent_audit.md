@@ -218,7 +218,111 @@ Dréau の \(E=3,n=2,\rho^*=0.2\) と、常圧 NV の吸収スペクトル(よ�
 
 ---
 
-## 4. 再現方法
+## 4. 追補 — 「86 GPa 一致」は偶然だった(否定的結果)
+
+`code/README.md` の v1 モデルは「green/blue crossover (457 nm fixed) ≈ 86 GPa」を
+掲げる。Ho カーネルで見つけた**分岐交代**は \(P^*=87.9\) GPa であり、
+両者が同一現象ではないかと疑ったが、**検証の結果まったく無関係だった。**
+再発見を防ぐためここに記録する。
+
+### 4.1 証拠
+
+**(a) v1 モデルには分岐構造が存在しない。**
+\(A(\lambda,P)=\lambda\sigma_{\rm abs}\) の局所極大を \(P=0\)–120 GPa で数えると
+**どの圧力でも常に 1 個**。`nv_model.py` の `_sigma_raw` は
+`psb + zpl_line` と ZPL 線を明示的に持つが、その Debye–Waller 因子は
+\(0.022\to0.0036\) と小さく、独立した極大を一度も形成しない。
+**交代すべき分岐が無い。**
+
+**(b) 交差の正体は単峰ピークと固定プローブの幾何。**
+
+| 量 | 値 |
+|---|---:|
+| v1 の \(\eta(457)=\eta(532)\) 交差圧 | 83.97 GPa |
+| その圧力での v1 の \(A\) ピーク位置 | **495.24 nm** |
+| 457 と 532 の算術中点 | **494.50 nm** |
+
+0.7 nm で一致する。単峰のピークが圧力で青方偏移し、2本の固定プローブの
+中点を通過した瞬間に順位が反転する、というだけの現象である。
+ZPL もフォノンサイドバンドも関与しない。
+
+**(c) 決定打 — 同一カーネル内で両者は 36 GPa 離れている。**
+
+| テスト(Ho カーネル) | 圧力 |
+|---|---:|
+| 457/532 固定波長の交差 | **51.44 GPa** |
+| 分岐交代(ZPL ↔ サイドバンド) | **87.9 GPa** |
+
+同じカーネルで計算すれば、固定波長交差と分岐交代はまったく別の圧力に出る。
+
+### 4.2 帰結
+
+- **分岐交代は v1 が既に見ていた現象ではない。** v1 は単峰なので原理的に
+  観測できなかった。新規現象として扱ってよい。
+- README の「~86 GPa」と本計算の 83.97 GPa の 2 GPa 差は未解決
+  (collection 設定かグリッド解像度の差と思われる)。要確認だが些細。
+- 教訓として、**異なるモデルから出た近い数値を同一視しない**こと。
+  A1 の数値実行で得た教訓(カーネル依存量とカーネル非依存量を混ぜない)の
+  別の現れである。
+
+---
+
+## 5. 追補 — Barry et al. 2020 (RMP 92, 015004) の位置づけ
+
+Zotero `HPHT` コレクション、item key `575X523P`、`branch-switching` タグ付き。
+arXiv:1903.08176 から本文を確認した。
+
+### 5.1 感度関数は完全一致
+
+彼らの式 (16):
+
+\[
+\eta_{\rm CW}=\frac{4}{3\sqrt3}\,\frac{h}{g_e\mu_B}\,\frac{\Delta\nu}{C_{\rm CW}\sqrt R}
+\]
+
+Dréau 2011 と Barry 2016 を引用。**本プロジェクトが一貫して使ってきた関数形は
+この分野の標準そのもの**であることが確認できた。A2 の定理 G が扱う
+\(\Phi=C^2R/\Delta\nu^2\) はこの \(\eta_{\rm CW}\) の逆二乗である。
+
+### 5.2 励起波長は最適化変数として扱われていない
+
+レビューの最適化軸は (i) \(T_2^*\)・コヒーレンス、(ii) 読み出し忠実度、
+(iii) 母材ダイヤモンドの3つ。**波長選択の節は存在せず**、
+532 nm は「a single free-running 532 nm solid-state laser is sufficient」と
+前提として扱われている。分岐交代も複数最適波長も現れない。
+
+すなわち `branch-switching` タグは願望的であり、Barry がそれを論じている
+わけではない。**新規性にとっては good news。**
+
+### 5.3 §V.G に、本研究の軸を名指しした未解決問題がある
+
+「Green absorption readout」の節に次の記述がある。
+
+> The anomalous \(C_{\rm absorb}\) reveals a **strong wavelength and power
+> dependence** (Bauch, 2010), which suggests that green absorption readout is
+> hindered by an unknown effect competing with and sometimes dominating
+> otherwise expected behavior. The wavelength and power dependence of this
+> effect **suggests NV⁰/NV⁻ charge dynamics could play a role. Further
+> investigation of this behavior might reveal presently unknown NV dynamics.**
+
+決定版レビューが 2020 年時点で「NV 光学読み出しに未解明の**波長 × パワー**
+構造があり、おそらく電荷ダイナミクス起源で、調べれば未知の NV 物理が
+出るかもしれない」と明記している。
+
+これはまさに本研究が \((\lambda, I)\) 平面として整理している対象であり、
+しかも (M) を破るチャネルとして A1 の P6 が NV⁰ 吸収帯を名指ししたことと
+一致する。**先行研究ではなく、本研究が応える未解決問題**として引用できる。
+
+### 5.4 その他
+
+- §V.D「Level-anticrossing-assisted readout」は GSLAC 読み出しの話であり、
+  本研究の分岐とは別概念。
+- §V.G の Fig. 28 は 514 nm 励起での吸収/蛍光同時測定(Bauch 2010)。
+  A2 の worked example で最下段を担う 514.5 nm と近いが、別文脈。
+
+---
+
+## 6. 再現方法
 
 ```bash
 cd code
