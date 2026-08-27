@@ -206,3 +206,60 @@ branches. That is a better talk than one where everything agreed.
 by the absorption line shape alone, the optimum is still a window rather than a
 point, and the protocol still measures the ZPL first and reads the line off it.
 What changes is which line comes out of it.
+
+---
+
+## The gap this leaves: nobody has swept the wavelength
+
+It is worth being precise about what the state of the art did, because it is
+less than it looks.
+
+Ho *et al.* used **532 nm from 4.7 to 51 GPa and 457 nm from 55 to 114 GPa**.
+That is a two-step function, chosen once, not a scan. Consequences:
+
+- **Exactly one pressure in the whole dataset carries both lines** — 51.0 GPa —
+  and the two series are separately normalised in the figure, so even that one
+  is unusable as a ratio. **The literature contains no pressure at which two
+  excitation wavelengths were compared on a common scale.**
+- Each dome therefore samples σ_abs at a *single* photon energy per pressure.
+  Two scale-free numbers come out of 61 points — the two peak pressures — and
+  that is why the model forms that all fit still spread ~30 nm at 120 GPa.
+- **σ_abs(λ) under pressure has never been measured.** It has been calculated,
+  and the calculation has been checked at two energies.
+
+And the fixed choice was not the optimum. Across every model form that fits,
+evaluated at the measurement temperature:
+
+| P (GPa) | λ_opt range | η(457)/η_opt |
+|---|---|---|
+| 55.2 | 494–518 nm | ×1.21–2.75 |
+| 74.5 | 478–502 | ×1.07–1.89 |
+| 85.8 | 469–495 | ×1.03–1.59 |
+| 99.1 | 458–487 | ×1.00–1.35 |
+| 113.8 | 447–479 | ×1.00–1.19 |
+
+457 nm only becomes the right line above about 100 GPa. At the bottom of its
+own blue run the state of the art was leaving up to ×2.75 in η — a factor of
+**7.6 in measurement time** — on the table. Symmetrically, 532 nm was fine to
+about 41 GPa and cost ×1.04–1.27 by 51 GPa.
+
+`slides/figs/fig10_tracking.png` draws this: λ_opt(P) as a band over the
+surviving model forms, with the two fixed lines and the pressures they were
+used at.
+
+So the earlier statement that "the answer is already out" was too pessimistic
+and should be narrowed. What is out is a *calculated* absorption lineshape from
+which a number could be read. What is not out, anywhere:
+
+1. any **measurement** of the excitation-wavelength dependence at pressure;
+2. the statement in terms of **sensitivity** rather than brightness — which is
+   what makes the measurement worth making, and which is a theorem here, not an
+   assumption (below saturation, argmax R = λ_opt, to under 1 nm in every model
+   form);
+3. **λ_opt(P) as a law** rather than a choice made twice;
+4. the **power dependence**, which moves the ridge 25–30 nm by u = 0.3 in every
+   surviving form.
+
+A single excitation scan at one high pressure supplies (1) and tests the
+calculated lineshape peak — the quantity this whole re-analysis showed to be
+the fragile one — for the first time.

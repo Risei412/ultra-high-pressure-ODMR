@@ -405,11 +405,51 @@ def fig9_yield():
     return _save(ax.figure, 'fig9_yield.png')
 
 
+# --------------------------------------------------------------------------
+# the gap in the literature -- the optimum moves, the experiments do not
+# --------------------------------------------------------------------------
+# what Ho et al. 2026 actually used: one line, then the other, no sweep
+HO_OPERATING = ((532.0, (4.7, 11.0, 20.0, 25.6, 29.5, 41.4, 51.0)),
+                (457.0, (55.2, 74.5, 85.8, 99.1, 113.8)))
+
+TRACKING_FORMS = ({}, dict(dE120=0.550), dict(hw=0.103),
+                  dict(S_slope=4.55), dict(alpha=1.21))
+
+
+def fig10_tracking():
+    """lambda_opt(P) as a band over every model form that fits the yield data,
+    with the excitation wavelengths the measurements were actually taken at.
+
+    The band is wide because nobody has measured an excitation spectrum under
+    pressure; the step is what the state of the art did instead.
+    """
+    P = np.linspace(5.0, 120.0, 60)
+    curves = np.array([[NVModel(T=90.0, **kw).lambda_opt(p) for p in P]
+                       for kw in TRACKING_FORMS])
+
+    ax = _axes()
+    ax.fill_between(P, curves.min(axis=0), curves.max(axis=0),
+                    color=NAVY, alpha=0.18, lw=0)
+    ax.plot(P, np.median(curves, axis=0), color=NAVY, lw=4.2)
+    for lam, points in HO_OPERATING:
+        pts = np.asarray(points)
+        ax.plot([pts.min(), pts.max()], [lam, lam], color=GREY, lw=3.0)
+        ax.plot(pts, np.full_like(pts, lam), 'o', ms=9, mfc='none',
+                mec=GREY, mew=2.0, ls='none')
+
+    ax.set_xlim(0, 120)
+    ax.set_ylim(430, 600)
+    ax.set_xlabel('圧力  (GPa)')
+    ax.set_ylabel('励起波長  (nm)')
+    return _save(ax.figure, 'fig10_tracking.png')
+
+
 FIGS = {4: fig4_absorption, 5: fig5_tornado, 6: fig6_window,
         7: fig7_crossover, 8: fig8_power,
         55: fig5_tornado_full,      # supplementary: the full breakdown
         77: fig7b_contrast,        # measured vs modelled contrast
-        9: fig9_yield}              # the sanity check that tests lambda
+        9: fig9_yield,              # the sanity check that tests lambda
+        10: fig10_tracking}         # the optimum moves; the experiments did not
 
 if __name__ == '__main__':
     want = [int(a) for a in sys.argv[1:]] or sorted(FIGS)
