@@ -156,6 +156,41 @@ Other caveats:
 - Sample degradation over a long pressure run would also depress the high-
   pressure end of the 457 nm series. It would not move the peak by 40 GPa.
 
+## What is decided, and what the theory is still needed for
+
+Run the same five models — the frozen one and the four single-knob refits, each
+of which fits the data — and ask what they agree on.
+
+**Penalty η(λ)/η_opt at 120 GPa, across all five:**
+
+| line | 405 | 445 | 457 | 473 | 488 | 505 | 532 |
+|---|---|---|---|---|---|---|---|
+| range | ×1.4–3.8 | **×1.00–1.34** | **×1.00–1.11** | ×1.00–1.25 | ×1.05–1.81 | ×1.33–3.11 | ×2.4–11.7 |
+
+**457 nm is within ×1.11 of optimal under every model considered, including the
+one the data rejected.** So as an engineering decision the wavelength question
+*is* closed: use 457 nm (or 445), and no plausible revision of the model moves
+that. The pressure at which blue overtakes green is 54–84 GPa in all five, so
+"blue wins at 120 GPa" is robust too; "it crosses at 73 GPa" is not.
+
+What is *not* decided, and what no amount of further modelling will decide:
+
+- **The size of the win.** η(532)/η_opt spans ×2.4 to ×11.7. Only an A/B
+  measurement in the actual apparatus settles it — step ③.
+- **Whether η behaves as modelled at all.** Nothing here measures ODMR
+  sensitivity versus excitation wavelength under pressure. That measurement
+  does not exist in the literature. This comparison tests σ_abs, which is one
+  factor of it.
+- **f₋ flatness across the window**, which is the reason the answer reduces to
+  the absorption shape. Untested, and untestable by this figure.
+- **The power dependence.** The ridge still runs ~25–30 nm blue between u → 0
+  and u = 0.3 in all five models, so the effect is robust in sign and rough
+  size; the calibration-free recipe ratio is not (1.8–5.1 depending on knob and
+  line). The procedure survives, the number does not — step ② measures it.
+
+The honest summary is that this comparison closed the question the model was
+*least* needed for and left open the ones it was built for.
+
 ## What this means for the freeze
 
 The freeze survives in form and fails in content. Re-anchoring on a measured

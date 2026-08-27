@@ -147,3 +147,14 @@ def test_the_ZPL_slope_alone_cannot_rescue_the_blue_branch(data):
     """One knob that does NOT work, so the test above is not vacuous."""
     rms, _ = _best_single(data, 'slope0', np.arange(4.0e-3, 1.0e-2, 2e-4))
     assert rms > 0.20
+
+
+def test_457_is_safe_under_every_model_that_fits(data):
+    """The engineering decision does not depend on resolving the attribution."""
+    models = [NVModel(T=300.0)]
+    models += [_best_single(data, n, v)[1] for n, v in SINGLE_KNOB]
+    for m in models:
+        opt = m.lambda_opt(120)
+        e = lambda lam: float(np.asarray(m.eta_lambda(lam, 120)[0]))
+        assert e(457.0) / e(opt) < 1.15
+        assert e(532.0) / e(opt) > 2.0        # and blue always beats green
