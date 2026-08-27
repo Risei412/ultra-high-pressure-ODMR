@@ -170,21 +170,26 @@ class GaugeResponse:
     """Power-law response, characterised entirely by one scalar.
 
     R = Gamma_p (1 + rho)^-s,  C = (1 + rho)^-c,  dnu = (1 + rho)^w,
-    with rho = Gamma_p / Gamma.  Then
+    with rho = (Gamma_p / Gamma)^n.  Then
 
         Phi = C^2 R / dnu^2 = Gamma_p (1 + rho)^-E,   E = 2c + s + 2w,
 
     so the entire response enters eta only through the **splitting exponent**
-    E.  Phi has an interior maximum iff E > 1, at rho* = 1/(E - 1).  Every
-    (c, s, w) on a plane of constant E is one model: same eta surface, same
-    Gamma_p*, same multiplicity ladder.  A1's mechanism table is the E > 1
-    test applied to four corners of this plane.
+    E and the pump nonlinearity n.  Phi has an interior maximum iff E n > 1,
+    at rho* = 1/(E n - 1).  Every (c, s, w) on a plane of constant E is one
+    model: same eta surface, same Gamma_p*, same multiplicity ladder.  A1's
+    mechanism table is the E n > 1 test at n = 1, applied to four corners of
+    this plane.
+
+    n = 1 is the default (a pump rate entering linearly).  The published CW
+    model of Dreau et al. has n = 2 and E = 3; see `dreau_exponent.py`.
     """
 
     c: float
     s: float
     w: float
     gamma: float = 1.0
+    n: float = 1.0
 
     @property
     def exponent(self):
@@ -193,10 +198,16 @@ class GaugeResponse:
 
     @property
     def splits(self):
-        return self.exponent > 1.0
+        return self.exponent * self.n > 1.0
+
+    @property
+    def rho_star(self):
+        """Interior maximum in rho, or nan when Phi is monotone."""
+        product = self.exponent * self.n
+        return 1.0 / (product - 1.0) if product > 1.0 else float('nan')
 
     def _rho(self, gamma_p):
-        return np.asarray(gamma_p, float) / self.gamma
+        return (np.asarray(gamma_p, float) / self.gamma) ** self.n
 
     def rate(self, gamma_p):
         return np.asarray(gamma_p, float) * (1.0 + self._rho(gamma_p)) ** -self.s
@@ -212,10 +223,10 @@ class GaugeResponse:
         return (self.contrast(gamma_p) / self.linewidth(gamma_p)) ** 2 * self.rate(gamma_p)
 
     def gamma_star(self):
-        """Interior maximum of Phi: rho* = 1/(exponent - 1) when exponent > 1."""
-        if self.exponent <= 1.0:
+        """Pump rate at the interior maximum, from rho* = 1/(E n - 1)."""
+        if not self.splits:
             return float('nan')
-        return float(self.gamma / (self.exponent - 1.0))
+        return float(self.gamma * self.rho_star ** (1.0 / self.n))
 
 
 def gauge_family(exponent=2.0):
@@ -245,7 +256,7 @@ def a1_mechanism_table():
     }
     return [{'mechanism': name, 'c': r.c, 's': r.s, 'w': r.w,
              'exponent': r.exponent, 'splits': r.splits,
-             'rho_star': (1.0 / (r.exponent - 1.0) if r.splits else float('nan'))}
+             'rho_star': r.rho_star}
             for name, r in rows.items()]
 
 

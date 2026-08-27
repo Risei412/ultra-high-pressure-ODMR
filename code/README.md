@@ -33,6 +33,11 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   absolute calibration) and the gauge-degeneracy theorem (η sees the response
   only through `E = 2c + s + 2w`).  Write-up in `docs/theory_a2_multiplicity.md`.
 - `fig6_a2_multiplicity.py` — figures for A2 → `a2_multiplicity_120GPa.png`.
+- `dreau_exponent.py` — reads A2's splitting exponent off the published CW-ODMR
+  model of Dréau et al., PRB 84, 195204 (2011): `E = 3`, pump nonlinearity
+  `n = 2`, so `E n = 6 > 1` and `rho* = 1/5`, independent of the microwave
+  setting.  A2's splitting antecedent is therefore measured, not assumed.
+  Audit in `docs/novelty_and_exponent_audit.md`.
 
 Note that the v1 Franck–Condon envelope (`nv_model.py`) and the v3 Ho kernel
 (`ho_spectrum_model.py`) do **not** agree on the optimum: 475.51 nm against

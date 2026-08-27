@@ -160,6 +160,30 @@ def test_exponent_below_one_never_splits():
         assert not np.isfinite(response.gamma_star())
 
 
+def test_a2_reproduces_the_published_dreau_anchor():
+    """G: A2's generalised rule at (c,s,w,n) = (1, 0, 1/2, 2) gives rho* = 1/5.
+
+    Those exponents are read straight off Dreau et al.'s fitted CW-ODMR forms,
+    so A2's splitting antecedent is measured rather than assumed.
+    """
+    response = GaugeResponse(c=1.0, s=0.0, w=0.5, n=2.0)
+    assert response.exponent == pytest.approx(3.0)
+    assert response.splits is True
+    assert response.rho_star == pytest.approx(0.2, rel=1e-9)
+    # And it really is the maximiser of Phi.
+    star = response.gamma_star()
+    assert response.phi(star) > response.phi(star / 3.0)
+    assert response.phi(star) > response.phi(star * 3.0)
+
+
+def test_pump_nonlinearity_defaults_to_linear():
+    """G: n = 1 recovers A1's rho* = 1/(E-1), so A2 stays backward compatible."""
+    linear = GaugeResponse(c=1.0, s=0.0, w=0.0)
+    assert linear.n == pytest.approx(1.0)
+    assert linear.rho_star == pytest.approx(1.0)
+    assert linear.gamma_star() == pytest.approx(1.0)
+
+
 def test_rho_star_formula():
     """G: rho* = 1/(E-1) for every member with E > 1."""
     for c, s, w in ((1.0, 0.0, 0.0), (0.0, 1.0, 0.5), (0.5, 1.0, 0.25),
