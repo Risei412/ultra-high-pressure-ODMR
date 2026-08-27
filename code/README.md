@@ -27,6 +27,12 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   `docs/theory_a1_numerical_execution.md`.
 - `fig5_a1_generalization.py` — figures for the above
   → `a1_generalization_120GPa.png`.
+- `theory_a2_multiplicity.py` — Addendum A2, the kernel-independent structural
+  layer: the multiplicity-ladder theorem (the optimal set is a level set of `A`,
+  whose size steps at the critical values of `A`, at power ratios needing no
+  absolute calibration) and the gauge-degeneracy theorem (η sees the response
+  only through `E = 2c + s + 2w`).  Write-up in `docs/theory_a2_multiplicity.md`.
+- `fig6_a2_multiplicity.py` — figures for A2 → `a2_multiplicity_120GPa.png`.
 
 Note that the v1 Franck–Condon envelope (`nv_model.py`) and the v3 Ho kernel
 (`ho_spectrum_model.py`) do **not** agree on the optimum: 475.51 nm against

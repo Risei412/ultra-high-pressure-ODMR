@@ -340,3 +340,172 @@ data exist. This strengthens, and supersedes, the qualitative caveat already
 recorded in *Optical-limit result at 120 GPa*. The optimum 440.65 nm, the
 ×1.04494 penalty at 457 nm, and all of Addendum A1 are unaffected.
 
+---
+
+# Erratum E2 — corrections to Addendum A1 from its numerical execution
+
+Date: 2026-08-27. Filed under the v3 bug-fix/erratum rule. It corrects
+Addendum A1 only. **No value in the frozen body changes**: the optical-limit
+table was re-run and reproduces exactly (440.65 nm, ×1.04494, ×12.53, ×11.99,
+0.0834), and the existing test suite passes.
+
+Full working: `docs/theory_a1_numerical_execution.md`
+(`code/theory_a1_generalization.py`, 23 regression tests).
+
+**Provenance note.** `code/ho_odmr_sensitivity.py`,
+`code/report_120gpa_sensitivity.py`, `code/tests/test_ho_odmr_sensitivity.py`
+and `code/data/ho_120gpa_wavelength_scan.csv` — all required by the
+*Reproduction* section above — were absent from the repository and present only
+inside `ho_integrated_odmr_v3_20260827.zip`. They have been restored.
+
+## E2.1 The reconstructed kernel is not a single band
+
+A1 treats \(A(\lambda)\) as one flat band peaked at 440.65 nm. The
+reconstruction carries **four** local maxima at 120 GPa:
+
+| λ [nm] | \(a/a_{\max}\) | optical-limit penalty |
+|---:|---:|---:|
+| 440.64 | 1.000 | ×1.0000 |
+| 475.55 | 0.660 | ×1.2306 |
+| 500.19 | 0.277 | ×1.8994 |
+| **514.46 (ZPL)** | **0.694** | **×1.2006** |
+
+The ZPL penalty ×1.2006 is indistinguishable from that of 473 nm (×1.2054), and
+514.46 nm lies inside the region §7 declares to hold real data (λ ≤ 517.4 nm),
+sampled there at 0.1–0.5 nm spacing. It is absent from every candidate-line
+list in the project.
+
+## E2.2 P2's threshold and destination
+
+A1 states that \(\lambda_\eta\) leaves the 5 % band once
+\(|\ell_G|>0.62\,\%/\mathrm{nm}\). Exact argmax over the reconstruction gives a
+**jump to the ZPL at \(\ell_G>0.268\,\%/\mathrm{nm}\)**, a displacement of
+73.8 nm rather than 15.6 nm. P2 is a local expansion and cannot represent this.
+
+P2's usable range is bounded on both sides: below
+\(\ell_G\approx0.1\,\%/\mathrm{nm}\) the predicted shift is smaller than the
+3–10 nm node spacing of the extraction and the argmax does not move at all;
+above \(0.268\,\%/\mathrm{nm}\) the global optimum has already left the band.
+In between the formula is good to a few per cent (at 0.4 %/nm, predicted
+10.51 nm against exact 10.21 nm).
+
+## E2.3 κ has two incompatible definitions
+
+P2 defines \(\kappa_R=-\mathrm{d}^2\ln R/\mathrm{d}\lambda^2\) as a **local**
+second derivative, but the quoted \(8\times10^{-4}\,\mathrm{nm^{-2}}\) is
+reproduced only by the **chord** curvature
+\(-2\ln a/(\lambda-\lambda_{\rm abs})^2\) (all seven rows of
+`theory_optima_coincidence.md` §2 reproduce to 1 %). The true pointwise second
+derivative spans \([-1.12,+1.14]\,\mathrm{nm^{-2}}\) with 20 sign changes and is
+unusable.
+
+A parabolic fit is window dependent: 7.01e-4 (±10 nm), 7.61e-4 (±15 nm),
+8.07e-4 (±40 nm). **The quoted 8e-4, hence the 2.5e3 nm² conversion factor,
+corresponds to a ±40 nm fit**; over the 5 % band it is 2628 nm². A1.3's
+falsification clause is not well posed until the fit window is stated; read it
+as "±40 nm parabolic fit".
+
+## E2.4 Three geometric corrections
+
+- **The 83 nm doublet row is unverifiable.** At \(a^*/a_{\max}=0.5\) the blue
+  member lies below 402 nm, outside the reconstruction and below the
+  ground-state ionisation edge where (M) fails by A1's own P6. The widest
+  verifiable separation is 112.6 nm. The 0.9 and 0.7 rows reproduce well
+  (32.80 and 60.55 nm against the Gaussian 33.28 and 61.24 nm).
+- **The doublet is degenerate but not symmetric.** η-degeneracy is exact
+  (2.2e-16), yet the red member sits ~3 nm further out at both levels. The 5 %
+  band is likewise asymmetric: **[426.43, 457.90] nm**, not 440.65 ± 15.6 nm.
+  T3 must be phrased as a search for equal η, not for symmetric placement.
+- **P5's window is narrower than advertised.** The split spans 1.43 decades, but
+  both members stay inside the data window over only **0.27 decades** (a factor
+  1.9 in power).
+
+## E2.5 P4's conclusion is too strong
+
+A1 concludes "saturation does not move the optimum; contrast does." The
+single-mechanism table is correct, but **saturation together with power
+broadening, and contrast collapse alone, give identical \(\Phi(\Gamma_p)\)**
+(difference 1.1e-16) and hence identical η surfaces. An observed split therefore
+does *not* identify contrast as its cause. Read P4 as: splitting requires
+\(\mathrm{d}\ln G/\mathrm{d}\ln\Gamma_p<-\tfrac12\,\mathrm{d}\ln R/\mathrm{d}\ln\Gamma_p\),
+which either mechanism achieves and which η alone cannot tell apart. This is why
+the experimental freeze's requirement to record rate, contrast and linewidth
+*separately* is load-bearing rather than a convenience. Addendum A2 turns this
+into a theorem.
+
+## E2.6 What is unaffected
+
+P1, P3's exact degeneracy, P4's algebra, P5's ordering, T4's inference procedure
+(\(\Gamma_p^*\) recovered to 2.7 % from a 457 nm sweep at 2 % noise; 200/200
+trials inside A1.3's factor-of-two bound), and all of E1's arithmetic reproduce
+exactly. The frozen body is untouched.
+
+---
+
+# Addendum A2 — multiplicity ladder and gauge degeneracy
+
+Date: 2026-08-27. Appended under the v3 immutability rule as a **theory-only**
+extension, like A1. It introduces no measurement and no fitted value, and
+changes nothing in the frozen body. Full derivations, numerical verification and
+pre-registered tests: `docs/theory_a2_multiplicity.md`
+(`code/theory_a2_multiplicity.py`, 15 regression tests).
+
+A2 exists because E2 showed that A1 fails along a clean seam: **every broken
+claim depends on the shape of the reconstructed kernel, and every surviving
+claim follows from the structure of \(\eta=1/(G\sqrt R)\).** A2 freezes the
+structural half and generalises it. No proposition below assumes anything about
+the absorption spectrum; the Ho kernel appears only as a worked example.
+
+**Theorem M (multiplicity ladder).** Under (M) with a unique interior maximum of
+\(\Phi\) at \(\Gamma_p^*\), the optimal set at power \(I\) is the level set
+
+\[
+\Lambda_\eta(I)=\{\lambda:\ a(\lambda)=I_c/I\},
+\qquad I_c=\Gamma_p^*/(\gamma A_{\max}).
+\]
+
+Its cardinality is piecewise constant in \(\ln I\) and changes only where the
+level crosses a critical value of \(A\): **+2** at an interior maximum, **−2** at
+a minimum, **−1** at a window edge. The transition powers are
+\(I_k/I_c=A_{\max}/A_k\).
+
+*Corollary (calibration-free).* The ratios \(I_k/I_j=a_j/a_k\) contain no
+response parameter, and under (M) the \(a_k\) are read directly off the low-power
+PL scan. The whole ladder follows from a relative spectrum plus the single scale
+\(I_c\), which T4 already supplies. A1's doublet is the bottom rung: a unimodal
+kernel has no interior critical values and admits only \(2\to1\).
+
+**Theorem G (gauge degeneracy).** η depends on \((C,R,\Delta\nu)\) only through
+\(\Phi=C^2R/\Delta\nu^2\). For power-law responses \(R=\Gamma_p(1+\rho)^{-s}\),
+\(C=(1+\rho)^{-c}\), \(\Delta\nu=(1+\rho)^{w}\),
+
+\[
+\Phi=\Gamma_p(1+\rho)^{-E},\qquad E\equiv 2c+s+2w,
+\qquad \rho^*=\frac{1}{E-1}\ \ (E>1).
+\]
+
+The response enters η through the single scalar \(E\), and splitting is exactly
+\(E>1\). A1's four-row mechanism table is the sign of \(E-1\); its "all three"
+case \(E=4\) gives \(\rho^*=1/3\), matching A1's numerical 0.3333.
+
+*Corollary.* Responses sharing \(E\) share the entire η surface, \(\Gamma_p^*\)
+and the ladder, so mechanism attribution from wavelength scans is impossible at
+any number of powers — only \(C\) and \(\Delta\nu\) measured apart separate them.
+*Conversely*, the ladder is invariant across the whole gauge plane, so it can be
+predicted and tested **without knowing which mechanism operates**.
+
+**Pre-registered tests.** T5 (ladder: predict \(I_k/I_c=1/a_k\) from the
+low-power scan, verify the steps); T6 (universal degeneracy: all \(N\) members
+share η exactly — an arbitrary-precision null test for (M), strengthening T3);
+T7 (exponent closure: \(E\) from separately measured \(C,R,\Delta\nu\) must
+predict the observed splitting power).
+
+**Worked example, conditional on the reconstruction.** At 120 GPa the predicted
+rungs fall at \(I/I_c=\) 1.4414 (ZPL, 514.46 nm), 1.5145, 1.5191, 1.8646, 3.6078
+and 4.2989, giving \(N=2\to4\to6\to4\to3\to5\to3\); all six match their predicted
+critical values to 0.00 %. **The lowest rung is the ZPL**, so a candidate-line
+list without it cannot see the effect at all. The \(N=6\) plateau spans only
+×1.003 in power and must not be claimed; the resolvable plateaux are ×1.05,
+×1.23, ×1.93 and ×1.19. These *values* are conditional on the Fig. 1(e)
+reconstruction — the *structure* is what A2 freezes.
+
