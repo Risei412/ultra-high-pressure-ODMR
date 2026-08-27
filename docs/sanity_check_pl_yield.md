@@ -76,13 +76,73 @@ step ① was built to apply.
 
 ## How much of this to believe
 
-The fitted 550 meV is an **effective** ZPL shift inside this model form, not
-independently a measurement of the ZPL. What the data actually say is that the
-absorption maximum at 120 GPa is about 20 nm bluer than the frozen model puts
-it. Within this parameterisation the only knob that does that is dE120; the
-same displacement could come from the single-effective-phonon envelope being
-the wrong shape, which is the ±15 % ħω model-form error already named as the
-dominant uncertainty. The two are not separable by these data.
+### The conclusion is robust; the attribution is not
+
+The obvious worry is that 550 meV is just a fitted number and the whole thing is
+one knob turned until it agreed. It is worth checking which knobs *can* do it,
+because that is the difference between a wrong constant and a wrong theory.
+Fitting each input on its own, against both branches at once:
+
+| refit | pooled residual | λ_opt(120 GPa) |
+|---|---|---|
+| nothing (frozen) | 26.4 % | 475.5 nm |
+| ΔE_ZPL(120) → 550 meV | 13.2 % | 449.6 nm |
+| ħω → 103 meV | 9.8 % | 450.7 nm |
+| S_abs slope → 4.55 | 12.3 % | 442.9 nm |
+| α → 1.21 | 14.4 % | 455.2 nm |
+| dE_ZPL/dP\|₀ → 8.3 meV/GPa | 23.0 % | 475.5 nm (fails) |
+
+**Four different inputs each reconcile both branches, and every one of them
+puts λ_opt between 443 and 455 nm.** So "the optimum is near 450 nm, not
+475 nm" does not depend on which knob is blamed; "the ZPL shift is 550 meV"
+very much does. The best commercial line is 445 or 457 nm in all four cases,
+and the 473 nm penalty is ×1.08–×1.25 — the recommendation degrades, it does
+not collapse.
+
+What is **not** pinned by these data is the size of the advantage over green:
+η(532)/η_opt comes out ×2.4 to ×11.7 depending on the knob. The ×11.7 quoted
+below is the dE120 case alone and should not be used as a result.
+
+### Why this is a wrong constant and not a wrong structure
+
+Three things say so.
+
+- **No trade-off.** Re-anchoring to fix the blue branch made the green branch
+  *better* (13.5 % → 13.0 %), not worse. A model with the wrong structure buys
+  agreement on one branch by giving it up on the other.
+- **The mechanism is what was confirmed.** The test only exists because the
+  absorption band sweeps *past* a fixed line as the ZPL shifts, which is the
+  same statement as "λ_opt is set by the absorption line shape alone". The data
+  show both domes, in the right order, with the green one at the predicted
+  pressure. The layer of the argument that the talk is about passed.
+- **400 meV was a bound, not a value.** Ho *et al.* write "a pronounced shift
+  **exceeding** 400 meV at 120 GPa". The freeze took the lower edge of a
+  one-sided statement and used it as a point estimate with a ±20 meV bar. That
+  is a defect in how the anchor was read, not in the physics.
+
+### Where the model form really is a caricature
+
+The paper's own Fig. 5(b) theory curve reproduces both domes, and its σ_abs is
+a mode-resolved calculation with explicit dynamical Jahn–Teller treatment of
+the JT-active modes (the K² constants). `nv_model.py` replaces all of that with
+a single 65 meV effective phonon and no JT. The paper notes that absorption is
+*not* the mirror of emission precisely because of the JT effect, and that the
+sideband broadening under pressure "is most pronounced in absorption" — which
+is exactly the regime this comparison probes. The ħω row above, which gives the
+best fit of the four, is that story: the effective phonon needs to be 103 meV,
+far outside the ±15 % that was carried as the model-form uncertainty.
+
+A second structural simplification: above ~100 GPa the measured ZPL is
+**split** by residual non-hydrostatic stress, and even the paper's theory
+models only the lower branch. `nv_model.py` has one ZPL.
+
+### What genuinely broke: the uncertainty budget
+
+The tornado figure carries ΔE_ZPL(120) at ±20 meV, a measurement-precision
+number for a quantity that was quoted as a bound. The data displace it by
+150 meV. The central value being wrong is recoverable; claiming ±20 meV on it
+was the actual error, and the same question should be asked of ħω, whose ±15 %
+also fails to cover the value that fits.
 
 Other caveats:
 

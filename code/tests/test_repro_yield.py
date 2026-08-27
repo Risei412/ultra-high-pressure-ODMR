@@ -90,3 +90,60 @@ def test_dropping_the_collection_factor_makes_the_fit_worse(data):
 def test_predict_is_shape_preserving():
     m = NVModel(T=300.0)
     assert predict(m, 532.0, [0.0, 60.0, 120.0]).shape == (3,)
+
+
+# --- is it a wrong constant or a wrong theory? ------------------------------
+
+SINGLE_KNOB = (('dE120', np.arange(0.40, 0.70, 0.01)),
+               ('hw', np.arange(0.065, 0.14, 0.002)),
+               ('S_slope', np.arange(1.5, 6.5, 0.10)),
+               ('alpha', np.arange(0.6, 1.5, 0.02)))
+
+
+def _best_single(data, name, values, T=300.0):
+    best = None
+    for v in values:
+        m = NVModel(T=T, **{name: float(v)})
+        c = compare(m, data)['pooled']
+        if best is None or c < best[0]:
+            best = (c, m)
+    return best
+
+
+@pytest.mark.parametrize('name,values', SINGLE_KNOB)
+def test_every_admissible_knob_lands_the_optimum_near_450(data, name, values):
+    """The answer must not depend on which input is blamed.
+
+    If the structure of the model were wrong, no single input would reconcile
+    both branches, and the ones that came closest would disagree about where
+    the optimum is.  They agree.
+    """
+    rms, m = _best_single(data, name, values)
+    assert rms < 0.16
+    assert 440.0 < m.lambda_opt(120) < 460.0
+
+
+def test_fixing_blue_does_not_cost_green(data):
+    """No trade-off: the signature of a mis-set constant, not a wrong form."""
+    frozen = compare(NVModel(T=300.0), data)
+    _, refit, _ = fit_dE120(data, T=300.0)
+    after = compare(refit, data)
+    assert after['457'] < frozen['457'] / 2.0
+    assert after['532'] <= frozen['532']
+
+
+def test_the_green_advantage_is_not_pinned_by_these_data(data):
+    """Honest limit: eta(532)/eta_opt varies by ~5x across the knobs that fit."""
+    ratios = []
+    for name, values in SINGLE_KNOB:
+        m = _best_single(data, name, values)[1]
+        opt = m.lambda_opt(120)
+        e = lambda lam: float(np.asarray(m.eta_lambda(lam, 120)[0]))
+        ratios.append(e(532.0) / e(opt))
+    assert max(ratios) / min(ratios) > 3.0
+
+
+def test_the_ZPL_slope_alone_cannot_rescue_the_blue_branch(data):
+    """One knob that does NOT work, so the test above is not vacuous."""
+    rms, _ = _best_single(data, 'slope0', np.arange(4.0e-3, 1.0e-2, 2e-4))
+    assert rms > 0.20
