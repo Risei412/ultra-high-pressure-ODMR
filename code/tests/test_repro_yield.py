@@ -3,8 +3,9 @@ import numpy as np
 import pytest
 
 from nv_model import NVModel
-from repro_yield import (load, predict, compare, fit_dE120, peak_pressure,
-                         _observed_peak, LINES)
+from repro_yield import (load, predict, compare, compare_experiment,
+                         compare_ho_theory, fit_dE120, peak_pressure,
+                         reproduction_gate, _observed_peak, LINES)
 
 
 @pytest.fixture(scope='module')
@@ -12,13 +13,24 @@ def data():
     return load()
 
 
-def test_both_series_present_and_disjoint_in_pressure(data):
+def test_both_experimental_series_present_and_meet_in_pressure(data):
     p532 = data['expt532'][0]
     p457 = data['expt457'][0]
     assert len(p532) == 32 and len(p457) == 29
     # the green run stops where the blue one starts, which is why one figure
     # covers 0-120 GPa at all
     assert p532.max() == pytest.approx(p457.min(), abs=0.1)
+
+
+def test_both_digitised_ho_theory_curves_are_present(data):
+    for lam in LINES:
+        pressure, values = data['theory%d_ho' % lam]
+        assert len(pressure) == 121
+        assert pressure[0] == 0.0 and pressure[-1] == 120.0
+        # Only the interval covered by the corresponding experiment is audited.
+        measured = data['expt%d' % lam][0]
+        mask = (pressure >= measured.min()) & (pressure <= measured.max())
+        assert np.all(values[mask] > 0.0)
 
 
 def test_yields_are_positive_and_on_the_plotted_scale(data):
@@ -55,7 +67,7 @@ def test_frozen_blue_branch_never_turns_over_but_the_data_do(data):
     assert _observed_peak(*data['expt457']) < 95.0
 
 
-def test_refit_moves_one_anchor_and_fixes_both_branches(data):
+def test_conditional_detected_yield_fit_matches_both_experimental_branches(data):
     dE, m, rms = fit_dE120(data, T=300.0)
     assert 0.52 < dE < 0.58
     assert rms < 0.16
@@ -79,12 +91,48 @@ def test_conclusion_does_not_depend_on_the_temperature_assumed(data):
     assert abs(warm - cold) < 0.02
 
 
-def test_dropping_the_collection_factor_makes_the_fit_worse(data):
-    """eta_col is not a fudge: leaving it out degrades both branches."""
+def test_experimental_fit_depends_materially_on_the_observable(data):
+    """The passband assumption is load-bearing and must remain visible."""
     m = NVModel(T=300.0)
     with_col = compare(m, data, collection=True)['pooled']
     without = compare(m, data, collection=False)['pooled']
-    assert without > with_col
+    assert without > with_col + 0.08
+
+    dE_detected, detected, _ = fit_dE120(
+        data, T=300.0, collection=True, target='experiment')
+    dE_absorption, absorption, _ = fit_dE120(
+        data, T=300.0, collection=False, target='experiment')
+    assert abs(dE_detected - dE_absorption) > 0.10
+    assert abs(detected.lambda_opt(120) - absorption.lambda_opt(120)) > 15.0
+
+
+def test_ho_theory_is_compared_to_absorption_not_collection(data):
+    """Changing eta_col must have no effect on the Ho-theory audit."""
+    m = NVModel(T=300.0)
+    before = compare_ho_theory(m, data)
+    m.eta_col = lambda pressure: np.full_like(np.asarray(pressure), 1e-12)
+    after = compare_ho_theory(m, data)
+    assert after['pooled_fractional_rms'] == pytest.approx(
+        before['pooled_fractional_rms'], rel=1e-12)
+
+
+def test_experiment_calibration_does_not_reproduce_ho_theory(data):
+    """A fit to experimental PL is not a reproduction of Ho's calculation."""
+    _, model, _ = fit_dE120(
+        data, T=300.0, collection=True, target='experiment')
+    gate = reproduction_gate(model, data)
+    assert gate['experiment_shape']
+    assert not gate['ho_theory']
+    assert not gate['overall']
+
+
+def test_single_zpl_anchor_cannot_clear_the_ho_theory_gate(data):
+    """Do not relabel a failed model-form check as a measured ZPL anchor."""
+    _, model, score = fit_dE120(
+        data, T=300.0, target='ho_theory',
+        grid=np.arange(0.35, 0.90, 0.005))
+    assert score > 0.20
+    assert not reproduction_gate(model, data)['ho_theory']
 
 
 def test_predict_is_shape_preserving():
@@ -158,4 +206,5 @@ def test_457_is_safe_under_every_model_that_fits(data):
         e = lambda lam: float(np.asarray(m.eta_lambda(lam, 120)[0]))
         assert e(457.0) / e(opt) < 1.15
         assert e(532.0) / e(opt) > 2.0        # and blue always beats green
+
 

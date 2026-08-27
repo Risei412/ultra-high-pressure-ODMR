@@ -1,145 +1,251 @@
-"""
-repro_yield.py
---------------
-The one comparison that tests the wavelength claim against measurement.
+"""Audit Ho et al. (2026) Fig. 5(b) without mixing observables.
 
-lambda_opt is made of sigma_abs(lambda, P) and almost nothing else -- the
-charge-state fraction is flat across the blue window and the ODMR contrast is
-wavelength independent by construction.  So a figure that compares MEASURED
-ODMR contrast with the model tests the absolute sensitivity scale, not the
-wavelength recommendation.  The quantity that does test it is the one in
-Ho et al. 2026 Fig. 5(b): integrated photoluminescence yield versus pressure at
-a FIXED excitation wavelength, taken at constant laser power and integration
-time.  As the ZPL blue shifts, the absorption band sweeps past the fixed laser
-line, so the yield rises, peaks, and falls; the pressure at which it peaks is a
-direct read-out of where the absorption maximum is, and it is invariant under
-the arbitrary vertical scale of the measurement.
-
-Two lines were measured: 532 nm from 4.7 to 51 GPa and 457 nm from 51 to
-114 GPa.  Between them they track the absorption maximum across 2.33-2.71 eV.
-
-What this script does:
-
-    - loads data/pl_yield_vs_pressure.csv
-    - compares it against the FROZEN model (dE120 = 400 meV)
-    - re-fits the single anchor the comparison actually constrains, the ZPL
-      shift at 120 GPa, and reports what that does to lambda_opt
-
-Run:  python repro_yield.py
+``expt*`` contains detected, spectrally integrated PL. A passband factor may
+enter this observable, so absorption-only and detected-yield proxies are kept
+separate. ``theory*_ho`` contains Ho et al.'s calculated absorption cross
+section and must be compared with ``sigma_abs`` only.
 """
 import os
 
 import numpy as np
 
 from nv_model import NVModel, nm2eV
+from ho_spectrum_model import HoPublishedSpectrumModel
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                     'data', 'pl_yield_vs_pressure.csv')
 LINES = (532.0, 457.0)
 
+# Generous audit tolerances for smooth vector curves and experimental sampling.
+HO_MAX_FRACTIONAL_RMS = 0.10
+HO_MAX_PEAK_ERROR_GPA = 5.0
+EXPT_MAX_FRACTIONAL_RMS = 0.16
+# Experimental sampling has a 16 GPa gap around the blue dome; 10 GPa is a
+# resolution-aware peak tolerance. The smooth Ho-theory curve keeps 5 GPa.
+EXPT_MAX_PEAK_ERROR_GPA = 10.0
+
 
 def load(path=DATA):
-    """{'expt532': (P, y), 'expt457': ..., 'theory532_ho': ...}"""
+    """Return all experimental and Ho-theory series from the digitised CSV."""
     out = {}
     with open(path) as f:
         for line in f:
             if line.startswith('#') or not line.strip():
                 continue
-            k, p, y = line.split(',')
-            out.setdefault(k, []).append((float(p), float(y)))
-    return {k: (np.array([r[0] for r in v]), np.array([r[1] for r in v]))
-            for k, v in out.items()}
+            key, pressure, value = line.split(',')
+            out.setdefault(key, []).append((float(pressure), float(value)))
+    return {
+        key: (np.array([row[0] for row in values]),
+              np.array([row[1] for row in values]))
+        for key, values in out.items()
+    }
 
 
-def predict(model, lam, P, collection=True):
-    """Detected PL yield, in the model's own arbitrary units.
-
-    What the camera integrates is not sigma_abs but the emission that survives
-    a fixed long-pass filter, and the emission band blue shifts out of that
-    filter as the ZPL does.  eta_col carries that, is wavelength independent,
-    and therefore cannot move lambda_opt -- but leaving it out here would
-    compare the model to a different quantity than the one measured.
-    """
-    P = np.atleast_1d(np.asarray(P, float))
-    s = np.array([model.sigma_abs(nm2eV(lam), p) for p in P])
-    return s * np.array([model.eta_col(p) for p in P]) if collection else s
+def predict_absorption(model, lam, pressure):
+    """Absorption cross section at a fixed excitation wavelength."""
+    pressure = np.atleast_1d(np.asarray(pressure, float))
+    return np.array([model.sigma_abs(nm2eV(lam), p) for p in pressure])
 
 
-def _scaled_residual(model, lam, P, y, collection=True):
-    """Fractional residuals after the one free scale each series is allowed."""
-    m = predict(model, lam, P, collection)
-    k = float(np.sum(m * y) / np.sum(m * m))       # least squares in y
-    return (k * m - y) / y, k
+def predict_detected_yield(model, lam, pressure):
+    """Detected-PL proxy for the explicitly assumed fixed passband."""
+    pressure = np.atleast_1d(np.asarray(pressure, float))
+    return predict_absorption(model, lam, pressure) * np.asarray(
+        model.eta_col(pressure), float)
 
 
-def compare(model, data, collection=True):
-    """{'532': rms fractional residual, ...} plus the pooled value."""
+def predict(model, lam, pressure, collection=True):
+    """Legacy wrapper; new analyses should call an explicit proxy."""
+    if collection:
+        return predict_detected_yield(model, lam, pressure)
+    return predict_absorption(model, lam, pressure)
+
+
+def _scaled_residual_from_prediction(prediction, reference):
+    """Fractional residual after the one allowed multiplicative scale."""
+    prediction = np.asarray(prediction, float)
+    reference = np.asarray(reference, float)
+    if prediction.shape != reference.shape:
+        raise ValueError('prediction and reference must have the same shape')
+    if np.any(reference <= 0.0):
+        raise ValueError('reference values must be positive in the audit window')
+    denom = float(np.sum(prediction * prediction))
+    if denom <= 0.0:
+        raise ValueError('prediction has zero norm')
+    scale = float(np.sum(prediction * reference) / denom)
+    residual = (scale * prediction - reference) / reference
+    return residual, scale
+
+
+def _observed_peak(pressure, values, window=5):
+    """Peak pressure of a noisy series, estimated with a running mean."""
+    order = np.argsort(pressure)
+    pressure, values = pressure[order], values[order]
+    kernel = np.ones(window) / window
+    smoothed = np.convolve(values, kernel, 'valid')
+    return float(pressure[window // 2 + int(np.argmax(smoothed))])
+
+
+def _curve_metrics(pressure, prediction, reference, noisy=False):
+    """Scale-free shape and peak metrics for one curve."""
+    pressure = np.asarray(pressure, float)
+    prediction = np.asarray(prediction, float)
+    reference = np.asarray(reference, float)
+    residual, scale = _scaled_residual_from_prediction(prediction, reference)
+    peak_ref = (_observed_peak(pressure, reference) if noisy else
+                float(pressure[int(np.argmax(reference))]))
+    peak_model = float(pressure[int(np.argmax(prediction))])
+    return {
+        'fractional_rms': float(np.sqrt(np.mean(residual ** 2))),
+        'scale': scale,
+        'correlation': float(np.corrcoef(prediction, reference)[0, 1]),
+        'peak_model_GPa': peak_model,
+        'peak_reference_GPa': peak_ref,
+        'peak_error_GPa': abs(peak_model - peak_ref),
+        '_residual': residual,
+    }
+
+
+def compare_experiment(model, data, collection):
+    """Compare with measured PL; ``collection`` must be stated explicitly."""
     out, pooled = {}, []
     for lam in LINES:
-        P, y = data['expt%d' % lam]
-        r, _ = _scaled_residual(model, lam, P, y, collection)
-        out['%d' % lam] = float(np.sqrt(np.mean(r ** 2)))
-        pooled.append(r)
-    out['pooled'] = float(np.sqrt(np.mean(np.concatenate(pooled) ** 2)))
+        pressure, values = data['expt%d' % lam]
+        prediction = predict(model, lam, pressure, collection=collection)
+        metrics = _curve_metrics(pressure, prediction, values, noisy=True)
+        pooled.append(metrics.pop('_residual'))
+        out['%d' % lam] = metrics
+    out['pooled_fractional_rms'] = float(
+        np.sqrt(np.mean(np.concatenate(pooled) ** 2)))
     return out
 
 
-def fit_dE120(data, T=300.0, grid=np.arange(0.35, 0.70, 0.005), **kw):
-    """Re-anchor the ZPL shift on these data.  Returns (dE120, model, rms).
+def compare_ho_theory(model, data):
+    """Compare ``sigma_abs`` with Ho's calculated absorption curves only."""
+    out, pooled = {}, []
+    for lam in LINES:
+        pressure, values = data['theory%d_ho' % lam]
+        measured_pressure = data['expt%d' % lam][0]
+        mask = ((pressure >= measured_pressure.min())
+                & (pressure <= measured_pressure.max()))
+        pressure, values = pressure[mask], values[mask]
+        prediction = predict_absorption(model, lam, pressure)
+        metrics = _curve_metrics(pressure, prediction, values, noisy=False)
+        pooled.append(metrics.pop('_residual'))
+        out['%d' % lam] = metrics
+    out['pooled_fractional_rms'] = float(
+        np.sqrt(np.mean(np.concatenate(pooled) ** 2)))
+    return out
 
-    This is the sanctioned exception to the freeze: dE120 is a measured input,
-    not a model form, and this is a measurement of it.
-    """
+
+def compare(model, data, collection=True):
+    """Legacy compact result for callers that consume the old API."""
+    audit = compare_experiment(model, data, collection=collection)
+    return {
+        '532': audit['532']['fractional_rms'],
+        '457': audit['457']['fractional_rms'],
+        'pooled': audit['pooled_fractional_rms'],
+    }
+
+
+def fit_dE120(data, T=300.0, grid=np.arange(0.35, 0.70, 0.005),
+              collection=True, target='experiment', **model_kw):
+    """Return a conditional one-parameter calibration, not a measurement."""
+    if target not in ('experiment', 'ho_theory'):
+        raise ValueError("target must be 'experiment' or 'ho_theory'")
     best = None
     for dE in grid:
-        m = NVModel(T=T, dE120=float(dE), **kw)
-        c = compare(m, data)['pooled']
-        if best is None or c < best[2]:
-            best = (float(dE), m, c)
+        model = NVModel(T=T, dE120=float(dE), **model_kw)
+        if target == 'experiment':
+            score = compare_experiment(
+                model, data, collection=collection)['pooled_fractional_rms']
+        else:
+            score = compare_ho_theory(model, data)['pooled_fractional_rms']
+        if best is None or score < best[2]:
+            best = (float(dE), model, score)
     return best
 
 
-def peak_pressure(model, lam, P=np.linspace(0.0, 200.0, 401)):
-    """Pressure at which the yield at this fixed line is maximal."""
-    return float(P[int(np.argmax(predict(model, lam, P)))])
+def peak_pressure(model, lam, pressure=np.linspace(0.0, 200.0, 401),
+                  collection=True):
+    """Peak of the explicitly selected observable at a fixed laser line."""
+    prediction = predict(model, lam, pressure, collection=collection)
+    return float(pressure[int(np.argmax(prediction))])
 
 
-def _observed_peak(P, y, window=5):
-    """Peak pressure of a noisy series, from a short running mean."""
-    order = np.argsort(P)
-    P, y = P[order], y[order]
-    k = np.ones(window) / window
-    sm = np.convolve(y, k, 'valid')
-    return float(P[window // 2 + int(np.argmax(sm))])
+def reproduction_gate(model, data):
+    """Return independent Ho-theory and experiment-shape gate results."""
+    ho = compare_ho_theory(model, data)
+    expt = compare_experiment(model, data, collection=True)
+    ho_pass = all(
+        ho[str(int(lam))]['fractional_rms'] <= HO_MAX_FRACTIONAL_RMS
+        and ho[str(int(lam))]['peak_error_GPa'] <= HO_MAX_PEAK_ERROR_GPA
+        for lam in LINES)
+    expt_pass = all(
+        expt[str(int(lam))]['fractional_rms'] <= EXPT_MAX_FRACTIONAL_RMS
+        and expt[str(int(lam))]['peak_error_GPa'] <= EXPT_MAX_PEAK_ERROR_GPA
+        for lam in LINES)
+    return {'ho_theory': ho_pass, 'experiment_shape': expt_pass,
+            'overall': ho_pass and expt_pass, 'ho': ho, 'experiment': expt}
+
+
+def _print_metrics(label, audit):
+    print(label)
+    print(f'  {"":10}{"frac RMS":>12}{"corr":>9}{"peak model/ref":>20}')
+    for lam in LINES:
+        metrics = audit[str(int(lam))]
+        print(f'  {int(lam):>4} nm  {metrics["fractional_rms"]*100:10.1f}%'
+              f'{metrics["correlation"]:9.2f}'
+              f'{metrics["peak_model_GPa"]:8.0f}/'
+              f'{metrics["peak_reference_GPa"]:<8.0f}')
+    print(f'  pooled fractional RMS: {audit["pooled_fractional_rms"]*100:.1f}%')
 
 
 def report(T=300.0):
     data = load()
     frozen = NVModel(T=T)
-    dE, refit, _ = fit_dE120(data, T)
+    dE, refit, _ = fit_dE120(data, T=T, collection=True,
+                             target='experiment')
 
-    print(f'PL yield vs pressure at a fixed line   (T = {T:.0f} K)')
-    print(f'  {"":22}{"532 nm":>10}{"457 nm":>10}{"pooled":>10}')
-    for name, m in (('frozen  dE120=0.400', frozen),
-                    (f'refit   dE120={dE:.3f}', refit)):
-        c = compare(m, data)
-        print(f'  {name:22}{c["532"]*100:9.1f}%{c["457"]*100:9.1f}%'
-              f'{c["pooled"]*100:9.1f}%')
+    print(f'Ho Fig. 5(b) observable audit (T = {T:.0f} K)')
+    _print_metrics('\nFrozen vs experiment: detected-yield proxy',
+                   compare_experiment(frozen, data, collection=True))
+    _print_metrics('\nFrozen vs experiment: absorption-only proxy',
+                   compare_experiment(frozen, data, collection=False))
+    _print_metrics('\nFrozen vs Ho calculated absorption',
+                   compare_ho_theory(frozen, data))
+    _print_metrics(f'\nExperiment-calibrated (dE120={dE:.3f} eV) '
+                   'vs experiment: detected-yield proxy',
+                   compare_experiment(refit, data, collection=True))
+    _print_metrics('\nSame calibrated model vs Ho calculated absorption',
+                   compare_ho_theory(refit, data))
 
-    print('\n  pressure of maximum yield (GPa)')
-    print(f'  {"":22}{"532 nm":>10}{"457 nm":>10}')
-    for name, m in (('frozen', frozen), ('refit', refit)):
-        print(f'  {name:22}{peak_pressure(m, 532.0):10.0f}'
-              f'{peak_pressure(m, 457.0):10.0f}')
-    obs = [_observed_peak(*data['expt%d' % lam]) for lam in LINES]
-    print(f'  {"measured":22}{obs[0]:10.0f}{obs[1]:10.0f}')
+    published = HoPublishedSpectrumModel()
+    _print_metrics('\nFig. 1(e) reconstruction vs Ho Fig. 5(b) absorption',
+                   compare_ho_theory(published, data))
+    _print_metrics('\nFig. 1(e) reconstruction vs experimental PL',
+                   compare_experiment(published, data, collection=False))
 
-    print(f'\n  lambda_opt(120 GPa)   frozen {frozen.lambda_opt(120):.1f} nm'
-          f'   ->   refit {refit.lambda_opt(120):.1f} nm')
-    print('  The 457 nm branch is what moves it: the frozen anchor puts the\n'
-          '  absorption maximum at 469 nm at 120 GPa, and these data put it\n'
-          '  bluer.  Nothing here touches hbar-omega, which stays the dominant\n'
-          '  model-form uncertainty.')
+    gate = reproduction_gate(refit, data)
+    print('\nReproduction gates for the experiment-calibrated model')
+    print(f'  Ho theory       : {"PASS" if gate["ho_theory"] else "FAIL"}')
+    print(f'  experiment shape: {"PASS" if gate["experiment_shape"] else "FAIL"}')
+    print(f'  overall         : {"PASS" if gate["overall"] else "FAIL"}')
+    print(f'  lambda_opt(120 GPa): {refit.lambda_opt(120):.1f} nm')
+    print('  dE120 above is a conditional fit parameter, not a direct ZPL '
+          'measurement.')
+
+    published_gate = reproduction_gate(published, data)
+    print('\nPublished-curve cross-figure reproduction')
+    print(f'  Ho theory       : '
+          f'{"PASS" if published_gate["ho_theory"] else "FAIL"}')
+    print(f'  experiment shape: '
+          f'{"PASS" if published_gate["experiment_shape"] else "FAIL"}')
+    print(f'  overall         : '
+          f'{"PASS" if published_gate["overall"] else "FAIL"}')
+    print(f'  lambda_opt(120 GPa): {published.lambda_opt(120):.1f} nm')
+    print('  This reproduces published curves; it is not an independent DFT/JT '
+          'calculation.')
 
 
 if __name__ == '__main__':
