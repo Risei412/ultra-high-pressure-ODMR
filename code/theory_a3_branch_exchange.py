@@ -39,6 +39,23 @@ Theorem X (branch exchange)
 The worked example is Ho et al.'s published 120 GPa series, in which both
 branches are present as separate *raw extracted* maxima at all seven pressures,
 so the exchange is read off the data rather than out of an interpolation.
+
+.. warning::
+
+   **Erratum E3 supersedes every ZPL-derived number in this module.**  Checking
+   the extraction against the source figure showed that the panel (e)
+   zero-phonon-line spikes are clipped by the axis: all seven rise to within
+   1 unit of the axis top.  The ZPL peak heights in the CSV, and hence
+   ``exchange_pressure``'s P* = 87.9 GPa and the "x6.04 ZPL collapse", are
+   artefacts of that clipping and are withdrawn.
+
+   The sideband half of this module is exact --- it reproduces a direct trace
+   of the figure to better than 1 %.  Theorem X also survives: taking the ZPL
+   weight from the published Debye-Waller factor instead, the branch ratio is
+   still monotone, so the crossing is still unique.  What does not survive is a
+   single value for P*, because comparing a narrow line with a broad band is
+   bandwidth dependent.  See ``figure_validation.py`` for the corrected
+   treatment and ``docs/theory_a3_branch_exchange.md`` for the write-up.
 """
 from dataclasses import dataclass
 
@@ -142,6 +159,12 @@ def _spline(pressures, values):
 def exchange_pressure(branches=None, weighted=True):
     """Solve ln(A_SB/A_ZPL) = 0 for the branch-exchange pressure P*.
 
+    SUPERSEDED by erratum E3: A_ZPL here comes from the clipped panel (e)
+    spikes, so the returned P* (87.9 GPa at fixed optical power) is not
+    defensible.  Retained because it is a faithful computation of what the CSV
+    contains, and because the tests pin it as a regression.  Use
+    ``figure_validation.exchange_pressure_at_bandwidth`` instead.
+
     `weighted=True` uses A = lambda sigma (fixed incident optical power);
     `weighted=False` uses sigma alone (fixed incident photon flux).
     """
@@ -231,6 +254,10 @@ def fixed_wavelength_crossover(lam_a=457.0, lam_b=532.0, path=DEFAULT_DATA):
 
 def zero_power_degeneracy(branches=None):
     """At P* the low-power optimum is already twofold, with no power applied.
+
+    The *structure* stands -- an exchange produces a degenerate pair at zero
+    power -- but the pressure and separation reported here inherit E3's clipped
+    P*, so treat them as illustrative only.
 
     This is what separates A3 from A2: the ladder needs I > I_c, whereas the
     branch exchange produces an exactly degenerate pair in the low-power limit.

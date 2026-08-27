@@ -39,6 +39,12 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   are identified in the **raw extracted samples**, not in the pressure
   interpolation.  Write-up in `docs/theory_a3_branch_exchange.md`.
 - `fig7_a3_branch_exchange.py` — figures for A3 → `a3_branch_exchange.png`.
+- `figure_validation.py` — pixel-level check of the extracted kernel against the
+  source figure.  The sideband branch reproduces it to better than 1 %; the
+  zero-phonon-line peaks turn out to be **clipped by the axis**, so A3's
+  ×6.04 collapse and P* = 87.9 GPa are withdrawn (erratum E3).  Supplies the
+  corrected, bandwidth-dependent treatment using the published Debye–Waller
+  factor from `data/ho_fig1_panels_bc.csv`.
 - `dreau_exponent.py` — reads A2's splitting exponent off the published CW-ODMR
   model of Dréau et al., PRB 84, 195204 (2011): `E = 3`, pump nonlinearity
   `n = 2`, so `E n = 6 > 1` and `rho* = 1/5`, independent of the microwave

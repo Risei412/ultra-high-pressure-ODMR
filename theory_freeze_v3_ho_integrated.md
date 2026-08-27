@@ -591,3 +591,93 @@ T11 is the cheapest and most decisive: it needs neither absolute nor intensity
 calibration, only two peak positions per pressure, and if the separation does
 not grow the antecedent fails and no exchange is predicted.
 
+---
+
+# Erratum E3 — the panel (e) zero-phonon-line peaks are clipped
+
+Date: 2026-08-27. Filed under the v3 bug-fix/erratum rule. It corrects
+Addendum A3 only. **The frozen body and Addendum A2's structural propositions
+are untouched.**
+
+The extraction in `code/data/ho_fig1e_absorption.csv` was checked pixel by pixel
+against the source Fig. 1. Working: `code/figure_validation.py`, 12 regression
+tests.
+
+## E3.1 The sideband branch is exact
+
+Tracing each coloured curve in panel (e) and taking its maximum on the
+absorption side reproduces the extracted CSV to **better than 1 % in height at
+all seven pressures**, and to 0.015 eV in position at six of them (20 GPa picks
+a shoulder 0.064 eV away). Everything A3 says about the sideband stands, as does
+its 0 GPa anchor at 637.1 nm.
+
+## E3.2 The ZPL peak heights are an artefact
+
+Every ZPL spike in panel (e) rises from its own baseline to within one unit of
+the top of the axis. Measured tops, on an axis ending near 15:
+
+| P [GPa] | 0 | 20 | 40 | 60 | 80 | 100 | 120 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| spike top | 14.93 | 14.95 | 14.67 | 14.03 | 14.09 | 14.62 | 14.94 |
+
+The spread across all seven is 0.92 units. They are drawn as near-delta lines
+and **the plot simply cuts them off**. The CSV heights (6.364 falling to 1.054)
+are a digitisation artefact of a clipped feature.
+
+**Withdrawn:** the "ZPL cross-section falls by ×6.04 over 0–120 GPa" claim, and
+with it \(P^*=87.9\) GPa (fixed optical power), 75.6 GPa (fixed photon flux),
+and the 71.3 nm jump. `theory_a3_branch_exchange.exchange_pressure` is retained
+as a faithful computation of what the CSV contains, and marked superseded.
+
+## E3.3 Theorem X survives, on better evidence
+
+Panels (b) and (c) publish precisely what is needed, as theory curves with
+markers, calibrated from their own axis ticks and not clipped
+(`code/data/ho_fig1_panels_bc.csv`):
+
+- **\(S_{\rm abs}\) rises 3.023 → 4.554** over 0–120 GPa, +51 %, monotone,
+  \(\mathrm{d}S/\mathrm{d}P = 12.7\) milli/GPa. Theorem X's **first driver is
+  confirmed directly from the published theory**, not inferred.
+- **DWF\(_{\rm abs}\) falls 0.0205 → 0.00226**, a factor **9.07**, monotone.
+  The ZPL weight collapse is real — steeper than the clipped spikes suggested.
+  (A single effective mode, \(e^{-S}\), would give only ×4.62, so the published
+  DWF is genuinely multi-mode.)
+
+## E3.4 What changes: P\(^*\) is bandwidth dependent
+
+The clipped-peak version silently compared two peak heights. It should not have:
+the sideband enters through a **lineshape density** (per eV) while the ZPL
+enters through a **dimensionless weight**, which must be divided by whatever
+bandwidth samples it — the laser linewidth, or the ZPL's own width, whichever is
+larger. Writing
+
+\[
+r(P)=\frac{\lambda_{\rm SB}\,\sigma_{\rm SB}}{\lambda_{\rm ZPL}\,{\rm DWF}_{\rm abs}}
+\quad[\mathrm{eV^{-1}}],
+\qquad
+\frac{A_{\rm SB}}{A_{\rm ZPL}} = r(P)\,W ,
+\]
+
+the exchange occurs where \(r(P)=1/W\). **\(r\) is monotone increasing, ×6.51
+over 0–120 GPa, so the crossing is still unique** and Theorem X is intact. But
+\(P^*\) now moves with \(W\):
+
+| \(W\) [meV] | 1.5 | 2 | 3 | 5 | 7 | 9 |
+|---|---:|---:|---:|---:|---:|---:|
+| \(P^*\) [GPa] | 119.6 | 104.0 | 77.7 | 45.2 | 24.1 | 6.7 |
+
+Outside roughly 1.5–9.7 meV there is no crossing inside 0–120 GPa. Equivalently,
+the ZPL only competes at all for an excitation bandwidth below
+\(1/r(P)\) — 9.7 meV at ambient falling to 1.5 meV at 120 GPa.
+
+**This is a strengthening, not merely a retraction.** The bandwidth dependence
+is a new, sharply testable prediction: sweeping the laser linewidth moves the
+exchange pressure monotonically, and no other mechanism in the framework does
+that. It also makes T11 (measure \(S\hbar\omega\) against pressure) more
+important, since it tests the antecedent without touching the bandwidth
+question at all.
+
+**Reporting rule.** Never quote \(P^*\) without stating the excitation
+bandwidth, alongside the existing rule about the fixed-power versus fixed-flux
+convention.
+
