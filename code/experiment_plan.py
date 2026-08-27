@@ -52,7 +52,58 @@ COMMERCIAL = (405.0, 445.0, 457.0, 473.0, 488.0, 505.0, 532.0)
 
 
 # ==========================================================================
-# step 1 -- wavelength from the measured ZPL
+# step 1 -- the excitation wavelength, measured directly at the working pressure
+# ==========================================================================
+SCAN_LINES = (445.0, 457.0, 473.0, 488.0, 505.0)
+
+
+def lambda_opt_is_brightest(P=P_TARGET, u=None, lo=405.0, hi=560.0, n=621):
+    """(argmax of the detected rate, argmin of eta) at this pressure.
+
+    The two coincide, and that is the whole reason step 1 can be a measurement
+    rather than a calculation: eta ~ dnu / (C sqrt(R)), and dnu and C carry no
+    wavelength dependence, so minimising eta IS maximising the count rate.
+    Whatever the absorption line shape turns out to be, THE BRIGHTEST LINE IS
+    THE MOST SENSITIVE LINE -- provided the scan is taken below saturation,
+    which is what `u` checks.
+    """
+    grid = np.linspace(lo, hi, n)
+    if u is None:
+        m = NVModel()
+        R = np.asarray(m.eta_lambda(grid, P)[2])
+        eta = np.asarray(m.eta_lambda(grid, P)[0])
+    else:
+        mp = NVModelPower()
+        eta, _, R = (np.asarray(a) for a in mp.eta_lambda_u(grid, P, u)[:3])
+    return float(grid[np.nanargmax(R)]), float(grid[np.nanargmin(eta)])
+
+
+def excitation_scan(power_normalised_yield, lines=SCAN_LINES):
+    """Reduce a measured excitation scan to the optimal wavelength.
+
+    power_normalised_yield : detected PL, one value per line, each divided by
+        the OPTICAL POWER actually delivered at that line (not the photon
+        flux -- the lambda in R = f- (I/E_gamma) sigma_abs eta_col is already
+        the thing being optimised, so dividing it out would remove the answer).
+
+    Returns the peak of a log-quadratic through the points.  Three lines are
+    the minimum; four or five bracketing the peak give a few nm.
+    """
+    lines = np.asarray(lines, float)
+    y = np.asarray(power_normalised_yield, float)
+    if len(y) != len(lines):
+        raise ValueError('one yield per line')
+    if len(y) < 3:
+        raise ValueError('at least three lines are needed to locate a peak')
+    c = np.polyfit(lines, np.log(np.clip(y, 1e-300, None)), 2)
+    if c[0] >= 0:
+        raise ValueError('the scan has no interior maximum -- the peak is '
+                         'outside the lines used; add a bluer or redder line')
+    return float(-c[1] / (2.0 * c[0]))
+
+
+# ==========================================================================
+# step 1b -- fallback: wavelength inferred from the measured ZPL
 # ==========================================================================
 def dE120_from_zpl(zpl_nm, P=P_TARGET, slope0=5.75e-3, alpha=ALPHA_REF):
     """Effective dE_ZPL(120 GPa) reproducing a ZPL measured at pressure P.

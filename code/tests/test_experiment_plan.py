@@ -136,3 +136,52 @@ def test_the_tolerance_window_barely_moves_with_temperature():
     lo_c, hi_c = window(4.0)
     lo_w, hi_w = window(300.0)
     assert abs(lo_c - lo_w) < 3.0 and abs(hi_c - hi_w) < 3.0
+
+
+# --- step 1 as a measurement rather than a calculation ----------------------
+
+def test_the_brightest_line_is_the_most_sensitive_line():
+    """Why step 1 can be measured: eta ~ dnu/(C sqrt R) with dnu, C flat in lambda."""
+    from experiment_plan import lambda_opt_is_brightest
+    for P in (60.0, 100.0, 120.0):
+        bright, best = lambda_opt_is_brightest(P)
+        assert abs(bright - best) < 1.0
+
+
+def test_that_equivalence_holds_for_every_model_form_that_fits_the_yield_data():
+    from nv_model import NVModel
+    import numpy as np
+    grid = np.linspace(405.0, 560.0, 621)
+    for kw in ({}, dict(dE120=0.550), dict(hw=0.103),
+               dict(S_slope=4.55), dict(alpha=1.21)):
+        m = NVModel(T=300.0, **kw)
+        R = np.asarray(m.eta_lambda(grid, 120.0)[2])
+        eta = np.asarray(m.eta_lambda(grid, 120.0)[0])
+        assert abs(grid[np.nanargmax(R)] - grid[np.nanargmin(eta)]) < 1.0
+
+
+def test_the_equivalence_breaks_above_the_saturation_knee():
+    """Which is the operational instruction: scan below the knee, not above."""
+    from experiment_plan import lambda_opt_is_brightest
+    bright, best = lambda_opt_is_brightest(120.0, u=0.06)
+    assert abs(bright - best) < 1.0
+    bright, best = lambda_opt_is_brightest(120.0, u=0.30)
+    assert bright - best > 8.0
+
+
+def test_a_five_line_scan_recovers_the_optimum_whatever_the_truth_is():
+    from experiment_plan import excitation_scan, SCAN_LINES
+    from nv_model import NVModel
+    import numpy as np
+    for kw in ({}, dict(dE120=0.550), dict(hw=0.103),
+               dict(S_slope=4.55), dict(alpha=1.21)):
+        m = NVModel(T=300.0, **kw)
+        y = [float(np.asarray(m.eta_lambda(l, 120.0)[2])) for l in SCAN_LINES]
+        assert abs(excitation_scan(y) - m.lambda_opt(120)) < 6.0
+
+
+def test_a_scan_that_does_not_bracket_the_peak_says_so():
+    from experiment_plan import excitation_scan
+    import pytest as _pt
+    with _pt.raises(ValueError, match='no interior maximum'):
+        excitation_scan([1.0, 2.0, 4.0], lines=(505.0, 488.0, 473.0))

@@ -1,13 +1,15 @@
 # Laser parameters for the 120 GPa run
 
-> **2026-08-27 — read `docs/sanity_check_pl_yield.md` first.** Measured PL yield
-> versus pressure puts the absorption maximum about 20 nm bluer at 120 GPa than
-> the anchor these tables were built on. Re-anchored, λ_opt(120 GPa) is 450 nm
-> and the line is **457 nm**, not 473 nm. The *procedure* below is unchanged and
-> is in fact what catches this: step ① measures the ZPL and reads the line off
-> it, and a ZPL near 497 nm falls outside the 512–541 nm range in which 473 nm
-> holds. Treat every 473 nm in this document as "the line step ① selects".
-
+> **2026-08-27 — step ① has been rewritten; read `docs/sanity_check_pl_yield.md`
+> first.** Measured PL yield versus pressure puts the absorption maximum about
+> 20 nm bluer at 120 GPa than the anchor these tables were built on, and the
+> model forms that fit those data still disagree by ~30 nm about λ_opt at
+> 120 GPa. Reading the line off a measured ZPL does not resolve that. Step ① is
+> therefore now a **direct measurement of λ_opt in the cell** — a five-line
+> excitation scan — which is possible because the brightest line is the most
+> sensitive line below saturation. Load **457 nm** as the working line: it is
+> within ×1.11 of optimal under every model form that fits, including the
+> rejected one. The ZPL route is kept below as a fallback.
 
 Two numbers have to be fixed before the cell is loaded: **which line** and
 **how much power**. Both are decided by measurements made in the cell itself,
@@ -46,42 +48,64 @@ harmless — arguably favourable — for flux exclusion along the compression ax
 
 ---
 
-## Step 1 — the excitation wavelength, from one PL spectrum
+## Step 1 — the excitation wavelength, measured at 120 GPa
 
-**Measure:** the NV⁻ zero-phonon line at the working pressure. One
-photoluminescence spectrum.
+**The theory does not have to supply this number, and should not be asked to.**
 
-**Then read off:**
+Ho *et al.*'s yield data stop at 113.8 GPa and probe σ_abs at only two photon
+energies. Getting λ_opt(120 GPa) out of them means extrapolating the absorption
+peak past the last measurement, and `docs/sanity_check_pl_yield.md` shows what
+that costs: the model forms that all fit those data disagree by ~30 nm about
+λ_opt at 120 GPa. Measuring the ZPL does **not** rescue it either — the ZPL
+fixes one end of the band and the Stokes shift S·ħω fixes the other, and it is
+S·ħω that the forms disagree about.
 
-| measured ZPL | ΔE_ZPL | λ_opt | best commercial line |
-|---|---|---|---|
-| 565 nm | 249 meV | 505 nm | 505 nm ×1.00 |
-| 555 | 289 | 497 | 505 nm ×1.02 |
-| 545 | 330 | 489 | 488 nm ×1.00 |
-| 535 | 372 | 481 | 488 nm ×1.02 |
-| **529** | **399** | **476** | **473 nm ×1.00** ← frozen anchor |
-| 525 | 417 | 473 | 473 nm ×1.00 |
-| 518 | 449 | 467 | 473 nm ×1.01 |
-| 512 | 477 | 462 | 457 nm ×1.01 |
+The way out is that λ_opt is directly measurable in the cell, in an afternoon.
 
-**Go/no-go:** 473 nm stays within 5% of the optimum for any **ZPL between 512
-and 541 nm**. 488 nm covers 529–561 nm. If the measured ZPL lands in the first
-range, use 473 nm and change nothing.
+### Why it is measurable
+
+η ∝ Δν / (C √R), and neither Δν nor C carries any wavelength dependence. So
+minimising η **is** maximising the detected count rate:
+
+> **At equal optical power and below saturation, the brightest line is the most
+> sensitive line.**
+
+This holds identically in all five model forms — `test_experiment_plan.py`
+asserts it to under 1 nm — so it does not depend on the part of the theory the
+yield comparison called into question. The theory's job here is to have proved
+the equivalence and to say how to use it, not to predict the number.
+
+### The measurement
+
+1. At the working pressure, illuminate at **445, 457, 473, 488 and 505 nm**
+   (three is the minimum; the peak must be bracketed).
+2. Set each line to the **same optical power**, well below the saturation knee.
+3. Record the detected PL through the usual filter, same integration time.
+4. Divide by the delivered power and fit the peak.
 
 ```python
-from experiment_plan import lambda_opt_from_zpl, line_penalties, zpl_range_for_line
-lambda_opt_from_zpl(529.0)            # -> 475.7 nm
-line_penalties(529.0)[:3]             # -> [(473.0, 1.00), (488.0, 1.05), ...]
-zpl_range_for_line(473.0)             # -> (512, 541) nm
+from experiment_plan import excitation_scan, SCAN_LINES
+excitation_scan(power_normalised_counts, SCAN_LINES)   # -> lambda_opt, nm
 ```
 
-Re-anchoring this way absorbs whatever the stress state did to the ZPL, without
-needing α for a geometry in which α was never measured.
+At 5 % photometry this returns the optimum to **±2–5 nm** whichever model form
+is true — against the ~30 nm spread the theory alone leaves. Nothing about the
+absorption line shape has to be assumed; only that it has a maximum.
 
-**Residual assumption:** the Huang–Rhys factor S_abs(P) and the effective phonon
-energy ħω are still taken from the near-hydrostatic reference. A uniaxial stress
-that changed the electron–phonon coupling itself would not be caught this way.
-That is the one thing step 1 cannot self-check.
+### The one thing the theory must be believed on
+
+**Stay below the knee.** The equivalence is exact at u ≤ 0.06 and fails above
+it: at u = 0.3 the brightest line sits 13–24 nm red of the most sensitive one,
+because saturation flattens the bright end of the scan. Run the scan at low
+power, then set the power by step 2. If the scan has to be run hot, the peak it
+returns is not λ_opt.
+
+### Go/no-go
+
+The lines to bring are settled without any of this: **457 nm is within ×1.11 of
+optimal under every model form that fits the data, including the rejected one**,
+and 445 nm is within ×1.34. So load 457 nm as the working line and let the scan
+confirm or refine it. 473 nm is ×1.00–1.25 — usable, not preferred.
 
 ---
 
