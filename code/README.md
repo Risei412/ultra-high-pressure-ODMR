@@ -18,6 +18,21 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
 - `fig2_blue_wavelength_sweep.py` — blue-wavelength sweep at a chosen pressure
   (optimum, mechanism, optimum-vs-pressure)
   → `blue_wavelength_sensitivity_<P>GPa.png`.
+- `ho_spectrum_model.py`, `ho_odmr_sensitivity.py`,
+  `report_120gpa_sensitivity.py` — the v3 external-kernel chain
+  (`σ_abs^Ho → R_det → η`) behind `theory_freeze_v3_ho_integrated.md`.
+- `theory_a1_generalization.py` — numerical execution of Addendum A1
+  (the coincidence/divergence propositions P1–P7 and tests T1–T4) against the
+  frozen Ho kernel.  Findings written up in
+  `docs/theory_a1_numerical_execution.md`.
+- `fig5_a1_generalization.py` — figures for the above
+  → `a1_generalization_120GPa.png`.
+
+Note that the v1 Franck–Condon envelope (`nv_model.py`) and the v3 Ho kernel
+(`ho_spectrum_model.py`) do **not** agree on the optimum: 475.51 nm against
+440.64 nm at 120 GPa.  `theory_a1_generalization.py` section S8 quantifies the
+gap; do not mix numbers from the two chains without saying which one produced
+them.
 
 ## Requirements
 Python ≥ 3.9 with `numpy`, `scipy`, `matplotlib` (see `requirements.txt`).
