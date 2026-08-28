@@ -814,3 +814,90 @@ reason, and even repaired it cannot place the peak.
 3. Never take a ZPL branch weight from the kernel above 40 GPa (K3).
 4. Never describe the v1 failure as structural (S1.5); it is 65 vs 87.9 meV.
 5. State that the 402 nm window edge is a figure limit, not a band edge (K1).
+
+---
+
+# Erratum E4 — S1.5's phonon energy was derived with the wrong stationarity condition
+
+Appended 2026-08-28. Corrects **S1.5 only**; S1.0–S1.4 and every reporting rule
+in S1.6 stand unchanged. Reproduced by `code/v1_diagnosis.py` (D1–D4).
+
+## E4.1 The error
+
+S1.5 derived the effective phonon energy from
+
+\[ \hbar\omega = (E_{\rm sideband}-E_{\rm ZPL})/S_{\rm abs}, \]
+
+i.e. it placed the absorption maximum exactly \(S\) phonons above the ZPL. That
+is the **continuum** limit. The Pekarian envelope
+\(e^{-S}S^{p}/\Gamma(p+1)\) is stationary not at \(p=S\) but at \(p^*\) solving
+
+\[ \psi(p^*+1) = \ln S \qquad (\psi = \text{digamma}), \]
+
+and over the relevant range \(3.0<S<4.6\) the offset is near-constant,
+\(S-p^*=0.51\pm0.003\). At ~100 meV per quantum that half phonon is a **50 meV
+error in the band maximum**.
+
+The correct derivation, \(\hbar\omega=(E_{\rm sideband}-E_{\rm ZPL})/p^*(S_{\rm abs})\),
+gives **101.1 meV**, not the 87.9 meV quoted in S1.5.
+
+## E4.2 The corrected model passes both gates
+
+| | pooled | 532 \(r\) | 532 peak | 457 \(r\) | 457 peak |
+|---|---:|---:|---:|---:|---:|
+| v1 as frozen | 39.5% | −0.51 | 38/17 | +0.64 | 113/88 |
+| \(\hbar\omega\) only (101.1 meV) | 3.8% | +1.00 | 18/17 | +0.93 | 99/88 |
+| \(\Delta E_{120}\) only | 38.6% | −0.42 | 36/17 | +0.67 | 113/88 |
+| S1.5's continuum shortcut | 10.7% | +0.89 | 24/17 | +0.90 | 101/88 |
+| **both, correct \(p^*\)** | **1.0%** | **+1.00** | **17/17** | **+1.00** | **89/88** |
+
+Gates (10% RMS, 5 GPa peak): **PASS** — 1.4% and 0 GPa at 532 nm, 0.5% and
+1 GPa at 457 nm. **This is the same score the reconstructed kernel achieves on
+the same test.** Nothing is fitted to Fig. 5(b); every input comes from
+Fig. 1(b),(e) plus the stationarity condition above.
+
+**S1.5's closing claim is withdrawn.** "The trend is recovered; the position is
+not" was an artefact of the wrong \(p^*\). The single-mode Franck–Condon
+picture reproduces Ho's calculated absorption at both laser lines exactly.
+
+## E4.3 This does not reinstate v1 as the optical kernel
+
+Fig. 5(b) is a **two-wavelength slice**, and it cannot see what v3 needs.
+Scanned in wavelength at 120 GPa over 402–517 nm, the corrected model against
+the kernel:
+
+| | model | kernel |
+|---|---:|---:|
+| interior local maxima | **1** | **4** |
+| \(\lambda_{\rm opt}\) | 439.10 nm | 440.60 nm |
+| fractional RMS | \multicolumn{2}{c}{52%} |
+| correlation | \multicolumn{2}{c}{+0.993} |
+
+The gross envelope is right; the structure is absent. **Every Addendum A2
+result — the level sets, the ladder \(N=2\to4\to6\to4\to3\to5\to3\), the
+calibration-free transition powers \(I_k/I_c=A_{\max}/A_k\) — lives on those
+four maxima**, and a single-mode Pekarian cannot produce them at any parameter
+value. That, and not an inability to fit, is why the kernel is taken from
+outside.
+
+**One robustness result.** The optical-limit optimum comes out at 439.10 nm
+against the kernel's 440.60 nm — a **1.5 nm** difference, where uncorrected v1
+gave 475.5 nm. The frozen **440.65 nm is robust to the choice of envelope**
+once the constants are right, which is a stronger statement than the freeze
+previously supported.
+
+## E4.4 Reporting rules, revised
+
+Rule 4 of S1.6 ("never describe the v1 failure as structural; it is 65 vs
+87.9 meV") becomes:
+
+4. The v1 failure is two constants — \(\hbar\omega\) 65 vs **101.1** meV and
+   \(\Delta E_{120}\) 0.400 vs 0.464 eV — and correcting them makes v1 pass the
+   Fig. 5(b) gates outright. Never cite the v1 failure as evidence that a
+   single-mode model cannot work.
+6. **New.** The reason v3 takes the kernel from outside is E4.3 — one local
+   maximum against four — not the Fig. 5(b) score. Never argue it from the
+   score.
+7. **New.** When quoting \(\hbar\omega\) from an observed sideband maximum,
+   use \(\psi(p^*+1)=\ln S\), never \(p^*=S\). The shortcut costs half a
+   phonon, ~50 meV here, and it is enough to fail a gate.

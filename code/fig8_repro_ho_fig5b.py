@@ -26,13 +26,19 @@ ever fitted to the Fig. 5(b) curves it is compared against here.
 
 The anticorrelation is not, however, a structural failure of the model.
 `v1_diagnosis.py` shows that two of v1's input constants can be derived from
-Ho's own Fig. 1(b),(e) -- the effective phonon energy is 87.9 meV, not the
+Ho's own Fig. 1(b),(e) -- the effective phonon energy is 101.1 meV, not the
 65 meV of Kehayias et al., and the kernel's ZPL shift is 0.464 eV, not the
 0.400 eV bound v1 is anchored to -- and that correcting both, with nothing
-fitted to Fig. 5(b), takes v1 to r = +0.89 and 10.7% pooled.  It still fails
-the peak gate.  The red curve here is v1 as frozen, which is what the freeze
-compares against; read it as a locatable error, not as a model that cannot
-work.
+fitted to Fig. 5(b), takes v1 to pooled 1.0%, r = 1.00 and peaks at 17/17 and
+89/88 GPa.  It then passes both gates, scoring exactly what the reconstruction
+scores on this test.
+
+So the red curve is not evidence that a single-mode model cannot reproduce
+Ho.  It is v1 as frozen, which is what the freeze compares against, and what
+it shows is the size of a two-constant error.  The reason v3 still takes the
+kernel from outside is elsewhere: scanned in wavelength at 120 GPa the
+corrected model has one local maximum where the kernel has four, and every
+Addendum A2 result lives on those four.
 
 Each panel carries a residual strip beneath it.  The curves in the main panel
 overlap too closely to read a 1.5% disagreement off them, and the residual is
