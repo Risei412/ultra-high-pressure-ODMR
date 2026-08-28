@@ -4,9 +4,9 @@ The freeze claims that the kernel reconstructed from Fig. 1(e) reproduces the
 independently published Fig. 5(b) absorption curves.  `repro_yield.py` checks
 that numerically but draws nothing, so the claim had no figure.  This is it.
 
-Two panels, one per laser line, because that is the whole claim: Ho's
-calculated absorption against the reconstruction, over the full published
-0-120 GPa axis.
+Panels (a),(b) are one per laser line: Ho's calculated absorption against the
+reconstruction, over the full published 0-120 GPa axis.  Panel (c) is there
+because (a),(b) alone would now mislead -- see below.
 
 What this figure does NOT show is our own physics predicting Ho's result.
 The reconstruction is Ho's own Fig. 1(e) spectra, digitised and interpolated
@@ -80,7 +80,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from ho_spectrum_model import HoPublishedSpectrumModel
-from nv_model import NVModel
+from nv_model import NVModel, nm2eV
+from v1_diagnosis import phonon_energy, zpl_shift
 from repro_yield import (
     EXPT_MAX_FRACTIONAL_RMS, EXPT_MAX_PEAK_ERROR_GPA, HO_MAX_FRACTIONAL_RMS,
     HO_MAX_PEAK_ERROR_GPA, LINES, _scaled_residual_from_prediction,
@@ -96,6 +97,12 @@ WINDOW_COLOUR = '0.90'
 # Fraction of its own maximum below which the digitised reference is too close
 # to zero for a fractional residual to mean anything.
 RESIDUAL_FLOOR = 0.05
+
+# Panel (c): the wavelength scan that says why the kernel is taken from
+# outside, at the pressure the whole v3 chain is quoted at.
+STRUCTURE_PRESSURE_GPA = 120.0
+STRUCTURE_WINDOW_NM = (402.0, 517.0)
+V1_COLOUR, V1_FIXED_COLOUR = 'tab:red', 'tab:purple'
 
 
 def audit_window(data, lam):
@@ -115,9 +122,18 @@ def main():
     published = HoPublishedSpectrumModel()
     frozen = NVModel(T=90.0)
 
-    fig, axes = plt.subplots(2, 2, figsize=(11.6, 5.8), sharex='col',
-                             gridspec_kw=dict(height_ratios=(3.0, 1.0),
-                                              hspace=0.08))
+    _, _, hw = phonon_energy()
+    dE120 = zpl_shift()
+    repaired = NVModel(T=90.0, hw=hw, dE120=dE120)
+
+    fig = plt.figure(figsize=(16.4, 5.8))
+    grid = fig.add_gridspec(2, 3, height_ratios=(3.0, 1.0), hspace=0.08,
+                            width_ratios=(1.0, 1.0, 1.05))
+    axes = [[fig.add_subplot(grid[0, 0]), fig.add_subplot(grid[0, 1])],
+            [None, None]]
+    axes[1][0] = fig.add_subplot(grid[1, 0], sharex=axes[0][0])
+    axes[1][1] = fig.add_subplot(grid[1, 1], sharex=axes[0][1])
+    structure_ax = fig.add_subplot(grid[:, 2])
     summary, pooled_window = {}, []
 
     for column, lam in enumerate(LINES):
@@ -130,6 +146,7 @@ def main():
 
         prediction = predict_absorption(published, lam, pressure)
         v1_raw = predict_absorption(frozen, lam, pressure)
+        fixed_raw = predict_absorption(repaired, lam, pressure)
 
         # the audit's own scale, fitted inside the audit window only
         recon_window, residual_window = scaled(prediction[inside],
@@ -137,6 +154,9 @@ def main():
         recon = recon_window.max() / prediction[inside].max() * prediction
         v1 = (scaled(v1_raw[inside], reference[inside])[0].max()
               / v1_raw[inside].max()) * v1_raw
+        fixed_window, fixed_residual = scaled(fixed_raw[inside],
+                                              reference[inside])
+        fixed = fixed_window.max() / fixed_raw[inside].max() * fixed_raw
         residual = (recon[scorable] - reference[scorable]) / reference[scorable]
 
         top.axvspan(lo, hi, color=WINDOW_COLOUR, zorder=0,
@@ -145,8 +165,11 @@ def main():
                  alpha=0.35, label='Ho Fig. 5(b), published')
         top.plot(pressure, recon / norm, color=COLOUR[lam], lw=1.8,
                  label='Fig. 1(e) reconstruction')
-        top.plot(pressure, v1 / norm, color='tab:red', lw=1.2, ls='--',
-                 alpha=0.8, label='v1: our model (Ho anchors, no fit)')
+        top.plot(pressure, fixed / norm, color=V1_FIXED_COLOUR, lw=1.4,
+                 ls=(0, (1, 1.4)),
+                 label='v1 repaired (hw, dE120 from Ho panels)')
+        top.plot(pressure, v1 / norm, color=V1_COLOUR, lw=1.2, ls='--',
+                 alpha=0.8, label='v1 as frozen')
 
         # the peak gate: both markers coincide, so only one line is visible
         peak_ref = float(pressure[inside][np.argmax(reference[inside])])
@@ -160,6 +183,7 @@ def main():
                      bbox=dict(fc='white', ec='0.75', alpha=0.85, pad=2.5))
 
         rms_window = float(np.sqrt(np.mean(residual_window ** 2)))
+        rms_fixed = float(np.sqrt(np.mean(fixed_residual ** 2)))
         rms_full = float(np.sqrt(np.mean(residual ** 2)))
         corr = float(np.corrcoef(recon, reference)[0, 1])
         corr_window = float(np.corrcoef(recon[inside], reference[inside])[0, 1])
@@ -175,10 +199,11 @@ def main():
         top.set_title(f'({"ab"[column]}) {lam:.0f} nm  --  audit window '
                       f'{rms_window*100:.1f}% RMS, r = {corr_window:.2f}',
                       fontsize=11)
-        top.text(0.03 if lam == 532.0 else 0.60, 0.06,
+        top.text(0.03 if lam == 532.0 else 0.56, 0.06,
                  f'full 0-120 GPa axis: {rms_full*100:.1f}% RMS\n'
                  f'(scored over {pressure[scorable].min():.0f}-'
-                 f'{pressure[scorable].max():.0f} GPa)',
+                 f'{pressure[scorable].max():.0f} GPa)\n'
+                 f'v1 repaired, audit window: {rms_fixed*100:.1f}% RMS',
                  transform=top.transAxes, fontsize=8.5, va='bottom',
                  bbox=dict(fc='white', ec='0.7', alpha=0.85, pad=3.0))
         top.set_ylabel(r'$\sigma_{\rm abs}$, scaled to the published curve',
@@ -198,6 +223,8 @@ def main():
         strip.plot(pressure[band],
                    ((recon[band] - reference[band]) / reference[band]) * 100.0,
                    color=COLOUR[lam], lw=2.2)
+        strip.plot(pressure[inside], fixed_residual * 100.0,
+                   color=V1_FIXED_COLOUR, lw=1.4, ls=(0, (1, 1.4)))
         strip.set_xlim(0.0, 120.0)
         strip.set_ylim(-16.0, 16.0)
         strip.set_yticks((-10, 0, 10))
@@ -206,18 +233,61 @@ def main():
         strip.grid(alpha=0.25)
 
     pooled = float(np.sqrt(np.mean(np.concatenate(pooled_window) ** 2)))
-    axes[1][0].text(0.03, 0.86, 'grey band: 10% audit tolerance;  '
-                    'thick: audit window,  thin: rest of the axis',
-                    transform=axes[1][0].transAxes, fontsize=8.0, va='top')
+    axes[1][0].text(0.03, 0.92, 'band: 10% tolerance;  thick: audit window;  '
+                    'dotted: v1 repaired', transform=axes[1][0].transAxes,
+                    fontsize=7.5, va='top')
+
+    # ---- (c) why the kernel is still taken from outside --------------------
+    lam_nm = np.arange(STRUCTURE_WINDOW_NM[0], STRUCTURE_WINDOW_NM[1] + 0.025,
+                       0.05)
+    energy = nm2eV(lam_nm)
+    kernel = np.asarray(published.sigma_abs(energy, STRUCTURE_PRESSURE_GPA),
+                        float)
+    ours = np.array([repaired.sigma_abs(value, STRUCTURE_PRESSURE_GPA)
+                     for value in energy])
+    kernel, ours = kernel / kernel.max(), ours / ours.max()
+    interior = lambda y: np.where((y[1:-1] > y[:-2]) & (y[1:-1] > y[2:]))[0] + 1
+
+    structure_ax.plot(lam_nm, kernel, color=REF_COLOUR, lw=2.4,
+                      label='Ho Fig. 1(e) kernel')
+    structure_ax.plot(lam_nm, ours, color=V1_FIXED_COLOUR, lw=1.6,
+                      ls=(0, (1, 1.4)), label='v1 repaired, same constants')
+    peaks = interior(kernel)
+    structure_ax.plot(lam_nm[peaks], kernel[peaks], 'v', color=REF_COLOUR,
+                      ms=8, zorder=5)
+    for index in peaks:
+        structure_ax.axvline(lam_nm[index], color=REF_COLOUR, lw=0.7,
+                             alpha=0.35)
+    structure_ax.plot(lam_nm[interior(ours)], ours[interior(ours)], 'v',
+                      color=V1_FIXED_COLOUR, ms=8, zorder=5)
+    structure_ax.set_title(f'(c) the same repaired model in WAVELENGTH at '
+                           f'{STRUCTURE_PRESSURE_GPA:.0f} GPa\n'
+                           f'{len(peaks)} local maxima against '
+                           f'{len(interior(ours))}', fontsize=11)
+    structure_ax.set_xlabel('excitation wavelength [nm]')
+    structure_ax.set_ylabel('absorption, each normalised to its own maximum')
+    structure_ax.set_xlim(*STRUCTURE_WINDOW_NM)
+    structure_ax.set_ylim(0.0, 1.52)
+    structure_ax.legend(fontsize=8.5, loc='center left')
+    structure_ax.grid(alpha=0.25)
+    structure_ax.text(
+        0.03, 0.985,
+        'passing (a),(b) does not make the model a substitute for the\n'
+        'kernel: Addendum A2 -- the level sets, the ladder\n'
+        r'$N=2\to4\to6\to4\to3\to5\to3$, the transition powers --'
+        '\nlives on these maxima, and one mode cannot produce four.',
+        transform=structure_ax.transAxes, fontsize=8.0, va='top',
+        bbox=dict(fc='white', ec='0.75', alpha=0.9, pad=3.0))
 
     fig.suptitle('Cross-figure reproduction: the kernel reconstructed from Ho '
                  f'Fig. 1(e), tested against Ho Fig. 5(b)  --  pooled '
                  f'{pooled*100:.1f}% RMS', fontsize=12.5)
     fig.text(0.5, 0.925, 'the reconstruction is Ho\u2019s own published '
-             'spectra interpolated, not an independent calculation; '
-             'v1 is our own model', ha='center', fontsize=9.0, color='0.35')
-    fig.subplots_adjust(left=0.065, right=0.985, top=0.855, bottom=0.10,
-                        wspace=0.19, hspace=0.08)
+             'spectra interpolated, not an independent calculation; the two v1 '
+             'curves are our own model, frozen and repaired',
+             ha='center', fontsize=9.0, color='0.35')
+    fig.subplots_adjust(left=0.048, right=0.988, top=0.845, bottom=0.10,
+                        wspace=0.21, hspace=0.08)
     fig.savefig(OUT, dpi=180)
 
     print(f'wrote {OUT}')
