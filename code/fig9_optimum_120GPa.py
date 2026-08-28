@@ -134,6 +134,17 @@ def panel_level_set(ax, kernel):
                          if result['truncated_blue'] else ''))
         for member in members:
             ax.plot([member], [1.0], 'v', color=colour, ms=7, zorder=5)
+        # what the optical-limit optimum now costs: it is no longer optimal
+        at_peak = float(np.interp(kernel.lam_abs, grid, eta / eta.min()))
+        ax.plot([kernel.lam_abs], [at_peak], 'o', color=colour, ms=6,
+                mfc='white', mew=1.6, zorder=6)
+        if ratio == 0.50:
+            ax.annotate(f'440.6 nm now costs +{100*(at_peak-1):.1f}%:\n'
+                        'the band peak has become the\n'
+                        'locally WORST choice between\nthe two optima',
+                        (kernel.lam_abs, at_peak), textcoords='offset points',
+                        xytext=(10, -4), fontsize=8.0, color=colour,
+                        ha='left', va='top')
 
     ax.axvline(kernel.lam_abs, color='tab:blue', lw=1.0, alpha=0.5)
     ax.set_xlim(*DATA_WINDOW)
@@ -149,7 +160,7 @@ def panel_level_set(ax, kernel):
 
 def main():
     kernel = Kernel()
-    fig, axes = plt.subplots(1, 2, figsize=(15.2, 5.6),
+    fig, axes = plt.subplots(1, 2, figsize=(15.2, 6.1),
                              gridspec_kw=dict(width_ratios=(1.65, 1.0)))
     panel_answer(axes[0], kernel)
     counts = panel_level_set(axes[1], kernel)
@@ -163,7 +174,7 @@ def main():
              'wavelength independent at low power',
              ha='center', fontsize=9.0, color='0.35')
     fig.text(
-        0.5, 0.035,
+        0.5, 0.015,
         '(b) every marked wavelength is EXACTLY as good as the others: they '
         r'are the level set $\{\lambda: A(\lambda)=I_c/I\}$, whose size is '
         'a step function of power (Theorem M).\n'
@@ -171,9 +182,14 @@ def main():
         f'N = {counts[0][1]} to {counts[1][1]} to {counts[2][1]} and moves the '
         'optimum onto the zero-phonon line, discontinuously.  So (a) alone '
         'would licence a single-wavelength experiment, which is the '
-        'prediction this theory contradicts.',
+        'prediction this theory contradicts.\n'
+        'Caveat: the members at 514 nm are the two flanks of the ZPL, whose '
+        'HEIGHT the kernel does not carry reliably at 120 GPa (E3, S1.3).  '
+        'Their existence follows from the ZPL being a maximum at all;\n'
+        'the power at which they join the level set does not.  The two '
+        'members inside the main band are free of that caveat.',
         ha='center', va='bottom', fontsize=8.5)
-    fig.subplots_adjust(left=0.058, right=0.99, top=0.845, bottom=0.19,
+    fig.subplots_adjust(left=0.058, right=0.99, top=0.855, bottom=0.235,
                         wspace=0.20)
     fig.savefig(OUT, dpi=180)
 
