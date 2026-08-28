@@ -681,3 +681,136 @@ question at all.
 bandwidth, alongside the existing rule about the fixed-power versus fixed-flux
 convention.
 
+
+---
+
+# Sanity-check closure S1 — the extraction's validated range, and why v1 failed
+
+Appended 2026-08-28. Additive: nothing above is retracted. Reproduced by
+`code/kernel_sanity_checks.py` (K1–K4) and `code/v1_diagnosis.py` (D1–D4),
+with 22 regression tests; 201 tests pass in total.
+
+## S1.0 What the Fig. 5(b) cross-check does and does not cover
+
+The cross-figure reproduction (`code/repro_yield.py`, drawn by
+`code/fig8_repro_ho_fig5b.py`) is excellent where it applies: pooled **1.0%**
+fractional RMS, \(r=1.00\), peak pressures exact at 17/17 and 88/88 GPa,
+against Ho's independently calculated absorption over the full published
+0–120 GPa axis.
+
+But it probes exactly two photon energies, and both lie deep in the phonon
+sideband throughout their audit windows:
+
+| line | energy | audit window | distance above the ZPL |
+|---|---:|---|---|
+| 532 nm | 2.331 eV | 4.7–51 GPa | +0.36 → +0.14 eV (5.5 → 2.2 phonons) |
+| 457 nm | 2.713 eV | 51–113.8 GPa | +0.52 → +0.32 eV (8.1 → 4.9 phonons) |
+
+**The ZPL is never sampled.** This is why the 1.0% agreement and erratum E3
+are not in conflict: E3's clipping is in a region the cross-check cannot see.
+
+## S1.1 The blue edge of the analysis window is a figure limit (K1)
+
+The published spectra are drawn to unit area, and the digitised curves confirm
+it to 0.5% at 0–60 GPa. Above that the integral falls to **0.914 at 120 GPa**,
+because the band does not return to zero inside the plotted window: the
+absorption at 3.0–3.2 eV is still **72.7% of its own peak at 120 GPa**, against
+0.0% at ambient.
+
+**Consequence.** The 402 nm blue edge of `DATA_WINDOW` is a property of Fig. 1(e),
+not of the defect. A1/A2 already treat it correctly — `sensitivity_optima`
+returns `truncated_blue`, and Theorem M counts an `edge-blue` critical point as
+\(\Delta N=-1\) rather than \(-2\) — but the fact was not recorded. Area-based
+quantities are underestimated at high pressure by the missing tail.
+
+## S1.2 The ZPL width is resolution limited (K2)
+
+The apparent FWHM of the zero-phonon spike is **2.53–2.59 meV at all seven
+pressures**, constant to 2.4% over 120 GPa. A physical ZPL broadens under
+compression — that is the *second* driver of Theorem X. A width that does not
+move is the plotting resolution.
+
+**Consequence.** Taken with E3 (all seven apexes clipped at the axis top), the
+only trustworthy ZPL information in Fig. 1(e) is its **position**. The
+withdrawn A3 numbers (×6.04, \(P^*=87.9\) GPa) are therefore **not
+recoverable** from Fig. 1(e) by any reprocessing: height and width are both
+unavailable. Theorem X stands on the published \(S_{\rm abs}\) and DWF, as E3
+already prescribed.
+
+## S1.3 The kernel's ZPL is usable below 40 GPa (K3)
+
+Integrating the background-subtracted spike gives the kernel's own DWF:
+
+| \(P\) [GPa] | 0 | 20 | 40 | 60 | 80 | 100 | 120 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| kernel / published DWF | 0.96 | 0.99 | 1.03 | 1.07 | 1.14 | 1.27 | **1.43** |
+
+Agreement within 4% up to 40 GPa is an **independent validation of the
+extraction in the region Fig. 5(b) cannot reach**. Above 40 GPa the kernel
+over-weights the ZPL, monotonically, reaching ×1.43 at 120 GPa.
+
+**Reporting rule.** Use the kernel's ZPL below 40 GPa; use the published DWF
+above it. Any ZPL-branch weight taken from the kernel at 120 GPa is high by up
+to a factor 1.43.
+
+## S1.4 Panels (b) and (c) are internally consistent (K4)
+
+DWF is not \(\exp(-S_{\rm abs})\); the ratio grows smoothly from 2.37 to 4.66.
+This is expected, since Ho defines \(S_{\rm abs}\) over the Jahn–Teller-inactive
+modes only. The residual is the JT-active coupling:
+
+\[ S_{\rm JT}(P) = \ln\!\big(e^{-S_{\rm abs}}/\mathrm{DWF}\big) : \; 0.864 \to 1.539, \qquad S_{\rm total}: \; 3.887 \to 6.092 \]
+
+Two separately digitised panels yielding a smooth, monotone derived quantity is
+itself evidence that neither extraction is broken.
+
+## S1.5 v1 failed for one locatable reason (D1–D4)
+
+The freeze records the v1 phenomenological model missing Ho's calculated
+absorption by 39.5% pooled and **anti**correlating at 532 nm (\(r=-0.51\),
+maximum at 38 GPa against Ho's 17). That was read as a structural failure of
+the single-mode Franck–Condon picture. **It is not.**
+
+Two of v1's input constants are derivable from Ho's own panels, independently
+of the Fig. 5(b) curves v1 is scored against, and both are wrong:
+
+* **Effective phonon energy.** In a single-mode band the absorption maximum
+  sits \(S\) phonons above the ZPL, so
+  \(\hbar\omega = (E_{\rm sideband}-E_{\rm ZPL})/S_{\rm abs}\) with the numerator
+  from Fig. 1(e) and the denominator from Fig. 1(b). Ho's spectra imply
+  **87.9 meV**, pressure independent to 8%. v1 carries **65 meV**, the ambient
+  value of Kehayias et al. — a 35% deficit, which delays the pressure at which
+  \(E_{\rm ZPL}+S\hbar\omega\) sweeps through a fixed laser line. That *is* the
+  38-versus-17 GPa error.
+* **ZPL shift.** The kernel carries **0.464 eV** over 0–120 GPa; v1 is anchored
+  to **0.400 eV**, which is the bound Ho's text states, not the value.
+
+Correcting both, with nothing fitted to Fig. 5(b):
+
+| | pooled | 532 \(r\) | 532 peak | 457 \(r\) | 457 peak |
+|---|---:|---:|---:|---:|---:|
+| v1 as frozen | 39.5% | −0.51 | 38/17 | +0.64 | 113/88 |
+| \(\hbar\omega\) only | 13.7% | +0.82 | 24/17 | +0.82 | 113/88 |
+| \(\Delta E_{120}\) only | 38.6% | −0.42 | 36/17 | +0.67 | 113/88 |
+| **both** | **10.7%** | **+0.89** | 24/17 | **+0.90** | 101/88 |
+
+The phonon energy carries almost all of it; the ZPL shift alone changes nothing.
+
+**Do not oversell this.** The corrected model still misses both peak pressures
+(24 vs 17, 101 vs 88 GPa) and fails both reproduction gates (10% RMS, 5 GPa).
+The trend is recovered; the position is not. `nv_model.py` is **not** modified —
+its defaults are frozen, `tests/test_freeze.py` pins them, and v3 does not use
+v1's envelope for anything.
+
+**Why it matters.** It converts "the envelope must come from outside" from a
+retreat into an argued choice: the abandoned model failed for a locatable
+reason, and even repaired it cannot place the peak.
+
+## S1.6 Reporting rules added by this section
+
+1. Never cite the 1.0% cross-figure agreement as validating the ZPL region.
+   It validates 2.33 and 2.71 eV only, both ≥2.2 phonons into the sideband.
+2. Never read a ZPL width or broadening from Fig. 1(e) (K2).
+3. Never take a ZPL branch weight from the kernel above 40 GPa (K3).
+4. Never describe the v1 failure as structural (S1.5); it is 65 vs 87.9 meV.
+5. State that the 402 nm window edge is a figure limit, not a band edge (K1).
