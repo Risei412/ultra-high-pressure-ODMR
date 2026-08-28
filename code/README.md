@@ -45,6 +45,17 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   ×6.04 collapse and P* = 87.9 GPa are withdrawn (erratum E3).  Supplies the
   corrected, bandwidth-dependent treatment using the published Debye–Waller
   factor from `data/ho_fig1_panels_bc.csv`.
+- `thesis_crosscheck.py` — T1-T3, the retrodictions against chapter 6 of
+  Bhattacharyya's thesis (`docs/ref/Principle_and_Applications_of_.pdf`).
+- `thesis_from_the_core.py` — N1-N4, the same chapter read out of the core
+  (eta, assumption (M), Theorems M/G/X) rather than sorted against it.
+- `anvil_transmission.py` — bounds the anvil transmission from Fig. 6.3(b).
+- `external_audit.py` — X1-X5, what the theory explains in the two external
+  sources and what it does not: the power-convention erratum E5, how far
+  erratum E1's sub-ZPL gap actually reaches, chapter 7's cryogenic 532 nm
+  megabar data against the hydrostatic kernel, and the band-position/anvil
+  degeneracy.  Write-ups in `docs/ho_results_audit.md` and
+  `docs/bhattacharyya_thesis_scope.md`.
 - `dreau_exponent.py` — reads A2's splitting exponent off the published CW-ODMR
   model of Dréau et al., PRB 84, 195204 (2011): `E = 3`, pump nonlinearity
   `n = 2`, so `E n = 6 > 1` and `rho* = 1/5`, independent of the microwave

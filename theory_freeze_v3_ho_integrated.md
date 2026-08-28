@@ -901,3 +901,77 @@ Rule 4 of S1.6 ("never describe the v1 failure as structural; it is 65 vs
 7. **New.** When quoting \(\hbar\omega\) from an observed sideband maximum,
    use \(\psi(p^*+1)=\ln S\), never \(p^*=S\). The shortcut costs half a
    phonon, ~50 meV here, and it is enough to fail a gate.
+
+---
+
+# Erratum E5 — the external cross-checks used the wrong power convention
+
+Appended 2026-08-28 under the v3 bug-fix/erratum rule. It corrects
+`code/thesis_crosscheck.py` and `code/anvil_transmission.py` only. **No
+equation and no value in the frozen body, in A1–A3, or in E1–E4 changes**;
+the 120 GPa optical-limit table re-runs unchanged and 260 tests pass.
+Reproduced by `code/external_audit.py` (X1–X5, 16 regression tests).
+
+## E5.1 The error
+
+Addendum A3 already carries the reporting rule *"never quote \(P^*\) without
+stating the power convention"*, and the frozen body defines the figure of merit
+at fixed incident optical power,
+
+\[ A(\lambda,P)=\lambda\,\sigma_{\rm abs}^{\rm Ho}(hc/\lambda,P). \]
+
+Both modules that score the theory against Bhattacharyya's thesis compared
+**bare cross sections** \(\sigma(\lambda)\) instead — the fixed **photon flux**
+convention. The thesis states its own convention explicitly: the two lines of
+Fig. 6.3 were taken *"for similar laser and microwave powers"*. At fixed power
+the photon flux carries the extra factor \(\lambda\), so the comparable
+quantity is \(A=\lambda\sigma\), not \(\sigma\). The two differ by
+\(532/450 = 1.18\), i.e. 1.087 in SNR.
+
+## E5.2 The correction improves both results
+
+| | fixed photon flux (as filed) | fixed optical power (correct) | observed |
+|---|---:|---:|---:|
+| Fig. 6.3 crossover | 51.82 GPa | **54.37 GPa** | **54.4 GPa** |
+| SNR(450)/SNR(532) at 50 GPa | 0.943 | 0.867 | 0.898 ± 11% |
+| Fig. 6.2 crossover (405 nm) | 72.0 GPa | 74.4 GPa | — |
+| fitted \(T(450)/T(532)\) | 0.94, CI [0.80, 1.11] | **1.12, CI [0.95, 1.31]** | — |
+| margin above the 0.70 threshold | 1.9σ | **2.9σ** | — |
+
+The retrodiction of the crossover was reported as a 2.6 GPa near-miss; in the
+convention the experiment was actually run in it agrees to **0.03 GPa**, far
+inside the digitisation precision. The 5% tie at the thesis's own measurement
+pressure survives (0.867 predicted against 0.898 ± 0.10 observed, 0.3σ).
+
+**Nothing here is a new measurement.** The observed numbers are unchanged; only
+the quantity they are compared with is.
+
+## E5.3 What the wider margin does and does not buy
+
+The anvil margin on 440.65 nm widens from 1.9σ to 2.9σ, but it is **not** now
+closed, for a reason E5 also exposes (`external_audit` X4): a
+pressure-independent anvil factor \(T\) and a red shift of the absorption
+**band** in a flat culet are degenerate along Fig. 6.3(b). A band scaled to
+\(g=0.564\) of the quasi-hydrostatic ZPL shift — which is what `nv_model.py`'s
+C-4 constant gives for a standard flat culet — fits *better* than \(g=1\)
+(\(\chi^2\) 0.41 against 4.31), but only at \(T(450)/T(532)=3.0\), a type Ia
+anvil passing blue three times better than green. **Requiring \(T\le1\) is what
+pins \(g\approx1\), not the fit.** Any future transmission measurement
+therefore also measures the band position, and vice versa; they cannot be
+separated by this figure.
+
+## E5.4 Reporting rules, revised
+
+Rule 7 of E4.4 is joined by:
+
+8. **New.** State the power convention on every cross-source comparison, not
+   only on \(P^*\). At fixed optical power use \(A=\lambda\sigma\); at fixed
+   photon flux use \(\sigma\). A2's ladder ratios \(I_k/I_c=A_{\max}/A_k\) are
+   defined on \(A\), so a comparison made on \(\sigma\) is not on the same
+   axis as the rest of the framework.
+9. **New.** Erratum E1's empty sub-ZPL interval is not a property of 120 GPa.
+   It opens wherever the ZPL passes the line — 92.1 GPa for 532 nm — and the
+   last reference curve of Fig. 1(e) whose real samples still bracket 532 nm is
+   **80 GPa**. Never quote \(A_{532}\) above 80 GPa as extracted data; the
+   previously published 100 GPa value (0.62% of ambient) is as much an
+   interpolation artefact as the 120 GPa one.

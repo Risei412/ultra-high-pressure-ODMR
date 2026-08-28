@@ -24,16 +24,18 @@ def model():
 
 def test_450_and_532_are_tied_where_the_thesis_measured(summary):
     """Fig. 6.3's null result is the prediction, not an accommodation."""
-    assert summary['fig63_snr_ratio'] == pytest.approx(0.94, abs=0.03)
+    assert summary['fig63_snr_ratio'] == pytest.approx(0.87, abs=0.03)
 
 
 def test_the_450_crossover_lands_on_their_measurement_pressure(summary):
-    assert summary['fig63_crossover'] == pytest.approx(51.8, abs=1.0)
+    """Erratum E5: at the fixed optical power the thesis states, 54.4 GPa --
+    which is where Fig. 6.3(b)'s own markers cross unity."""
+    assert summary['fig63_crossover'] == pytest.approx(54.4, abs=1.0)
 
 
 def test_450_would_have_won_higher_up(model):
     """Half a hit: they compressed to ~70 GPa and still saw no advantage."""
-    assert snr_ratio(model, 450.0, 70.0) > 1.8
+    assert snr_ratio(model, 450.0, 70.0) > 1.7
 
 
 def test_405_spans_four_orders_between_their_two_pressures(summary):
@@ -45,13 +47,19 @@ def test_405_spans_four_orders_between_their_two_pressures(summary):
 
 
 def test_405_crossover_is_above_both_thesis_pressures_but_one(summary):
-    assert summary['fig62_crossover'] == pytest.approx(72.0, abs=1.5)
+    assert summary['fig62_crossover'] == pytest.approx(74.4, abs=1.5)
 
 
 def test_532_survives_the_zpl_crossing(summary):
     """Doherty projected 532 nm to be precluded at ~66 GPa; Dai ran to 140."""
     assert summary['a532_fraction_66'] > 0.2
     assert summary['a532_fraction_120'] > 0.0
+
+
+def test_the_sub_zpl_rows_are_labelled_as_interpolation(summary):
+    """Erratum E1 reaches 100 GPa, not only 120 (external_audit X2)."""
+    assert summary['e1_last_sampled_GPa'] == pytest.approx(80.0)
+    assert summary['a532_fraction_80'] > 0.05
 
 
 def test_532_absorption_is_never_negative_in_the_used_range(model):

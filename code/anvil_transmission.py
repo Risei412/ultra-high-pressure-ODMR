@@ -18,7 +18,7 @@ The extraction reads:
     450/532    0.245   0.689   0.774   0.898   1.129   1.110
 
 which crosses unity between 50 and 60 GPa -- interpolating, at 54.4 GPa.
-The kernel, knowing nothing of this figure, puts the crossover at 51.8 GPa.
+The kernel, knowing nothing of this figure, puts the crossover at 54.37 GPa.
 
 Better than the crossover alone: an anvil transmission that is
 pressure-independent multiplies the observed ratio by a CONSTANT
@@ -30,9 +30,9 @@ fits, chi2/dof = 1.08, and returns
 
 i.e. consistent with no attenuation at all.  Mapped onto N4's parameterisation
 that is D ~ 2100 nm against a threshold of 321 nm: the optimum stays at
-440.65 nm, and the threshold is 1.9 sigma away.
+440.65 nm, and the threshold is 2.9 sigma away.
 
-So 440.65 nm survives -- at 1.9 sigma, on a type Ia anvil, and conditional on
+So 440.65 nm survives -- at 2.9 sigma, on a type Ia anvil, and conditional on
 the kernel being right, since the fit uses it.  At -1 sigma the optimum moves
 to 450.85 nm, still inside the tolerance band; at -2 sigma it jumps 74 nm to
 the ZPL.  That is not comfortable enough to close the question: it downgrades
@@ -109,10 +109,22 @@ def observed_ratio(data=None, blue=450.0, green=532.0):
 
 
 def predicted_ratio(pressure, blue=450.0, green=532.0, model=None):
-    """Optical-limit SNR ratio from the NV cross section alone."""
+    """Optical-limit SNR ratio from the NV cross section alone.
+
+    At FIXED OPTICAL POWER -- the convention the thesis states for Fig. 6.3
+    ("similar laser and microwave powers") -- the absorbed rate is
+    A = lambda sigma, not sigma; see the freeze, Erratum E5.
+    """
     model = HoPublishedSpectrumModel() if model is None else model
-    return float(np.sqrt(model.sigma_abs(nm2eV(blue), pressure)
-                         / model.sigma_abs(nm2eV(green), pressure)))
+    return float(np.sqrt(blue * model.sigma_abs(nm2eV(blue), pressure)
+                         / (green * model.sigma_abs(nm2eV(green), pressure))))
+
+
+def kernel_crossover(blue=450.0, green=532.0, low=1.0, high=119.0):
+    """Pressure at which the kernel alone puts `blue` ahead of `green`."""
+    from scipy.optimize import brentq
+    return float(brentq(lambda p: predicted_ratio(p, blue, green) - 1.0,
+                        low, high))
 
 
 def crossover(rows):
@@ -189,7 +201,8 @@ def report():
               f'{row["ratio"] / predicted:11.3f}')
     print(f'  observed crossover  {crossover(rows):.1f} GPa')
     print(f'  predicted crossover '
-          f'{51.8:.1f} GPa   (kernel alone, thesis_crosscheck T1)')
+          f'{kernel_crossover():.1f} GPa   (kernel alone, '
+          'thesis_crosscheck T1)')
 
     fit = fit_transmission(rows)
     print(f'\nOne-parameter fit of a pressure-independent anvil factor '
@@ -211,7 +224,8 @@ def report():
           f'{check["optimum_minus_1sigma"]:.2f} nm')
     print(f'  lambda_opt at -2 sigma          : '
           f'{check["optimum_minus_2sigma"]:.2f} nm')
-    print('  440.65 nm survives, but on a type Ia anvil and at 1.9 sigma;')
+    print(f'  440.65 nm survives, but on a type Ia anvil and at '
+          f'{check["sigma_above_threshold"]:.1f} sigma;')
     print('  a direct transmission measurement is still strongly recommended,')
     print('  and this says nothing about the type Ib side of a DAC.')
     return {'rows': rows, 'fit': fit, 'verdict': check,

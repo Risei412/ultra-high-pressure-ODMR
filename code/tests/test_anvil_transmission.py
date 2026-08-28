@@ -38,8 +38,8 @@ def test_the_observed_ratio_rises_and_crosses_unity(summary):
 
 
 def test_the_observed_crossover_matches_the_kernel(summary):
-    """The kernel put it at 51.8 GPa without seeing this figure."""
-    assert abs(summary['crossover'] - 51.8) < 4.0
+    """The kernel put it at 54.37 GPa without seeing this figure (E5)."""
+    assert abs(summary['crossover'] - 54.37) < 4.0
 
 
 def test_a_constant_anvil_factor_fits(summary):
@@ -49,7 +49,7 @@ def test_a_constant_anvil_factor_fits(summary):
 
 def test_the_fitted_transmission_is_consistent_with_no_attenuation(summary):
     fit = summary['fit']
-    assert fit['transmission_ratio'] == pytest.approx(0.94, abs=0.03)
+    assert fit['transmission_ratio'] == pytest.approx(1.12, abs=0.03)
     assert fit['ci_low'] < 1.0 < fit['ci_high']
 
 
@@ -58,12 +58,14 @@ def test_the_optimum_survives_at_the_fit(summary):
                                                                   abs=0.1)
 
 
-def test_but_only_at_about_two_sigma(summary):
-    """Not comfortable enough to close the question."""
+def test_but_only_at_about_three_sigma(summary):
+    """Erratum E5 widened the margin from 1.9 to 2.9 sigma; still not closed,
+    because the anvil factor is degenerate with the band position
+    (external_audit X4)."""
     check = summary['verdict']
-    assert 1.5 < check['sigma_above_threshold'] < 2.5
+    assert 2.5 < check['sigma_above_threshold'] < 3.5
     assert check['optimum_minus_1sigma'] < 460.0
-    assert check['optimum_minus_2sigma'] > 500.0
+    assert check['optimum_minus_2sigma'] < 460.0
 
 
 def test_no_attenuation_reproduces_the_frozen_answer():
