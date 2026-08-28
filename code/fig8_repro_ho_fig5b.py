@@ -70,8 +70,9 @@ import numpy as np
 from ho_spectrum_model import HoPublishedSpectrumModel
 from nv_model import NVModel
 from repro_yield import (
-    HO_MAX_FRACTIONAL_RMS, LINES, _scaled_residual_from_prediction, load,
-    predict_absorption,
+    EXPT_MAX_FRACTIONAL_RMS, EXPT_MAX_PEAK_ERROR_GPA, HO_MAX_FRACTIONAL_RMS,
+    HO_MAX_PEAK_ERROR_GPA, LINES, _scaled_residual_from_prediction,
+    compare_experiment, compare_ho_theory, load, predict_absorption,
 )
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -134,6 +135,17 @@ def main():
                  label='Fig. 1(e) reconstruction')
         top.plot(pressure, v1 / norm, color='tab:red', lw=1.2, ls='--',
                  alpha=0.8, label='v1: our model (Ho anchors, no fit)')
+
+        # the peak gate: both markers coincide, so only one line is visible
+        peak_ref = float(pressure[inside][np.argmax(reference[inside])])
+        peak_recon = float(pressure[inside][np.argmax(recon[inside])])
+        top.axvline(peak_ref, color=REF_COLOUR, lw=1.0, alpha=0.6)
+        top.axvline(peak_recon, color=COLOUR[lam], lw=1.0, ls=':', alpha=0.9)
+        top.annotate(f'peak {peak_recon:.0f}/{peak_ref:.0f} GPa\n'
+                     f'(gate: within {HO_MAX_PEAK_ERROR_GPA:.0f} GPa)',
+                     xy=(peak_ref, 0.30), xycoords=('data', 'axes fraction'),
+                     ha='center', va='center', fontsize=8.0, color='0.3',
+                     bbox=dict(fc='white', ec='0.75', alpha=0.85, pad=2.5))
 
         rms_window = float(np.sqrt(np.mean(residual_window ** 2)))
         rms_full = float(np.sqrt(np.mean(residual ** 2)))
@@ -211,15 +223,29 @@ def main():
               f'peak {peak_v1:.0f} GPa')
     print(f'  pooled audit-window RMS: {pooled*100:.1f}%')
 
-    print('\n  measured PL of the same figure is a different observable and is '
-          'not drawn:')
-    for lam in LINES:
-        pressure, values = data['expt%d' % lam]
-        _, residual = scaled(predict_absorption(published, lam, pressure),
-                             values)
-        print(f'    {lam:.0f} nm: RMS '
-              f'{float(np.sqrt(np.mean(residual ** 2)))*100:.1f}% '
-              '(see repro_yield.compare_experiment)')
+    # The gates the freeze actually quotes PASS/FAIL against.  They are numbers,
+    # not curves, so they are printed rather than given a panel of their own.
+    ho = compare_ho_theory(published, data)
+    expt = compare_experiment(published, data, collection=True)
+    print('\n  reproduction gates (ceiling in brackets)')
+    print(f'  {"comparison":<28}{"shape RMS":>18}{"peak error":>20}')
+    for label, audit, rms_max, peak_max in (
+            ('vs Ho calculated abs.', ho, HO_MAX_FRACTIONAL_RMS,
+             HO_MAX_PEAK_ERROR_GPA),
+            ('vs measured PL', expt, EXPT_MAX_FRACTIONAL_RMS,
+             EXPT_MAX_PEAK_ERROR_GPA)):
+        for lam in LINES:
+            metrics = audit[str(int(lam))]
+            rms, peak = metrics['fractional_rms'], metrics['peak_error_GPa']
+            print(f'  {label + f" {lam:.0f} nm":<28}'
+                  f'{rms*100:8.1f}% [{rms_max*100:4.0f}%] '
+                  f'{"PASS" if rms <= rms_max else "FAIL"}'
+                  f'{peak:9.0f} [{peak_max:3.0f}] GPa '
+                  f'{"PASS" if peak <= peak_max else "FAIL"}')
+    print('  the measured-PL rows are a different observable -- a detection '
+          'passband,\n  the emission quantum yield and charge-state '
+          'conversion all enter them --\n  which is why they are gated '
+          'separately and are not drawn above.')
 
 
 if __name__ == '__main__':
