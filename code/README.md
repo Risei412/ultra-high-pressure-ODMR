@@ -65,6 +65,20 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   `g >= 1.048` for a [100] culet.  The two signs are why `nv_model`'s C-4
   factor is NOT extended per NV group.  Write-up in
   `docs/geometry_of_the_optimum.md`.
+- `fig67_contrast_map.py` — tests N1 (the zero-contrast contour) against
+  Fig. 6.7(b) of the thesis.  Panel (b) is an indexed raster whose 254-entry
+  palette is embedded in the PDF, so it inverts to a signed contrast map with
+  100% exact pixel hits.  **The result is null**: both contrast signs are
+  present but no resonance changes sign along the cut, and where the negatives
+  fade the positives fade too.  Carries the baseline-window check that catches
+  the false positive (+0.49 at 401 px, +0.02 at 1201 px).
+- `preregistered_geometry_tests.py` — G1 and G2, the two measurements that turn
+  the [111] geometry bound into a value: a 532 nm PL temperature sweep (ten
+  orders of magnitude between the two flat-culet geometries at 50 K, decisive
+  above 92 GPa) and one local zero-phonon line (31.8 nm spread between
+  geometries; 5 nm of ZPL gives lambda_opt to 7 nm).  Predictions, acceptance
+  criteria and the analysis that will consume the data.  Write-up for both:
+  `docs/n1_test_and_geometry_measurements.md`.
 - `dreau_exponent.py` — reads A2's splitting exponent off the published CW-ODMR
   model of Dréau et al., PRB 84, 195204 (2011): `E = 3`, pump nonlinearity
   `n = 2`, so `E n = 6 > 1` and `rho* = 1/5`, independent of the microwave
