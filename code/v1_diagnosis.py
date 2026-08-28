@@ -66,6 +66,8 @@ that could not be made to work at all.
 
 Run for the table; `report()` returns it for the tests.
 """
+import os
+
 import numpy as np
 
 from scipy.optimize import brentq
@@ -79,7 +81,8 @@ from repro_yield import (
 )
 from theory_a3_branch_exchange import identify_branches
 
-PANELS_BC = 'data/ho_fig1_panels_bc.csv'
+PANELS_BC = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         'data', 'ho_fig1_panels_bc.csv')
 
 # v1's frozen inputs, for reference: nv_model.HW and NVModel's dE120 default.
 V1_HW_EV = 0.065          # Kehayias et al., ambient pressure
