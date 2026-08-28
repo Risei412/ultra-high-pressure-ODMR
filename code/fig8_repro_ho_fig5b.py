@@ -6,10 +6,19 @@ that numerically but draws nothing, so the claim had no figure.  This is it.
 
 Two panels, one per laser line, because that is the whole claim: Ho's
 calculated absorption against the reconstruction, over the full published
-0-120 GPa axis.  The v1 phenomenological model is drawn on the same axes to
-show what a failing curve looks like -- at 532 nm it puts the maximum at
-38 GPa instead of 17 and anticorrelates (r = -0.51) inside the audit window,
-so the agreement below is not the kind any smooth model would achieve.
+0-120 GPa axis.
+
+What this figure does NOT show is our own physics predicting Ho's result.
+The reconstruction is Ho's own Fig. 1(e) spectra, digitised and interpolated
+(`ho_spectrum_model.py` -- no DFT, no Jahn-Teller), so the agreement is a
+consistency check between two figures of the same paper: it establishes that
+the extraction feeding the whole v3 chain is faithful, and nothing about
+whether we could have predicted the curve.  The one curve here that IS our
+own physics is v1, drawn on the same axes to show what a failing curve looks
+like -- at 532 nm it puts the maximum at 38 GPa instead of 17 and
+anticorrelates (r = -0.51) inside the audit window.  That contrast is the
+point of drawing it: it shows the agreement is not the kind any smooth curve
+would achieve, while making clear which of the two curves is ours.
 
 To be precise about what v1 is: it is anchored to Ho's *reported scalars*
 (dE_ZPL(120 GPa) = 0.400 eV, S_abs 3.08 -> 4.61) but no parameter of it was
@@ -124,7 +133,7 @@ def main():
         top.plot(pressure, recon / norm, color=COLOUR[lam], lw=1.8,
                  label='Fig. 1(e) reconstruction')
         top.plot(pressure, v1 / norm, color='tab:red', lw=1.2, ls='--',
-                 alpha=0.8, label='v1 phenomenological model')
+                 alpha=0.8, label='v1: our model (Ho anchors, no fit)')
 
         rms_window = float(np.sqrt(np.mean(residual_window ** 2)))
         rms_full = float(np.sqrt(np.mean(residual ** 2)))
@@ -180,7 +189,10 @@ def main():
     fig.suptitle('Cross-figure reproduction: the kernel reconstructed from Ho '
                  f'Fig. 1(e), tested against Ho Fig. 5(b)  --  pooled '
                  f'{pooled*100:.1f}% RMS', fontsize=12.5)
-    fig.subplots_adjust(left=0.065, right=0.985, top=0.87, bottom=0.10,
+    fig.text(0.5, 0.925, 'the reconstruction is Ho\u2019s own published '
+             'spectra interpolated, not an independent calculation; '
+             'v1 is our own model', ha='center', fontsize=9.0, color='0.35')
+    fig.subplots_adjust(left=0.065, right=0.985, top=0.855, bottom=0.10,
                         wspace=0.19, hspace=0.08)
     fig.savefig(OUT, dpi=180)
 
