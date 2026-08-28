@@ -22,11 +22,17 @@ would achieve, while making clear which of the two curves is ours.
 
 To be precise about what v1 is: it is anchored to Ho's *reported scalars*
 (dE_ZPL(120 GPa) = 0.400 eV, S_abs 3.08 -> 4.61) but no parameter of it was
-ever fitted to the Fig. 5(b) curves it is compared against here.  Nor does
-fitting rescue it -- calibrating dE120 against the measured PL moves it to
-0.555 eV and still leaves 34.8% pooled RMS against Ho's calculated
-absorption, with r = -0.26 at 532 nm.  The disagreement is structural, not a
-missing fit.
+ever fitted to the Fig. 5(b) curves it is compared against here.
+
+The anticorrelation is not, however, a structural failure of the model.
+`v1_diagnosis.py` shows that two of v1's input constants can be derived from
+Ho's own Fig. 1(b),(e) -- the effective phonon energy is 87.9 meV, not the
+65 meV of Kehayias et al., and the kernel's ZPL shift is 0.464 eV, not the
+0.400 eV bound v1 is anchored to -- and that correcting both, with nothing
+fitted to Fig. 5(b), takes v1 to r = +0.89 and 10.7% pooled.  It still fails
+the peak gate.  The red curve here is v1 as frozen, which is what the freeze
+compares against; read it as a locatable error, not as a model that cannot
+work.
 
 Each panel carries a residual strip beneath it.  The curves in the main panel
 overlap too closely to read a 1.5% disagreement off them, and the residual is
