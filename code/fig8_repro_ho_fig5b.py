@@ -165,11 +165,12 @@ def main():
                  alpha=0.35, label='Ho Fig. 5(b), published')
         top.plot(pressure, recon / norm, color=COLOUR[lam], lw=1.8,
                  label='Fig. 1(e) reconstruction')
-        top.plot(pressure, fixed / norm, color=V1_FIXED_COLOUR, lw=1.4,
-                 ls=(0, (1, 1.4)),
-                 label='v1 repaired (hw, dE120 from Ho panels)')
-        top.plot(pressure, v1 / norm, color=V1_COLOUR, lw=1.2, ls='--',
-                 alpha=0.8, label='v1 as frozen')
+        top.plot(pressure, v1 / norm, color=V1_COLOUR, lw=1.0, ls='--',
+                 alpha=0.55,
+                 label='OURS, superseded: v1 as frozen (E4)')
+        top.plot(pressure, fixed / norm, color=V1_FIXED_COLOUR, lw=2.0,
+                 ls=(0, (1.2, 1.2)),
+                 label='OURS, current: v1 + Ho-derived constants')
 
         # the peak gate: both markers coincide, so only one line is visible
         peak_ref = float(pressure[inside][np.argmax(reference[inside])])
@@ -208,7 +209,7 @@ def main():
                  bbox=dict(fc='white', ec='0.7', alpha=0.85, pad=3.0))
         top.set_ylabel(r'$\sigma_{\rm abs}$, scaled to the published curve',
                        fontsize=9.5)
-        top.legend(fontsize=8.5,
+        top.legend(fontsize=7.8, framealpha=0.92,
                    loc='upper right' if lam == 532.0 else 'upper left')
         top.grid(alpha=0.25)
 
@@ -234,7 +235,7 @@ def main():
 
     pooled = float(np.sqrt(np.mean(np.concatenate(pooled_window) ** 2)))
     axes[1][0].text(0.03, 0.92, 'band: 10% tolerance;  thick: audit window;  '
-                    'dotted: v1 repaired', transform=axes[1][0].transAxes,
+                    'dotted: our model', transform=axes[1][0].transAxes,
                     fontsize=7.5, va='top')
 
     # ---- (c) why the kernel is still taken from outside --------------------
@@ -251,7 +252,8 @@ def main():
     structure_ax.plot(lam_nm, kernel, color=REF_COLOUR, lw=2.4,
                       label='Ho Fig. 1(e) kernel')
     structure_ax.plot(lam_nm, ours, color=V1_FIXED_COLOUR, lw=1.6,
-                      ls=(0, (1, 1.4)), label='v1 repaired, same constants')
+                      ls=(0, (1.2, 1.2)),
+                      label='OURS, current: same constants')
     peaks = interior(kernel)
     structure_ax.plot(lam_nm[peaks], kernel[peaks], 'v', color=REF_COLOUR,
                       ms=8, zorder=5)
@@ -275,7 +277,9 @@ def main():
         'passing (a),(b) does not make the model a substitute for the\n'
         'kernel: Addendum A2 -- the level sets, the ladder\n'
         r'$N=2\to4\to6\to4\to3\to5\to3$, the transition powers --'
-        '\nlives on these maxima, and one mode cannot produce four.',
+        '\nlives on these maxima, and one mode cannot produce four.\n'
+        'The 514 nm member is the ZPL, whose HEIGHT erratum E3 withdraws;\n'
+        'three interior maxima survive that, and one is still not three.',
         transform=structure_ax.transAxes, fontsize=8.0, va='top',
         bbox=dict(fc='white', ec='0.75', alpha=0.9, pad=3.0))
 
@@ -283,8 +287,8 @@ def main():
                  f'Fig. 1(e), tested against Ho Fig. 5(b)  --  pooled '
                  f'{pooled*100:.1f}% RMS', fontsize=12.5)
     fig.text(0.5, 0.925, 'the reconstruction is Ho\u2019s own published '
-             'spectra interpolated, not an independent calculation; the two v1 '
-             'curves are our own model, frozen and repaired',
+             'spectra interpolated, not an independent calculation; the two '
+             'dashed/dotted curves are ours \u2014 read the purple one',
              ha='center', fontsize=9.0, color='0.35')
     fig.subplots_adjust(left=0.048, right=0.988, top=0.845, bottom=0.10,
                         wspace=0.21, hspace=0.08)
