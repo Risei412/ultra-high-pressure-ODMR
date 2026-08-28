@@ -41,7 +41,8 @@ def panel_kernel(ax, kernel):
         ax.annotate(f'{lam:.0f} nm', (lam, 0.04), rotation=90, fontsize=7.5,
                     color=colour, ha='right', va='bottom')
     ax.axvline(475.51, color='tab:purple', ls=':', lw=1.4)
-    ax.annotate('v1 optimum\n475.5 nm', (478.0, 1.06), fontsize=7.5,
+    ax.annotate('v1 as frozen\n475.5 nm\n(superseded, E4:\nrepaired v1 gives\n439.1 nm)',
+                (478.0, 1.06), fontsize=7.0,
                 color='tab:purple', ha='left', va='top')
     ax.set_xlabel('wavelength [nm]')
     ax.set_ylabel(r'$A/A_{\max}$')
