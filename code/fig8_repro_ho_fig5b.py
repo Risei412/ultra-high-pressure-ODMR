@@ -230,13 +230,18 @@ def main():
         strip.set_ylim(-16.0, 16.0)
         strip.set_yticks((-10, 0, 10))
         strip.set_xlabel('pressure [GPa]')
-        strip.set_ylabel('residual [%]', fontsize=9.5)
+        strip.set_ylabel('(curve - Ho) / Ho  [%]', fontsize=8.5)
         strip.grid(alpha=0.25)
 
     pooled = float(np.sqrt(np.mean(np.concatenate(pooled_window) ** 2)))
-    axes[1][0].text(0.03, 0.92, 'band: 10% tolerance;  thick: audit window;  '
-                    'dotted: our model', transform=axes[1][0].transAxes,
-                    fontsize=7.5, va='top')
+    for column in range(2):
+        axes[1][column].text(
+            0.015, 0.93,
+            'residual of the panel above, magnified\n'
+            + ('solid = reconstruction, dotted = ours\n'
+               'band = 10% gate, thick = audit window'
+               if column == 0 else 'both curves are inside the 10% gate'),
+            transform=axes[1][column].transAxes, fontsize=7.0, va='top')
 
     # ---- (c) why the kernel is still taken from outside --------------------
     lam_nm = np.arange(STRUCTURE_WINDOW_NM[0], STRUCTURE_WINDOW_NM[1] + 0.025,
