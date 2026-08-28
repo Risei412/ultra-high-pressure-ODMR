@@ -1,0 +1,30 @@
+# cwODMR SNR ~ contrast * sqrt(counts) vs pressure at 532 nm and 450 nm,
+# [100] cut culet, imaged through a type Ia anvil.
+# P. Bhattacharyya, PhD thesis, UC Berkeley 2022, Fig. 6.3(b)
+#   (docs/ref/Principle_and_Applications_of_.pdf, PDF page 101).
+#
+# These are RAW PATH COORDINATES in PDF points, not values: marker centres and
+# error-bar endpoints taken from the figure's vector content, so they are exact
+# to the plotting precision. The axis labels are outlined glyphs and carry no
+# text, so the calibration comes from the tick stubs and lives in
+# anvil_transmission.py, where it can be checked:
+#   x ticks at 359.17, 404.93, 450.69, 496.46 pt = 0, 20, 40, 60 GPa
+#   y decade spacing 41.46 pt, with 10^2 at y = 201.97 pt
+# The check that the calibration is right: the six markers convert to
+# 2.9, 27.0, 42.0, 50.0, 60.0, 70.0 GPa.
+#
+# bar_top_pt/bar_bottom_pt are the error-bar endpoints (smaller y = larger
+# SNR). The 450 nm bar at the 50 GPa point is absent from the figure.
+line_nm,marker_x_pt,marker_y_pt,bar_top_pt,bar_bottom_pt
+532,365.764,130.937,124.729,140.490
+532,420.951,163.212,159.922,167.240
+532,455.271,169.967,167.625,172.660
+532,473.575,182.321,180.692,184.112
+532,496.455,199.183,197.643,200.868
+532,519.335,215.069,213.253,217.089
+450,365.764,156.275,151.560,162.681
+450,420.951,169.929,166.683,173.891
+450,455.271,174.583,172.605,176.806
+450,473.575,184.250,,
+450,496.455,196.991,192.775,202.507
+450,519.335,213.184,207.887,220.722
