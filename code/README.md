@@ -56,6 +56,15 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   megabar data against the hydrostatic kernel, and the band-position/anvil
   degeneracy.  Write-ups in `docs/ho_results_audit.md` and
   `docs/bhattacharyya_thesis_scope.md`.
+- `geometry_layer.py` — the optimum as a function of culet geometry.  A single
+  scalar `g` scales the band shift relative to Ho's quasi-hydrostatic
+  micropillar; `g = 1` reduces the layer to the frozen kernel exactly (window,
+  a_max, the four maxima and the 1.4414 ZPL rung).  Chapter 7 of the thesis
+  bounds `g <= 0.741` for the [111] group in a [111] culet, so the optimum
+  there is `>= 460.33 nm`, not 440.65 nm; Fig. 6.3(b) with `T <= 1` bounds
+  `g >= 1.048` for a [100] culet.  The two signs are why `nv_model`'s C-4
+  factor is NOT extended per NV group.  Write-up in
+  `docs/geometry_of_the_optimum.md`.
 - `dreau_exponent.py` — reads A2's splitting exponent off the published CW-ODMR
   model of Dréau et al., PRB 84, 195204 (2011): `E = 3`, pump nonlinearity
   `n = 2`, so `E n = 6 > 1` and `rho* = 1/5`, independent of the microwave
