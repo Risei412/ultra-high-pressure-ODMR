@@ -11,6 +11,14 @@ show what a failing curve looks like -- at 532 nm it puts the maximum at
 38 GPa instead of 17 and anticorrelates (r = -0.51) inside the audit window,
 so the agreement below is not the kind any smooth model would achieve.
 
+To be precise about what v1 is: it is anchored to Ho's *reported scalars*
+(dE_ZPL(120 GPa) = 0.400 eV, S_abs 3.08 -> 4.61) but no parameter of it was
+ever fitted to the Fig. 5(b) curves it is compared against here.  Nor does
+fitting rescue it -- calibrating dE120 against the measured PL moves it to
+0.555 eV and still leaves 34.8% pooled RMS against Ho's calculated
+absorption, with r = -0.26 at 532 nm.  The disagreement is structural, not a
+missing fit.
+
 Each panel carries a residual strip beneath it.  The curves in the main panel
 overlap too closely to read a 1.5% disagreement off them, and the residual is
 not flat noise: at 532 nm it drifts monotonically from +2% to -3% across the
