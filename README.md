@@ -19,7 +19,7 @@ Code-level notes are in [`code/README.md`](code/README.md).
 
 # ultra-high-pressure-ODMR
 
-作成者: 阿部 理生（東京科学大学）
+作成者: 阿部李星（東京科学大学）
 
 このリポジトリは、超高圧下の NV センター ODMR、および高圧・高温下でのゼロフォノン線の研究の作業用本体です。公開用の入口は
 [NV-center-Zero-phonon-Line-at-high-pressure-and-high-temperature](https://github.com/Risei412/NV-center-Zero-phonon-Line-at-high-pressure-and-high-temperature)
