@@ -1,0 +1,17 @@
+# Huang-Rhys factor and Debye-Waller factor for ABSORPTION,
+# read from the vector paths of the published Fig. 1 panels
+# (b) and (c) by extract_ho_fig1_panels_bc.py.  The seven
+# polyline vertices are the computed values; the axis scale
+# comes from the major ticks in the same coordinate system.
+# Reproduces the endpoints the source states in its text,
+# S_abs 3.08 -> 4.61 and DWF_abs 2.2 % -> 0.36 %, to better
+# than 0.5 %.  Panel (e) zero-phonon peak heights are clipped
+# and are never used; these two panels are not affected.
+pressure_GPa,S_abs,DWF_abs
+0,3.0812,0.02180
+20,3.3676,0.01565
+40,3.6484,0.01127
+60,3.9080,0.00835
+80,4.1518,0.00620
+100,4.3745,0.00479
+120,4.6131,0.00363

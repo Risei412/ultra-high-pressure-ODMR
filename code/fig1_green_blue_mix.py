@@ -4,9 +4,13 @@ Sensitivity of green (532 nm) / blue (457 nm) / mixture vs pressure (0-140 GPa),
 plus the underlying absorption cross section and NV- fraction.
 
 Run:  python fig1_green_blue_mix.py
-Out:  sensitivity_green_blue_mix.png
+Out:  outputs/figures/sensitivity_green_blue_mix.png
 """
+from pathlib import Path
+
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 from nv_model import NVModel, mc_band, default_randomiser
@@ -87,5 +91,7 @@ ax2.legend(frameon=False, loc='upper right', fontsize=9)
 ax2.grid(True, alpha=0.18)
 
 plt.tight_layout()
-plt.savefig('sensitivity_green_blue_mix.png', dpi=190, bbox_inches='tight')
-print('saved sensitivity_green_blue_mix.png ; crossover ~%.0f GPa' % xover)
+out = Path(__file__).resolve().parent / 'outputs' / 'figures' / 'sensitivity_green_blue_mix.png'
+out.parent.mkdir(parents=True, exist_ok=True)
+plt.savefig(out, dpi=190, bbox_inches='tight')
+print('saved %s ; crossover ~%.0f GPa' % (out, xover))

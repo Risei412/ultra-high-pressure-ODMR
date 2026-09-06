@@ -11,6 +11,7 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 
 HBARC = 1239.84  # eV nm
+REPORTED_WAVELENGTH_RESOLUTION_NM = 1.0
 DEFAULT_DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                             'data', 'ho_fig1e_absorption.csv')
 
@@ -95,10 +96,15 @@ class HoPublishedSpectrumModel:
         objective = wavelengths * absorption if fixed_optical_power else absorption
         return float(wavelengths[int(np.argmax(objective))])
 
+    def reported_lambda_opt(self, pressure, **kwargs):
+        """Optimum rounded to the precision supported by the extraction."""
+        value = self.lambda_opt(pressure, **kwargs)
+        resolution = REPORTED_WAVELENGTH_RESOLUTION_NM
+        return float(resolution * np.round(value / resolution))
+
 
 if __name__ == '__main__':
     model = HoPublishedSpectrumModel()
     for pressure in (0, 20, 40, 60, 80, 100, 120):
         print(f'{pressure:3d} GPa  lambda_opt = '
               f'{model.lambda_opt(pressure):.1f} nm')
-

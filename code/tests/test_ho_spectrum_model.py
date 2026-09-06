@@ -57,6 +57,7 @@ def test_published_model_matches_experimental_dome_shape(model, data):
 
 def test_published_curve_optimum_at_120_gpa_is_near_441_nm(model):
     assert model.lambda_opt(120.0) == pytest.approx(440.6, abs=0.5)
+    assert model.reported_lambda_opt(120.0) == 441.0
     # The published spectrum supports 457 nm as a practical fixed line, while
     # distinguishing it from the reconstructed optimum.
     optimum_lam = model.lambda_opt(120.0)
@@ -72,4 +73,3 @@ def test_reference_model_never_applies_collection_factor(model):
 
 def test_lines_used_for_cross_figure_validation_are_unchanged():
     assert LINES == (532.0, 457.0)
-

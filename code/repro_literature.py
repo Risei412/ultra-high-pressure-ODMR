@@ -250,7 +250,7 @@ def main():
     for lam_b in (473., 457., 450.):
         g = lambda P: snr_ratio(m, lam_b, 532., P) - 1.0
         xo[lam_b] = brentq(g, 20., 145.)
-    check('R21', 'this work', 'the recommended 473 nm line beats 532 nm only '
+    check('R21', 'this work', 'the legacy 473 nm comparison beats 532 nm only '
           'above a threshold pressure; below it the recommendation reverses',
           'crossover ' + ', '.join(f'{int(l)}nm:{x:.0f} GPa'
                                    for l, x in xo.items()),

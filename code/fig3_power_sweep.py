@@ -1,6 +1,7 @@
 """
 fig3_power_sweep.py
-Power-explicit blue-wavelength optimisation at a fixed pressure (Part B of PLAN.md):
+Power-explicit blue-wavelength optimisation at a fixed pressure
+(Part B of docs/experiment/PLAN.md):
   (a) eta(lambda, u) heatmap with the optimal-wavelength ridge overlaid
   (b) optimal blue wavelength vs power u (+ MC band), showing whether/where it
       jumps between the two competing local optima
@@ -11,10 +12,14 @@ Run:
   python fig3_power_sweep.py            # 120 GPa
   python fig3_power_sweep.py 100        # any other pressure
 Out:
-  power_wavelength_sensitivity_<P>GPa.png
+  outputs/figures/power_wavelength_sensitivity_<P>GPa.png
 """
 import sys
+from pathlib import Path
+
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 from nv_model import mc_band
@@ -88,7 +93,9 @@ ax.set_title(f'(c)  $\\eta(u)$ for candidate lines @ {Pi} GPa', loc='left', weig
 ax.legend(frameon=False, fontsize=8.5, ncol=2); ax.grid(True, which='both', alpha=0.18)
 
 plt.tight_layout()
-out = f'power_wavelength_sensitivity_{Pi}GPa.png'
+out = (Path(__file__).resolve().parent / 'outputs' / 'figures' /
+       f'power_wavelength_sensitivity_{Pi}GPa.png')
+out.parent.mkdir(parents=True, exist_ok=True)
 plt.savefig(out, dpi=185, bbox_inches='tight')
 
 # ---- text summary ----
