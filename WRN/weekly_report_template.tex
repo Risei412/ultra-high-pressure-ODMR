@@ -1,0 +1,138 @@
+\documentclass[11pt,a4paper]{ltjsarticle}
+% Compile with LuaLaTeX
+% If you use pLaTeX/dvipdfmx, change the documentclass if needed.
+
+% =========================
+% Packages
+% =========================
+\usepackage{luatexja}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{geometry}
+
+\geometry{margin=25mm}
+\setcounter{tocdepth}{3}
+
+% =========================
+% User information
+% =========================
+\title{Weekly Report: Project Title}
+\author{Your Name}
+\date{Week: YYYY/MM/DD -- YYYY/MM/DD}
+
+% =========================
+% Custom commands
+% =========================
+\newcommand{\sectionblock}[1]{%
+  \vspace{4mm}
+  {\large\textbf{#1}}
+  \vspace{2mm}
+
+}
+
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+
+\begin{document}
+
+\maketitle
+
+% Optional table of contents
+% \tableofcontents
+% \newpage
+
+
+
+% =========================================================
+% 1. Question / Purpose
+% =========================================================
+\sectionblock{Question}
+
+% What is the scientific or technical question this week?
+% Keep it concrete.
+
+\begin{quote}
+What do you want to understand, demonstrate, or improve this week?
+\end{quote}
+
+% =========================================================
+% 2. Hypothesis
+% =========================================================
+\sectionblock{Hypothesis}
+
+% Describe your expectation before the experiment/simulation.
+% Example:
+% If the applied pressure generates a transverse strain component opposite to the intrinsic strain,
+% the ODMR splitting should become smaller.
+
+
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.75\linewidth]{image/example_result.png}
+%   \caption{
+%   Example result.
+%   Replace this figure with the main ODMR spectrum, pressure estimation, force feedback result, or simulation result.
+%   }
+%   \label{fig:main_result}
+% \end{figure}
+
+
+
+% =========================================================
+% 3. Evidence / Interpretation
+% =========================================================
+\sectionblock{Evidence / Interpretation}
+
+% Explain why the result supports or does not support your hypothesis.
+% Use equations if necessary.
+
+
+
+
+% Add your interpretation here:
+\begin{itemize}[leftmargin=8mm]
+  \item Evidence 1:
+  \item Evidence 2:
+  \item Interpretation:
+\end{itemize}
+
+% =========================================================
+% 4. Gap / Failure
+% =========================================================
+\sectionblock{Gap / Failure}
+
+% Be honest about what did not work.
+% This section is very useful for discussion with collaborators/supervisors.
+
+\begin{itemize}[leftmargin=8mm]
+  \item Possible reason:
+  \item What is still unclear:
+\end{itemize}
+
+% =========================================================
+% 5. Next Step
+% =========================================================
+\sectionblock{Next Step}
+
+
+
+% =========================================================
+% 6. References
+% =========================================================
+\sectionblock{References}
+
+% Example:
+% [1] Author Name, Journal Name, Volume, Page (Year).
+% [2] Author Name, arXiv:XXXX.XXXXX.
+
+\begin{enumerate}[leftmargin=8mm]
+  \item Reference 1
+  \item Reference 2
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,27 @@
+Question: 一文
+Hypothesis：一文
+Evidence：箇条書きで最大二つ
+Gap/failure：箇条書きで最大二つ
+nextstep：一文
+
+レポートの枚数は最大2枚まで
+
+///////////
+図の作成
+
+図はlegend axis label はいれること
+文章で説明できる点については、図にふくまないこと
+図のlegendがグラフと重なっていたら修正
+
+///////////
+
+///////////
+デザイン
+
+役割	色	HEX	意味
+Primary	Science Blue	#1C3177	主役となる科学的対象
+Accent	Deep Indigo	#4B0082	特異点・臨界構造・注目箇所
+Pale	Mist Lavender	#E8EAF1	補助領域・不確かさ・背景領域
+Dark	Midnight Ink	#101426	本文・軸・中立比較
+Background	Optic White	#FFFFFF	基本背景・余白
+///////////
