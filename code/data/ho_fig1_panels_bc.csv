@@ -1,0 +1,14 @@
+# Huang-Rhys factor and Debye-Waller factor for ABSORPTION, digitised from the
+# published Fig. 1 panels (b) and (c) of the source preprint (theory curves,
+# "S_abs" and "thr. abs.").  Extracted by pixel analysis of the vector figure;
+# see code/figure_validation.py.  Axis calibration came from the major ticks,
+# so these carry none of the clipping problem that invalidates the panel (e)
+# zero-phonon-line peak heights.
+pressure_GPa,S_abs,DWF_abs
+0,3.0235,0.02050
+20,3.3081,0.01425
+40,3.5875,0.00990
+60,3.8486,0.00693
+80,4.0914,0.00479
+100,4.3133,0.00336
+120,4.5535,0.00226

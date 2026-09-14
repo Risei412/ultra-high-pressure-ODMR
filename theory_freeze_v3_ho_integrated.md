@@ -340,3 +340,564 @@ data exist. This strengthens, and supersedes, the qualitative caveat already
 recorded in *Optical-limit result at 120 GPa*. The optimum 440.65 nm, the
 ×1.04494 penalty at 457 nm, and all of Addendum A1 are unaffected.
 
+---
+
+# Erratum E2 — corrections to Addendum A1 from its numerical execution
+
+Date: 2026-08-27. Filed under the v3 bug-fix/erratum rule. It corrects
+Addendum A1 only. **No value in the frozen body changes**: the optical-limit
+table was re-run and reproduces exactly (440.65 nm, ×1.04494, ×12.53, ×11.99,
+0.0834), and the existing test suite passes.
+
+Full working: `docs/theory_a1_numerical_execution.md`
+(`code/theory_a1_generalization.py`, 23 regression tests).
+
+**Provenance note.** `code/ho_odmr_sensitivity.py`,
+`code/report_120gpa_sensitivity.py`, `code/tests/test_ho_odmr_sensitivity.py`
+and `code/data/ho_120gpa_wavelength_scan.csv` — all required by the
+*Reproduction* section above — were absent from the repository and present only
+inside `ho_integrated_odmr_v3_20260827.zip`. They have been restored.
+
+## E2.1 The reconstructed kernel is not a single band
+
+A1 treats \(A(\lambda)\) as one flat band peaked at 440.65 nm. The
+reconstruction carries **four** local maxima at 120 GPa:
+
+| λ [nm] | \(a/a_{\max}\) | optical-limit penalty |
+|---:|---:|---:|
+| 440.64 | 1.000 | ×1.0000 |
+| 475.55 | 0.660 | ×1.2306 |
+| 500.19 | 0.277 | ×1.8994 |
+| **514.46 (ZPL)** | **0.694** | **×1.2006** |
+
+The ZPL penalty ×1.2006 is indistinguishable from that of 473 nm (×1.2054), and
+514.46 nm lies inside the region §7 declares to hold real data (λ ≤ 517.4 nm),
+sampled there at 0.1–0.5 nm spacing. It is absent from every candidate-line
+list in the project.
+
+## E2.2 P2's threshold and destination
+
+A1 states that \(\lambda_\eta\) leaves the 5 % band once
+\(|\ell_G|>0.62\,\%/\mathrm{nm}\). Exact argmax over the reconstruction gives a
+**jump to the ZPL at \(\ell_G>0.268\,\%/\mathrm{nm}\)**, a displacement of
+73.8 nm rather than 15.6 nm. P2 is a local expansion and cannot represent this.
+
+P2's usable range is bounded on both sides: below
+\(\ell_G\approx0.1\,\%/\mathrm{nm}\) the predicted shift is smaller than the
+3–10 nm node spacing of the extraction and the argmax does not move at all;
+above \(0.268\,\%/\mathrm{nm}\) the global optimum has already left the band.
+In between the formula is good to a few per cent (at 0.4 %/nm, predicted
+10.51 nm against exact 10.21 nm).
+
+## E2.3 κ has two incompatible definitions
+
+P2 defines \(\kappa_R=-\mathrm{d}^2\ln R/\mathrm{d}\lambda^2\) as a **local**
+second derivative, but the quoted \(8\times10^{-4}\,\mathrm{nm^{-2}}\) is
+reproduced only by the **chord** curvature
+\(-2\ln a/(\lambda-\lambda_{\rm abs})^2\) (all seven rows of
+`theory_optima_coincidence.md` §2 reproduce to 1 %). The true pointwise second
+derivative spans \([-1.12,+1.14]\,\mathrm{nm^{-2}}\) with 20 sign changes and is
+unusable.
+
+A parabolic fit is window dependent: 7.01e-4 (±10 nm), 7.61e-4 (±15 nm),
+8.07e-4 (±40 nm). **The quoted 8e-4, hence the 2.5e3 nm² conversion factor,
+corresponds to a ±40 nm fit**; over the 5 % band it is 2628 nm². A1.3's
+falsification clause is not well posed until the fit window is stated; read it
+as "±40 nm parabolic fit".
+
+## E2.4 Three geometric corrections
+
+- **The 83 nm doublet row is unverifiable.** At \(a^*/a_{\max}=0.5\) the blue
+  member lies below 402 nm, outside the reconstruction and below the
+  ground-state ionisation edge where (M) fails by A1's own P6. The widest
+  verifiable separation is 112.6 nm. The 0.9 and 0.7 rows reproduce well
+  (32.80 and 60.55 nm against the Gaussian 33.28 and 61.24 nm).
+- **The doublet is degenerate but not symmetric.** η-degeneracy is exact
+  (2.2e-16), yet the red member sits ~3 nm further out at both levels. The 5 %
+  band is likewise asymmetric: **[426.43, 457.90] nm**, not 440.65 ± 15.6 nm.
+  T3 must be phrased as a search for equal η, not for symmetric placement.
+- **P5's window is narrower than advertised.** The split spans 1.43 decades, but
+  both members stay inside the data window over only **0.27 decades** (a factor
+  1.9 in power).
+
+## E2.5 P4's conclusion is too strong
+
+A1 concludes "saturation does not move the optimum; contrast does." The
+single-mechanism table is correct, but **saturation together with power
+broadening, and contrast collapse alone, give identical \(\Phi(\Gamma_p)\)**
+(difference 1.1e-16) and hence identical η surfaces. An observed split therefore
+does *not* identify contrast as its cause. Read P4 as: splitting requires
+\(\mathrm{d}\ln G/\mathrm{d}\ln\Gamma_p<-\tfrac12\,\mathrm{d}\ln R/\mathrm{d}\ln\Gamma_p\),
+which either mechanism achieves and which η alone cannot tell apart. This is why
+the experimental freeze's requirement to record rate, contrast and linewidth
+*separately* is load-bearing rather than a convenience. Addendum A2 turns this
+into a theorem.
+
+## E2.6 What is unaffected
+
+P1, P3's exact degeneracy, P4's algebra, P5's ordering, T4's inference procedure
+(\(\Gamma_p^*\) recovered to 2.7 % from a 457 nm sweep at 2 % noise; 200/200
+trials inside A1.3's factor-of-two bound), and all of E1's arithmetic reproduce
+exactly. The frozen body is untouched.
+
+---
+
+# Addendum A2 — multiplicity ladder and gauge degeneracy
+
+Date: 2026-08-27. Appended under the v3 immutability rule as a **theory-only**
+extension, like A1. It introduces no measurement and no fitted value, and
+changes nothing in the frozen body. Full derivations, numerical verification and
+pre-registered tests: `docs/theory_a2_multiplicity.md`
+(`code/theory_a2_multiplicity.py`, 15 regression tests).
+
+A2 exists because E2 showed that A1 fails along a clean seam: **every broken
+claim depends on the shape of the reconstructed kernel, and every surviving
+claim follows from the structure of \(\eta=1/(G\sqrt R)\).** A2 freezes the
+structural half and generalises it. No proposition below assumes anything about
+the absorption spectrum; the Ho kernel appears only as a worked example.
+
+**Theorem M (multiplicity ladder).** Under (M) with a unique interior maximum of
+\(\Phi\) at \(\Gamma_p^*\), the optimal set at power \(I\) is the level set
+
+\[
+\Lambda_\eta(I)=\{\lambda:\ a(\lambda)=I_c/I\},
+\qquad I_c=\Gamma_p^*/(\gamma A_{\max}).
+\]
+
+Its cardinality is piecewise constant in \(\ln I\) and changes only where the
+level crosses a critical value of \(A\): **+2** at an interior maximum, **−2** at
+a minimum, **−1** at a window edge. The transition powers are
+\(I_k/I_c=A_{\max}/A_k\).
+
+*Corollary (calibration-free).* The ratios \(I_k/I_j=a_j/a_k\) contain no
+response parameter, and under (M) the \(a_k\) are read directly off the low-power
+PL scan. The whole ladder follows from a relative spectrum plus the single scale
+\(I_c\), which T4 already supplies. A1's doublet is the bottom rung: a unimodal
+kernel has no interior critical values and admits only \(2\to1\).
+
+**Theorem G (gauge degeneracy).** η depends on \((C,R,\Delta\nu)\) only through
+\(\Phi=C^2R/\Delta\nu^2\). For power-law responses \(R=\Gamma_p(1+\rho)^{-s}\),
+\(C=(1+\rho)^{-c}\), \(\Delta\nu=(1+\rho)^{w}\),
+
+\[
+\Phi=\Gamma_p(1+\rho)^{-E},\qquad E\equiv 2c+s+2w,
+\qquad \rho^*=\frac{1}{E-1}\ \ (E>1).
+\]
+
+The response enters η through the single scalar \(E\), and splitting is exactly
+\(E>1\). A1's four-row mechanism table is the sign of \(E-1\); its "all three"
+case \(E=4\) gives \(\rho^*=1/3\), matching A1's numerical 0.3333.
+
+*Corollary.* Responses sharing \(E\) share the entire η surface, \(\Gamma_p^*\)
+and the ladder, so mechanism attribution from wavelength scans is impossible at
+any number of powers — only \(C\) and \(\Delta\nu\) measured apart separate them.
+*Conversely*, the ladder is invariant across the whole gauge plane, so it can be
+predicted and tested **without knowing which mechanism operates**.
+
+**Pre-registered tests.** T5 (ladder: predict \(I_k/I_c=1/a_k\) from the
+low-power scan, verify the steps); T6 (universal degeneracy: all \(N\) members
+share η exactly — an arbitrary-precision null test for (M), strengthening T3);
+T7 (exponent closure: \(E\) from separately measured \(C,R,\Delta\nu\) must
+predict the observed splitting power).
+
+**Worked example, conditional on the reconstruction.** At 120 GPa the predicted
+rungs fall at \(I/I_c=\) 1.4414 (ZPL, 514.46 nm), 1.5145, 1.5191, 1.8646, 3.6078
+and 4.2989, giving \(N=2\to4\to6\to4\to3\to5\to3\); all six match their predicted
+critical values to 0.00 %. **The lowest rung is the ZPL**, so a candidate-line
+list without it cannot see the effect at all. The \(N=6\) plateau spans only
+×1.003 in power and must not be claimed; the resolvable plateaux are ×1.05,
+×1.23, ×1.93 and ×1.19. These *values* are conditional on the Fig. 1(e)
+reconstruction — the *structure* is what A2 freezes.
+
+---
+
+# Addendum A3 — pressure-driven branch exchange of the optimum
+
+Date: 2026-08-27. Appended under the v3 immutability rule as a **theory-only**
+extension, like A1 and A2. It introduces no measurement and no fitted value.
+Full derivations, numerical verification and pre-registered tests:
+`docs/theory_a3_branch_exchange.md` (`code/theory_a3_branch_exchange.py`,
+12 regression tests).
+
+A2 asked what *power* does to the optimum at one pressure. A3 asks the
+orthogonal question, and finds something A2's ladder cannot produce. An
+absorption spectrum built on a Franck–Condon progression carries two
+structurally distinct branches — the zero-phonon line and the phonon sideband —
+whose peak heights scale differently with the Huang–Rhys factor \(S\). Pressure
+raises \(S\), the branches move relative to one another, and where their
+weighted peaks cross the global optimum **switches branch discontinuously**.
+
+**Theorem X (branch exchange).** With \(A=\lambda\sigma_{\rm abs}\) the
+fixed-power figure of merit and \(D(P)=\ln(A_{\rm SB}/A_{\rm ZPL})\), the global
+optimum exchanges branch wherever \(D\) changes sign, and the optimal wavelength
+jumps from \(\lambda_{\rm ZPL}(P^*)\) to \(\lambda_{\rm SB}(P^*)\) taking no
+intermediate value. For a Franck–Condon pair
+\(A_{\rm ZPL}\sim e^{-S}/\Gamma_{\rm ZPL}\) and
+\(A_{\rm SB}\sim(1-e^{-S})/\Gamma_{\rm SB}\), so
+
+\[
+\frac{\mathrm{d}D}{\mathrm{d}P}
+=\frac{\mathrm{d}S}{\mathrm{d}P}
++\frac{\mathrm{d}}{\mathrm{d}P}\ln\frac{\Gamma_{\rm ZPL}}{\Gamma_{\rm SB}}+\cdots>0
+\]
+
+whenever pressure strengthens the electron–phonon coupling and broadens the ZPL
+at least as fast as the sideband. \(D\) is then monotone and **the crossing is
+unique**: a generic, once-only exchange rather than an accident of one material.
+Both antecedents are generic for a colour centre under compression, so what
+varies between materials is only where \(P^*\) falls inside the accessible
+range — not whether an exchange occurs. That is the general condition for
+high-pressure optical sensing.
+
+**Two degeneracies, not one.** A2's ladder is driven by power and needs
+\(I>I_c\); A3's pair is driven by pressure and exists at **zero power**. At
+\(P^*\) the low-power optimum is already twofold, before any power-induced
+structure appears — which is what makes the two separable in practice. Together
+they give the full \((P,I)\) phase diagram: A3 selects the branch, A2 splits it.
+
+**Verification, in the raw samples rather than the interpolation.** Because E2
+established that this kernel's pressure interpolation is unreliable, A3
+identifies both branches as local maxima of the *extracted samples themselves*.
+Both are present at all seven published pressures. The ZPL branch at 0 GPa lands
+at **637.1 nm (1.945 eV)** — the NV⁻ ZPL, a value fitted nowhere in the
+pipeline and therefore an independent check that the extraction is anchored
+correctly. \(\ln(A_{\rm SB}/A_{\rm ZPL})\) rises monotonically at all seven
+points, by ×4.33 in total, with exactly one sign change.
+
+**Worked example, conditional on the reconstruction.** At fixed incident optical
+power \(P^*=87.9\) GPa, where the ZPL branch sits at 534.8 nm and the sideband at
+463.5 nm: the optimum jumps **71.3 nm**. At fixed incident photon flux
+\(P^*=75.6\) GPa instead, so the power convention must be stated whenever
+\(P^*\) is quoted. The driver is visible directly: the Franck–Condon
+displacement \(S\hbar\omega\) grows from 0.232 to 0.404 eV (+74 %, monotone,
+1.27 meV/GPa), the ZPL cross-section falls by ×6.04 over 0–120 GPa while the
+sideband falls by only ×1.34, and the two branches carry different pressure
+coefficients (3.83 against 5.11 meV/GPa).
+
+**What this is not.** The 457/532 fixed-wavelength ranking crossover sits at
+51.4 GPa in the same kernel, 36 GPa away: that crossover is the geometry of one
+unimodal peak sweeping past the midpoint of two probes and needs no branch
+structure at all. The v1 Franck–Condon envelope has exactly one local maximum at
+every pressure and so cannot show this effect; its "green/blue crossover
+≈ 86 GPa" is unrelated, and its numerical closeness to 87.9 GPa is a coincidence
+(`docs/novelty_and_exponent_audit.md` §4).
+
+**Pre-registered tests.** T8 (track \(\lambda_{\rm PL}(P)\) at low power through
+\(P^*\); a jump confirms Theorem X), T9 (check both branches coexist either side
+of \(P^*\), distinguishing exchange from branch disappearance), T10 (compare the
+two wavelengths at low power, separating A3's zero-power degeneracy from A2's
+ladder), T11 (measure the branch separation \(S\hbar\omega\) against pressure).
+T11 is the cheapest and most decisive: it needs neither absolute nor intensity
+calibration, only two peak positions per pressure, and if the separation does
+not grow the antecedent fails and no exchange is predicted.
+
+---
+
+# Erratum E3 — the panel (e) zero-phonon-line peaks are clipped
+
+Date: 2026-08-27. Filed under the v3 bug-fix/erratum rule. It corrects
+Addendum A3 only. **The frozen body and Addendum A2's structural propositions
+are untouched.**
+
+The extraction in `code/data/ho_fig1e_absorption.csv` was checked pixel by pixel
+against the source Fig. 1. Working: `code/figure_validation.py`, 12 regression
+tests.
+
+## E3.1 The sideband branch is exact
+
+Tracing each coloured curve in panel (e) and taking its maximum on the
+absorption side reproduces the extracted CSV to **better than 1 % in height at
+all seven pressures**, and to 0.015 eV in position at six of them (20 GPa picks
+a shoulder 0.064 eV away). Everything A3 says about the sideband stands, as does
+its 0 GPa anchor at 637.1 nm.
+
+## E3.2 The ZPL peak heights are an artefact
+
+Every ZPL spike in panel (e) rises from its own baseline to within one unit of
+the top of the axis. Measured tops, on an axis ending near 15:
+
+| P [GPa] | 0 | 20 | 40 | 60 | 80 | 100 | 120 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| spike top | 14.93 | 14.95 | 14.67 | 14.03 | 14.09 | 14.62 | 14.94 |
+
+The spread across all seven is 0.92 units. They are drawn as near-delta lines
+and **the plot simply cuts them off**. The CSV heights (6.364 falling to 1.054)
+are a digitisation artefact of a clipped feature.
+
+**Withdrawn:** the "ZPL cross-section falls by ×6.04 over 0–120 GPa" claim, and
+with it \(P^*=87.9\) GPa (fixed optical power), 75.6 GPa (fixed photon flux),
+and the 71.3 nm jump. `theory_a3_branch_exchange.exchange_pressure` is retained
+as a faithful computation of what the CSV contains, and marked superseded.
+
+## E3.3 Theorem X survives, on better evidence
+
+Panels (b) and (c) publish precisely what is needed, as theory curves with
+markers, calibrated from their own axis ticks and not clipped
+(`code/data/ho_fig1_panels_bc.csv`):
+
+- **\(S_{\rm abs}\) rises 3.023 → 4.554** over 0–120 GPa, +51 %, monotone,
+  \(\mathrm{d}S/\mathrm{d}P = 12.7\) milli/GPa. Theorem X's **first driver is
+  confirmed directly from the published theory**, not inferred.
+- **DWF\(_{\rm abs}\) falls 0.0205 → 0.00226**, a factor **9.07**, monotone.
+  The ZPL weight collapse is real — steeper than the clipped spikes suggested.
+  (A single effective mode, \(e^{-S}\), would give only ×4.62, so the published
+  DWF is genuinely multi-mode.)
+
+## E3.4 What changes: P\(^*\) is bandwidth dependent
+
+The clipped-peak version silently compared two peak heights. It should not have:
+the sideband enters through a **lineshape density** (per eV) while the ZPL
+enters through a **dimensionless weight**, which must be divided by whatever
+bandwidth samples it — the laser linewidth, or the ZPL's own width, whichever is
+larger. Writing
+
+\[
+r(P)=\frac{\lambda_{\rm SB}\,\sigma_{\rm SB}}{\lambda_{\rm ZPL}\,{\rm DWF}_{\rm abs}}
+\quad[\mathrm{eV^{-1}}],
+\qquad
+\frac{A_{\rm SB}}{A_{\rm ZPL}} = r(P)\,W ,
+\]
+
+the exchange occurs where \(r(P)=1/W\). **\(r\) is monotone increasing, ×6.51
+over 0–120 GPa, so the crossing is still unique** and Theorem X is intact. But
+\(P^*\) now moves with \(W\):
+
+| \(W\) [meV] | 1.5 | 2 | 3 | 5 | 7 | 9 |
+|---|---:|---:|---:|---:|---:|---:|
+| \(P^*\) [GPa] | 119.6 | 104.0 | 77.7 | 45.2 | 24.1 | 6.7 |
+
+Outside roughly 1.5–9.7 meV there is no crossing inside 0–120 GPa. Equivalently,
+the ZPL only competes at all for an excitation bandwidth below
+\(1/r(P)\) — 9.7 meV at ambient falling to 1.5 meV at 120 GPa.
+
+**This is a strengthening, not merely a retraction.** The bandwidth dependence
+is a new, sharply testable prediction: sweeping the laser linewidth moves the
+exchange pressure monotonically, and no other mechanism in the framework does
+that. It also makes T11 (measure \(S\hbar\omega\) against pressure) more
+important, since it tests the antecedent without touching the bandwidth
+question at all.
+
+**Reporting rule.** Never quote \(P^*\) without stating the excitation
+bandwidth, alongside the existing rule about the fixed-power versus fixed-flux
+convention.
+
+
+---
+
+# Sanity-check closure S1 — the extraction's validated range, and why v1 failed
+
+Appended 2026-08-28. Additive: nothing above is retracted. Reproduced by
+`code/kernel_sanity_checks.py` (K1–K4) and `code/v1_diagnosis.py` (D1–D4),
+with 22 regression tests; 201 tests pass in total.
+
+## S1.0 What the Fig. 5(b) cross-check does and does not cover
+
+The cross-figure reproduction (`code/repro_yield.py`, drawn by
+`code/fig8_repro_ho_fig5b.py`) is excellent where it applies: pooled **1.0%**
+fractional RMS, \(r=1.00\), peak pressures exact at 17/17 and 88/88 GPa,
+against Ho's independently calculated absorption over the full published
+0–120 GPa axis.
+
+But it probes exactly two photon energies, and both lie deep in the phonon
+sideband throughout their audit windows:
+
+| line | energy | audit window | distance above the ZPL |
+|---|---:|---|---|
+| 532 nm | 2.331 eV | 4.7–51 GPa | +0.36 → +0.14 eV (5.5 → 2.2 phonons) |
+| 457 nm | 2.713 eV | 51–113.8 GPa | +0.52 → +0.32 eV (8.1 → 4.9 phonons) |
+
+**The ZPL is never sampled.** This is why the 1.0% agreement and erratum E3
+are not in conflict: E3's clipping is in a region the cross-check cannot see.
+
+## S1.1 The blue edge of the analysis window is a figure limit (K1)
+
+The published spectra are drawn to unit area, and the digitised curves confirm
+it to 0.5% at 0–60 GPa. Above that the integral falls to **0.914 at 120 GPa**,
+because the band does not return to zero inside the plotted window: the
+absorption at 3.0–3.2 eV is still **72.7% of its own peak at 120 GPa**, against
+0.0% at ambient.
+
+**Consequence.** The 402 nm blue edge of `DATA_WINDOW` is a property of Fig. 1(e),
+not of the defect. A1/A2 already treat it correctly — `sensitivity_optima`
+returns `truncated_blue`, and Theorem M counts an `edge-blue` critical point as
+\(\Delta N=-1\) rather than \(-2\) — but the fact was not recorded. Area-based
+quantities are underestimated at high pressure by the missing tail.
+
+## S1.2 The ZPL width is resolution limited (K2)
+
+The apparent FWHM of the zero-phonon spike is **2.53–2.59 meV at all seven
+pressures**, constant to 2.4% over 120 GPa. A physical ZPL broadens under
+compression — that is the *second* driver of Theorem X. A width that does not
+move is the plotting resolution.
+
+**Consequence.** Taken with E3 (all seven apexes clipped at the axis top), the
+only trustworthy ZPL information in Fig. 1(e) is its **position**. The
+withdrawn A3 numbers (×6.04, \(P^*=87.9\) GPa) are therefore **not
+recoverable** from Fig. 1(e) by any reprocessing: height and width are both
+unavailable. Theorem X stands on the published \(S_{\rm abs}\) and DWF, as E3
+already prescribed.
+
+## S1.3 The kernel's ZPL is usable below 40 GPa (K3)
+
+Integrating the background-subtracted spike gives the kernel's own DWF:
+
+| \(P\) [GPa] | 0 | 20 | 40 | 60 | 80 | 100 | 120 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| kernel / published DWF | 0.96 | 0.99 | 1.03 | 1.07 | 1.14 | 1.27 | **1.43** |
+
+Agreement within 4% up to 40 GPa is an **independent validation of the
+extraction in the region Fig. 5(b) cannot reach**. Above 40 GPa the kernel
+over-weights the ZPL, monotonically, reaching ×1.43 at 120 GPa.
+
+**Reporting rule.** Use the kernel's ZPL below 40 GPa; use the published DWF
+above it. Any ZPL-branch weight taken from the kernel at 120 GPa is high by up
+to a factor 1.43.
+
+## S1.4 Panels (b) and (c) are internally consistent (K4)
+
+DWF is not \(\exp(-S_{\rm abs})\); the ratio grows smoothly from 2.37 to 4.66.
+This is expected, since Ho defines \(S_{\rm abs}\) over the Jahn–Teller-inactive
+modes only. The residual is the JT-active coupling:
+
+\[ S_{\rm JT}(P) = \ln\!\big(e^{-S_{\rm abs}}/\mathrm{DWF}\big) : \; 0.864 \to 1.539, \qquad S_{\rm total}: \; 3.887 \to 6.092 \]
+
+Two separately digitised panels yielding a smooth, monotone derived quantity is
+itself evidence that neither extraction is broken.
+
+## S1.5 v1 failed for one locatable reason (D1–D4)
+
+The freeze records the v1 phenomenological model missing Ho's calculated
+absorption by 39.5% pooled and **anti**correlating at 532 nm (\(r=-0.51\),
+maximum at 38 GPa against Ho's 17). That was read as a structural failure of
+the single-mode Franck–Condon picture. **It is not.**
+
+Two of v1's input constants are derivable from Ho's own panels, independently
+of the Fig. 5(b) curves v1 is scored against, and both are wrong:
+
+* **Effective phonon energy.** In a single-mode band the absorption maximum
+  sits \(S\) phonons above the ZPL, so
+  \(\hbar\omega = (E_{\rm sideband}-E_{\rm ZPL})/S_{\rm abs}\) with the numerator
+  from Fig. 1(e) and the denominator from Fig. 1(b). Ho's spectra imply
+  **87.9 meV**, pressure independent to 8%. v1 carries **65 meV**, the ambient
+  value of Kehayias et al. — a 35% deficit, which delays the pressure at which
+  \(E_{\rm ZPL}+S\hbar\omega\) sweeps through a fixed laser line. That *is* the
+  38-versus-17 GPa error.
+* **ZPL shift.** The kernel carries **0.464 eV** over 0–120 GPa; v1 is anchored
+  to **0.400 eV**, which is the bound Ho's text states, not the value.
+
+Correcting both, with nothing fitted to Fig. 5(b):
+
+| | pooled | 532 \(r\) | 532 peak | 457 \(r\) | 457 peak |
+|---|---:|---:|---:|---:|---:|
+| v1 as frozen | 39.5% | −0.51 | 38/17 | +0.64 | 113/88 |
+| \(\hbar\omega\) only | 13.7% | +0.82 | 24/17 | +0.82 | 113/88 |
+| \(\Delta E_{120}\) only | 38.6% | −0.42 | 36/17 | +0.67 | 113/88 |
+| **both** | **10.7%** | **+0.89** | 24/17 | **+0.90** | 101/88 |
+
+The phonon energy carries almost all of it; the ZPL shift alone changes nothing.
+
+**Do not oversell this.** The corrected model still misses both peak pressures
+(24 vs 17, 101 vs 88 GPa) and fails both reproduction gates (10% RMS, 5 GPa).
+The trend is recovered; the position is not. `nv_model.py` is **not** modified —
+its defaults are frozen, `tests/test_freeze.py` pins them, and v3 does not use
+v1's envelope for anything.
+
+**Why it matters.** It converts "the envelope must come from outside" from a
+retreat into an argued choice: the abandoned model failed for a locatable
+reason, and even repaired it cannot place the peak.
+
+## S1.6 Reporting rules added by this section
+
+1. Never cite the 1.0% cross-figure agreement as validating the ZPL region.
+   It validates 2.33 and 2.71 eV only, both ≥2.2 phonons into the sideband.
+2. Never read a ZPL width or broadening from Fig. 1(e) (K2).
+3. Never take a ZPL branch weight from the kernel above 40 GPa (K3).
+4. Never describe the v1 failure as structural (S1.5); it is 65 vs 87.9 meV.
+5. State that the 402 nm window edge is a figure limit, not a band edge (K1).
+
+---
+
+# Erratum E4 — S1.5's phonon energy was derived with the wrong stationarity condition
+
+Appended 2026-08-28. Corrects **S1.5 only**; S1.0–S1.4 and every reporting rule
+in S1.6 stand unchanged. Reproduced by `code/v1_diagnosis.py` (D1–D4).
+
+## E4.1 The error
+
+S1.5 derived the effective phonon energy from
+
+\[ \hbar\omega = (E_{\rm sideband}-E_{\rm ZPL})/S_{\rm abs}, \]
+
+i.e. it placed the absorption maximum exactly \(S\) phonons above the ZPL. That
+is the **continuum** limit. The Pekarian envelope
+\(e^{-S}S^{p}/\Gamma(p+1)\) is stationary not at \(p=S\) but at \(p^*\) solving
+
+\[ \psi(p^*+1) = \ln S \qquad (\psi = \text{digamma}), \]
+
+and over the relevant range \(3.0<S<4.6\) the offset is near-constant,
+\(S-p^*=0.51\pm0.003\). At ~100 meV per quantum that half phonon is a **50 meV
+error in the band maximum**.
+
+The correct derivation, \(\hbar\omega=(E_{\rm sideband}-E_{\rm ZPL})/p^*(S_{\rm abs})\),
+gives **101.1 meV**, not the 87.9 meV quoted in S1.5.
+
+## E4.2 The corrected model passes both gates
+
+| | pooled | 532 \(r\) | 532 peak | 457 \(r\) | 457 peak |
+|---|---:|---:|---:|---:|---:|
+| v1 as frozen | 39.5% | −0.51 | 38/17 | +0.64 | 113/88 |
+| \(\hbar\omega\) only (101.1 meV) | 3.8% | +1.00 | 18/17 | +0.93 | 99/88 |
+| \(\Delta E_{120}\) only | 38.6% | −0.42 | 36/17 | +0.67 | 113/88 |
+| S1.5's continuum shortcut | 10.7% | +0.89 | 24/17 | +0.90 | 101/88 |
+| **both, correct \(p^*\)** | **1.0%** | **+1.00** | **17/17** | **+1.00** | **89/88** |
+
+Gates (10% RMS, 5 GPa peak): **PASS** — 1.4% and 0 GPa at 532 nm, 0.5% and
+1 GPa at 457 nm. **This is the same score the reconstructed kernel achieves on
+the same test.** Nothing is fitted to Fig. 5(b); every input comes from
+Fig. 1(b),(e) plus the stationarity condition above.
+
+**S1.5's closing claim is withdrawn.** "The trend is recovered; the position is
+not" was an artefact of the wrong \(p^*\). The single-mode Franck–Condon
+picture reproduces Ho's calculated absorption at both laser lines exactly.
+
+## E4.3 This does not reinstate v1 as the optical kernel
+
+Fig. 5(b) is a **two-wavelength slice**, and it cannot see what v3 needs.
+Scanned in wavelength at 120 GPa over 402–517 nm, the corrected model against
+the kernel:
+
+| | model | kernel |
+|---|---:|---:|
+| interior local maxima | **1** | **4** |
+| \(\lambda_{\rm opt}\) | 439.10 nm | 440.60 nm |
+| fractional RMS | \multicolumn{2}{c}{52%} |
+| correlation | \multicolumn{2}{c}{+0.993} |
+
+The gross envelope is right; the structure is absent. **Every Addendum A2
+result — the level sets, the ladder \(N=2\to4\to6\to4\to3\to5\to3\), the
+calibration-free transition powers \(I_k/I_c=A_{\max}/A_k\) — lives on those
+four maxima**, and a single-mode Pekarian cannot produce them at any parameter
+value. That, and not an inability to fit, is why the kernel is taken from
+outside.
+
+**One robustness result.** The optical-limit optimum comes out at 439.10 nm
+against the kernel's 440.60 nm — a **1.5 nm** difference, where uncorrected v1
+gave 475.5 nm. The frozen **440.65 nm is robust to the choice of envelope**
+once the constants are right, which is a stronger statement than the freeze
+previously supported.
+
+## E4.4 Reporting rules, revised
+
+Rule 4 of S1.6 ("never describe the v1 failure as structural; it is 65 vs
+87.9 meV") becomes:
+
+4. The v1 failure is two constants — \(\hbar\omega\) 65 vs **101.1** meV and
+   \(\Delta E_{120}\) 0.400 vs 0.464 eV — and correcting them makes v1 pass the
+   Fig. 5(b) gates outright. Never cite the v1 failure as evidence that a
+   single-mode model cannot work.
+6. **New.** The reason v3 takes the kernel from outside is E4.3 — one local
+   maximum against four — not the Fig. 5(b) score. Never argue it from the
+   score.
+7. **New.** When quoting \(\hbar\omega\) from an observed sideband maximum,
+   use \(\psi(p^*+1)=\ln S\), never \(p^*=S\). The shortcut costs half a
+   phonon, ~50 meV here, and it is enough to fail a gate.
