@@ -12,3 +12,9 @@ paper/out/
 *.out
 *.synctex.gz
 *.toc
+
+# test scratch and caches
+.pytest_cache/
+.pytest_tmp_*/
+.test-tmp-*/
+.test-alpha-fix/

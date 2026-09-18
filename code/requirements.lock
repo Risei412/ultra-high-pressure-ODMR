@@ -1,0 +1,36 @@
+# Fully pinned environment for reproducible runs of this repository.
+#
+# These are the exact versions in which the full suite (243 tests) is green,
+# measured 2026-09-19 on Python 3.14.7. `requirements.txt` keeps the loose
+# lower bounds for casual use; this file is what CI installs and what any
+# reproducibility claim about this repository refers to.
+#
+#   python -m pip install -r code/requirements.lock
+#   python -m pytest code/
+#
+# Regenerate with:
+#   python -m pip freeze
+# and re-run the full suite before committing a change here.
+
+# --- direct dependencies ---
+numpy==2.5.2
+scipy==1.18.1
+matplotlib==3.11.1
+pytest==9.1.1
+
+# --- transitive: matplotlib ---
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.63.0
+kiwisolver==1.5.0
+packaging==26.3
+pillow==12.3.0
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+six==1.17.0
+
+# --- transitive: pytest ---
+iniconfig==2.3.0
+pluggy==1.6.0
+pygments==2.21.0
+colorama==0.4.6 ; sys_platform == "win32"
