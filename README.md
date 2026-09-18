@@ -6,7 +6,7 @@ This is the working repository for NV-center ODMR under ultra-high pressure, inc
 
 The public entry point is
 [NV-center-Zero-phonon-Line-at-high-pressure-and-high-temperature](https://github.com/Risei412/NV-center-Zero-phonon-Line-at-high-pressure-and-high-temperature).
-This repository currently remains private.
+This repository currently remains public.
 
 Code-level notes are in [`code/README.md`](code/README.md).
 
