@@ -1,0 +1,118 @@
+\documentclass[11pt,a4paper]{ltjsarticle}
+% Compile with LuaLaTeX
+
+% =========================
+% Packages
+% =========================
+\usepackage{luatexja}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{geometry}
+
+\geometry{margin=22mm}
+\setcounter{tocdepth}{3}
+\setlength{\parskip}{0.6mm}
+\setlength{\abovecaptionskip}{2mm}
+
+% =========================
+% User information
+% =========================
+\title{Weekly Report: Ultra-High-Pressure ODMR --- \\ How much of the predicted multiplicity ladder can we actually measure?}
+\author{Risei Abe}
+\date{Week: 2026/08/24 -- 2026/08/30}
+
+% =========================
+% Custom commands
+% =========================
+\newcommand{\sectionblock}[1]{%
+  \vspace{2mm}
+  {\large\textbf{#1}}
+  \vspace{1mm}
+
+}
+
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+
+\begin{document}
+
+\maketitle
+\vspace{-8mm}
+
+% =========================================================
+% 1. Question / Purpose
+% =========================================================
+\sectionblock{Question}
+
+\begin{quote}
+Above the splitting power $I_c$ the optimum is a degenerate level set, so what an experiment actually sees is the $\eta$ bump \emph{between} its members rather than the members themselves --- how many of the seven predicted rungs survive that, and what power grid do the survivors demand?
+\end{quote}
+
+% =========================================================
+% 2. Hypothesis
+% =========================================================
+\sectionblock{Hypothesis}
+
+If members closer than the addressable resolution ($0.5$\,nm) merge and a rung counts as read only when every bump separating its members clears $3\sigma_\eta$, then what limits the experiment is bump \emph{depth} rather than rung width, and the power grid is fixed by the narrowest \emph{readable} rung instead of the narrowest one.
+
+% =========================================================
+% 3. Evidence / Interpretation
+% =========================================================
+\sectionblock{Evidence / Interpretation}
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{image/ladder_detection.png}{%
+    \includegraphics[width=0.95\linewidth]{image/ladder_detection.png}%
+  }{%
+    \fbox{\parbox[c][55mm][c]{0.92\linewidth}{\centering
+      Figure asset missing from the uploaded files:\\
+      \texttt{image/ladder\_detection.png}\\[2mm]
+      The caption and quantitative interpretation are retained below.}}
+  }
+  \vspace{-1mm}
+  \caption{(a) The computed ladder ($N_{\rm math}$) against the observable one ($N_{\rm obs}$, members within $0.5$\,nm merged); shaded rungs are readable at $\sigma_\eta = 1\%$. (b) The smallest $\eta$ bump on each rung against the $3\sigma$ floor.}
+  \label{fig:ladder}
+\end{figure}
+\vspace{-3mm}
+
+\begin{itemize}[leftmargin=8mm]
+  \item \textbf{Depth, not width, decides what is measurable}: the smallest bump on a rung ranges over four orders of magnitude ($0.00\%$--$110.80\%$), so at $\sigma_\eta = 1\%$ only three of the seven rungs are readable --- the $\times1.192$-wide five-member rung is lost to depth ($0.10\%$), and the split itself, opening from zero at $I_c$, does not clear $3\sigma$ until $I/I_c \approx 1.64$ --- which fixes the experiment as \textbf{ten log-spaced powers of ratio $1.227$ from $I/I_c = 1$ to $6$}, calibration free, aimed at the deep transitions at $1.865$ and $4.299$ rather than at the split.
+\end{itemize}
+
+% =========================================================
+% 4.  Gap / Failure
+% =========================================================
+\sectionblock{Gap / Failure}
+
+\begin{itemize}[leftmargin=8mm]
+  \item \textbf{Gap} --- the bump depths that decide every verdict above are computed from the Ho Fig.\,1(e) kernel reconstruction (L2, kernel conditional), unlike the level-set structure itself, and $I_c$ has never been located experimentally, so the required span $I_{\max}/I_c \ge 4.3$ cannot yet be checked against our source.
+  \item \textbf{Failure} --- the headline claim, ``the optimum divides,'' is retired as a target: it needs sub-$0.1\%$ photometry, and this week's calculation replaces it with the multiplicity transitions.
+\end{itemize}
+
+% =========================================================
+% 5. Next Step
+% =========================================================
+\sectionblock{Next Step}
+
+Anchor $I_c$ from a coarse scan on the robust $I/I_c = 1.865$ transition (not on the split onset, which is below the $1\%$ floor), then run the ten-point ratio-$1.227$ sweep at $1\%$ photometry while recording the NV$^0$/NV$^-$ ratio at each member, which tests both predicted transitions and assumption (M) in one beam time.
+
+% =========================================================
+% 9. References
+% =========================================================
+\sectionblock{References}
+
+\begin{enumerate}[leftmargin=8mm]
+  \item K.\,O.\ Ho, C.\ Dailledouze, V.\ \v{Z}alandauskas, \emph{et al.}, ``Optical Stability and Photophysics of NV Centers in Diamond up to 120 GPa,'' arXiv:2606.02399 (2026).
+  \item A.\ Dr\'eau \emph{et al.}, ``Avoiding power broadening in optically detected magnetic resonance of single NV defects,'' Phys.\ Rev.\ B \textbf{84}, 195204 (2011).
+  \item P.\ Bhattacharyya, \emph{Principle and Applications of Quantum Metrology in Diamond Anvil Cells using the Nitrogen Vacancy Color Center}, Ph.D.\ thesis, UC Berkeley (Fall 2022), Ch.\ 6 and p.\,65.
+  \item Repository: \path{code/ladder_detection.py}, \path{code/theory_a2_multiplicity.py}, \path{code/fig10_ladder_detection.py} (this analysis); \path{theory_freeze_v3_ho_integrated.md} (A2, N1--N4), \path{STATUS.md} \S6.
+\end{enumerate}
+
+\end{document}
