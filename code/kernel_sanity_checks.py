@@ -49,12 +49,15 @@ remain the only source for the drivers of Theorem X.
 
 Run for the tables; each check returns its numbers for the tests.
 """
+import os
+
 import numpy as np
 
 from ho_spectrum_model import HoPublishedSpectrumModel
 from theory_a3_branch_exchange import identify_branches
 
-PANELS_BC = 'data/ho_fig1_panels_bc.csv'
+PANELS_BC = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         'data', 'ho_fig1_panels_bc.csv')
 
 # Half-window for the ZPL spike, ~8x its apparent width, and the fraction of
 # the plotted energy range counted as "the top of the window" in K1.

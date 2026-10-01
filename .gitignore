@@ -1,11 +1,8 @@
 __pycache__/
-.test-tmp-*/
-.pytest_cache/
-*.pyc
 slides/intro_deck.standalone.html
 
 # LaTeX build output
-paper/build/
+paper/out/
 *.aux
 *.bbl
 *.blg
@@ -16,15 +13,8 @@ paper/build/
 *.synctex.gz
 *.toc
 
-# Regenerable analysis previews and reports
-code/outputs/
-
-# Publisher PDFs of cited works. Kept locally for reading, never redistributed:
-# this repository is public and these are not ours to republish. The notes in
-# docs/references/notes/ are ours and are tracked.
-docs/references/papers/
-docs/ref/*.pdf
-
-# Scratch directories left by test runs
+# test scratch and caches
+.pytest_cache/
+.pytest_tmp_*/
+.test-tmp-*/
 .test-alpha-fix/
-.pytest_tmp_repro_*/

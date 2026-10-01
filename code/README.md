@@ -8,6 +8,32 @@ Photophysics of NV Centers in Diamond up to 120 GPa," arXiv:2606.02399 (2026).
 Phenomenological rate constants remain calibration targets rather than measured
 high-pressure inputs.
 
+## Main manuscript: optimum depends on stress geometry
+
+`../paper/main.tex` uses the design manuscript from main and foregrounds the
+conditional stress-dependent optimum. The G/M/X theory manuscript is preserved
+in `../archive/manuscripts/main_theory_GMX_20260906.tex`.
+
+`alpha = sigma_xx/sigma_zz = sigma_yy/sigma_zz`. At fixed `sigma_zz = 120 GPa`,
+changing alpha changes both mean and deviatoric stress. The Ho hydrostatic
+optimum is approximately 441 nm at alpha = 1. The differential phenomenological
+correction in `calc_alpha_corrected_optimum.py` gives 475.2–488.1 nm at alpha =
+0.60 and 444.7–446.1 nm at alpha = 0.95. These ranges describe the two stress
+normalisations; they are not statistical confidence intervals or measurements
+of an anisotropic absorption spectrum.
+
+```powershell
+# From the repository root:
+python code/calc_alpha_corrected_optimum.py
+python code/fig_alpha_optimum_tolerance.py
+```
+
+The conditional optimum/tolerance figure is written to
+`../docs/experiment/figures/alpha_optimum_tolerance_120gpa.pdf` and its PNG
+preview. Its tolerance bands additionally assume a rigid wavelength shift of
+the hydrostatic sensitivity curve. Do not apply the 120-GPa additive anchor at
+other pressures. See `../docs/theory/erratum_E5_ho_kernel_geometry.md`.
+
 ## Contents
 
 - `ho_spectrum_model.py` — reconstructed published absorption kernel.
@@ -21,7 +47,8 @@ high-pressure inputs.
 - `theory_a3_branch_exchange.py` — pressure-driven branch exchange.
 - `data/` — digitized or reconstructed numerical inputs.
 - `tests/` — regression and figure tests.
-- `outputs/` — regenerable previews and reports; ignored by Git.
+- `figures/` — legacy and weekly-report figure entry points.
+- `outputs/figures/` — generated analysis previews (some are tracked).
 
 ## [111]-aligned anisotropic-stress calculation
 
@@ -50,9 +77,9 @@ python report_111_anisotropic.py --pressure 120 --alpha 0.56
 reported as `I/Ic` because the absolute `Ic` requires calibration in the actual
 [111] DAC.
 
-The source modules remain in one directory because the analyses import each
-other as flat modules. Do not split them into subpackages without updating the
-imports and tests together.
+Shared analysis modules remain in `code/` because they import one another as
+flat modules. Figure entry points moved by main live in `figures/` and load
+those shared modules independently of the working directory.
 
 ## Above 120 GPa
 
@@ -94,7 +121,7 @@ python -m pip install -r requirements.txt
 python -m pytest . -q
 ```
 
-## Current manuscript figures
+## Archived theory manuscript figures
 
 ```powershell
 python fig_m_level_set_ladder.py
@@ -122,9 +149,9 @@ quotes; none is rendered into the raster.
 ## Legacy exploratory figures
 
 ```powershell
-python fig1_green_blue_mix.py
-python fig2_blue_wavelength_sweep.py
-python fig3_power_sweep.py
+python figures/fig1_green_blue_mix.py
+python figures/fig2_blue_wavelength_sweep.py
+python figures/fig3_power_sweep.py
 ```
 
 These scripts write PNG files to `outputs/figures/`. Their v1 numerical claims

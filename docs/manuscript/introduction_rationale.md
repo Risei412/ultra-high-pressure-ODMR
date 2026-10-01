@@ -1,16 +1,25 @@
-# Introduction rationale
+# Introduction rationale — stress-dependent blue-laser selection
 
-本稿の中心は単一の推奨レーザー線ではなく、励起波長最適化の構造である。
+更新: 2026-10-01。主原稿は main 側の設計原稿 `paper/main.tex` とする。
+G/M/X を中心とする別原稿は `archive/manuscripts/main_theory_GMX_20260906.tex`
+に保存する。
 
-1. 高圧 NV 磁気計測では photon rate だけでなく、ODMR contrast と linewidth が感度を決める。
-2. 波長が光ポンピング率だけを介して応答へ入る場合、最適波長は吸収率のレベル集合になる。
-3. 圧力は ZPL と sideband の相対重みを変え、励起帯域に依存する branch exchange を起こしうる。
-4. Ho et al. の公開曲線を用いた 120 GPa の worked example では、固定パワーの
-   静水圧光学基準は約 441 nm、5% 許容帯は約 426.4–457.9 nm である。
-5. 440.65 nm は補間器の数値出力であり、元データの波長精度ではない。
-6. [111] 異方応力下の方向分解吸収スペクトルは公表されていないため、静水圧基準を
-   軸応力または平均応力へ写像した予測として提示しない。
+本稿では、青レーザーの選択を局所応力と光学入力に条件づける。
 
-実験提案では 445/457 nm を青色候補、532 nm を慣例的対照として扱い、PL、contrast、
-linewidth、charge state を同時測定する。数値は設計事前値として提示し、実測による
-更新可能性を本文で明記する。
+1. 応力比は `alpha = sigma_xx/sigma_zz = sigma_yy/sigma_zz` と定義する。
+   同じ軸応力でも alpha が変われば平均応力と偏差応力が変わる。
+2. Ho の静水圧120 GPaカーネルは alpha = 1 の基準であり、最適波長は約441 nm。
+   このカーネルを全ての alpha にそのまま使う場合の不変性はモデルの仮定である。
+3. 異方応力の対抗仮説には現象論モデルの alpha 依存差分だけを加える。
+   alpha = 0.60 で475.2–488.1 nm、alpha = 0.95 で444.7–446.1 nmとなる。
+   この区間は2つの応力規格化の違いであり、統計的信頼区間ではない。
+4. 旧単一モードモデルの475.5 nmと473 nm候補は alpha = 0.95 の旧モデル内の
+   設計事前値として残し、静水圧Ho基準や修正モデルの予測と混同しない。
+5. alpha 依存図・表を結果の前半に置き、異方応力下の直接測定が未完了である
+   ことと、5%帯には曲線の剛体シフトを仮定することを併記する。
+6. 実験では励起波長とalphaを変えて photon rate、contrast、linewidth を
+   同時測定する。120 GPaの加算基準を別の圧力へ持ち出さない。
+
+計算: `code/calc_alpha_corrected_optimum.py`。
+図: `docs/experiment/figures/alpha_optimum_tolerance_120gpa.pdf`。
+仮定と出所: `docs/theory/erratum_E5_ho_kernel_geometry.md`。

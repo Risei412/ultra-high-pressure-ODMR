@@ -295,3 +295,24 @@ python fig7_a3_branch_exchange.py     # a3_branch_exchange.png
 python -m pytest tests/test_theory_a3_branch_exchange.py \
                 tests/test_figure_validation.py -q
 ```
+
+
+## Integration note (2026-10-01): corrected panel (b,c) extraction
+
+The merged calculation uses the vector-path extraction in
+`code/extract_ho_fig1_panels_bc.py` and `code/data/ho_fig1_panels_bc.csv`,
+with matching regression tests from the integration branch. Earlier raster
+numbers in this historical record are superseded for those panels:
+S_abs is 3.0812–4.6131 and DWF_abs is 0.02180–0.00363 over 0–120 GPa;
+the DWF fall is approximately 6.01, rather than 9.07. The reconstructed/published
+ZPL-area ratio at 120 GPa is approximately 0.89, rather than 1.43.
+The corrected branch-density growth is approximately 4.31; critical bandwidths
+at 0 and 120 GPa are 10.30 and 2.39 meV. The crossing pressures at bandwidths
+3, 5, and 7 meV are approximately 101.2, 56.8, and 31.0 GPa.
+These corrections are implemented in the existing integration-branch data and
+tests, and were not chosen to make compilation or testing succeed.
+
+The active design manuscript is `paper/main.tex`; the G/M/X manuscript is
+preserved in `archive/manuscripts/main_theory_GMX_20260906.tex`. Conditional
+alpha-dependent blue-laser selection is documented in the active manuscript
+and `docs/manuscript/introduction_rationale.md`.

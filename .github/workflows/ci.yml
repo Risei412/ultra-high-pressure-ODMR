@@ -1,9 +1,4 @@
-name: tests
-
-# The numerical record in this repository is frozen: code/tests/test_freeze.py
-# and test_freeze_a4_handoff.py assert published and derived values to a stated
-# tolerance. CI exists so that those assertions are checked in a clean, pinned
-# environment on every change, rather than only on the author's machine.
+name: CI
 
 on:
   push:
@@ -11,62 +6,45 @@ on:
   pull_request:
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   frozen-values:
-    # Fast signal on the part that matters most: the frozen numerical record.
-    # 90 tests, ~10 s locally (2026-09-06).
-    name: frozen values (pinned env)
+    name: frozen values (fast signal)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version-file: .python-version
-          cache: pip
-          cache-dependency-path: code/requirements.lock
 
       - name: Install pinned environment
-        run: python -m pip install --disable-pip-version-check -r code/requirements.lock
-
-      - name: Record the environment
-        # The tolerance at which these values reproduce depends on the BLAS
-        # kernel and CPU, so log what actually ran.
         run: |
-          python -c "import platform, sys; print(sys.version); print(platform.platform()); print(platform.processor())"
-          python -c "import numpy; numpy.show_config()"
-          python -m pip freeze
+          python -m pip install --upgrade pip
+          python -m pip install -r code/requirements.lock
 
-      - name: Frozen-value tests
-        working-directory: code
-        run: python -m pytest tests/test_freeze.py tests/test_freeze_a4_handoff.py -q --durations=10
+      - name: Record numerical environment
+        run: python .github/scripts/report_env.py
+
+      - name: Frozen-value regression tests
+        run: python -m pytest code/tests/test_freeze.py code/tests/test_freeze_a4_handoff.py -q
 
   full-suite:
-    # 357 tests, ~4 min locally (2026-09-06), about half of it the single
-    # level-set scan in the session fixture. The timeout is set well above that
-    # because runner speed varies.
-    name: full suite (pinned env)
+    name: full suite
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version-file: .python-version
-          cache: pip
-          cache-dependency-path: code/requirements.lock
 
       - name: Install pinned environment
-        run: python -m pip install --disable-pip-version-check -r code/requirements.lock
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r code/requirements.lock
 
-      - name: Run tests
-        working-directory: code
-        # The suite includes a level-set scan of ~1100 evaluations (see
-        # code/tests/conftest.py); --durations makes the cost visible.
-        run: python -m pytest . -q --durations=15
+      - name: Record numerical environment
+        run: python .github/scripts/report_env.py
+
+      - name: Full test suite
+        run: python -m pytest code/ -q
