@@ -1,6 +1,6 @@
 """Figures for the WRN weekly reports.
 
-Three panels, one per report, drawn in the WRN palette (rule.txt):
+One panel per report, drawn in the WRN palette (rule.txt):
 Science Blue #1C3177, Deep Indigo #4B0082, Mist Lavender #E8EAF1,
 Midnight Ink #101426 on Optic White.
 
@@ -151,11 +151,82 @@ def fig_level_set(path, level=0.60):
     plt.close(fig)
 
 
+def fig_optimum_penalty(path, band_penalty=1.05, ceiling=2.0):
+    """Optical-limit penalty eta/eta_min = sqrt(A_max/A): the answer under (M)."""
+    kernel = Kernel()
+    lo, hi = DATA_WINDOW
+    grid = np.arange(lo, hi + 1e-9, 0.01)
+    penalty = 1.0 / np.sqrt(kernel.a(grid))
+    blue, red = kernel.tolerance_band(band_penalty)
+
+    fig, ax = plt.subplots(figsize=(4.4, 3.2))
+    ax.plot(grid, penalty, color=PRIMARY, lw=1.6, zorder=3,
+            label=r'$\eta/\eta_{\min}$, optical limit, 120 GPa')
+    ax.axvspan(blue, red, color=PALE, zorder=1,
+               label=f'{100 * (band_penalty - 1):.0f}% tolerance band')
+    ax.axvline(kernel.lam_abs, color=ACCENT, lw=1.2, ls='--', zorder=2,
+               label=f'optimum {kernel.lam_abs:.2f} nm')
+
+    ax.set_xlim(lo, hi)
+    ax.set_ylim(1.0, ceiling)
+    ax.set_xlabel(r'Excitation wavelength  $\lambda$ (nm)')
+    ax.set_ylabel(r'Sensitivity penalty  $\eta(\lambda)/\eta_{\min}$')
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.24), ncol=2,
+              fontsize=8, borderaxespad=0.0)
+    fig.tight_layout()
+    fig.savefig(path, dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+def fig_split_visibility(path, sigma_eta=0.01, targets=(1.8646, 4.2989)):
+    """Smallest eta bump between adjacent optima against power (L2, L5)."""
+    from ladder_detection import SIGMA_MULTIPLE, plateau_structure
+
+    ratios = np.unique(np.concatenate([
+        np.geomspace(1.01, 6.0, 120),
+        np.array(targets) * 0.999, np.array(targets) * 1.001,
+    ]))
+    bumps = []
+    for ratio in ratios:
+        structure = plateau_structure(float(ratio))
+        bumps.append(min(structure['bumps']) if structure['bumps'] else np.nan)
+    bumps = 100.0 * np.array(bumps)
+    # A bump of exactly zero means the separating maximum is unresolvable on the
+    # 0.01 nm grid; it has no place on a log axis.
+    bumps[bumps <= 0.0] = np.nan
+
+    fig, ax = plt.subplots(figsize=(4.4, 3.2))
+    ax.plot(ratios, bumps, color=PRIMARY, lw=1.6, zorder=3,
+            label='smallest $\\eta$ bump between optima, 120 GPa')
+    ax.axhline(100.0 * SIGMA_MULTIPLE * sigma_eta, color=DARK, lw=1.0, ls='--',
+               zorder=2, label=f'{SIGMA_MULTIPLE:.0f}$\\sigma$ at '
+                               f'{100 * sigma_eta:.0f}% precision on $\\eta$')
+    for index, target in enumerate(targets):
+        ax.axvline(target, color=ACCENT, lw=1.0, ls=':', zorder=1,
+                   label='target transitions' if index == 0 else None)
+
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_xlim(1.0, 6.0)
+    ax.set_ylim(1e-3, 1e3)
+    ax.set_xticks([1, 1.5, 2, 3, 4, 6])
+    ax.set_xticklabels(['1', '1.5', '2', '3', '4', '6'])
+    ax.set_xlabel(r'Excitation power ratio  $I / I_c$')
+    ax.set_ylabel(r'Smallest $\eta$ bump (%)')
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.24), ncol=2,
+              fontsize=8, borderaxespad=0.0)
+    fig.tight_layout()
+    fig.savefig(path, dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     fig_zero_contrast(os.path.join(OUT, 'wrn_zero_contrast_width.png'))
     fig_ladder(os.path.join(OUT, 'wrn_ladder_steps.png'))
     fig_level_set(os.path.join(OUT, 'wrn_level_set_members.png'))
+    fig_optimum_penalty(os.path.join(OUT, 'wrn_optimum_penalty.png'))
+    fig_split_visibility(os.path.join(OUT, 'wrn_split_visibility.png'))
 
     kernel = Kernel()
     print('level-set members at a=0.60:',
