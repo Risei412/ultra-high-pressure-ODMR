@@ -2,7 +2,7 @@
 
 A1 stated its propositions on the assumption that the absorption kernel is a
 single flat band, and quoted numbers read off a digitised figure.  The
-numerical execution in `docs/theory_a1_numerical_execution.md` showed that the
+numerical execution in `docs/theory/theory_a1_numerical_execution.md` showed that the
 two halves of A1 fail differently: everything that depends on the *shape* of
 the reconstructed kernel is fragile, and everything that follows from the
 *structure* of eta = 1/(G sqrt(R)) is exact.
@@ -29,7 +29,7 @@ Theorem G (gauge degeneracy)
     Theorem M is invariant across the whole family -- the same degeneracy that
     forbids attribution makes the ladder robust.
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import numpy as np
 from scipy.optimize import brentq
@@ -311,18 +311,38 @@ def identifiability(gamma_p=1.0):
     }
 
 
-def ladder_is_gauge_invariant(kernel, window=DATA_WINDOW):
-    """The multiplicity ladder is the same for every member of the plane."""
+def ladder_is_gauge_invariant(kernel, window=DATA_WINDOW, gamma_a_max=1.0,
+                              half_scales=(0.25, 0.5, 1.0, 2.0, 4.0),
+                              probes=(1.05, 1.45, 1.55, 2.0, 3.7, 4.5)):
+    """The multiplicity ladder is the same for every member of the plane.
+
+    The theorem is that N enters the response only through I_c, so probing at
+    absolute intensities and then normalising by each model's own
+    I_c = Gamma_p^*/(gamma A_max) must collapse the ladders onto one sequence.
+    The check therefore has content only if the models differ in their absolute
+    scale: `gauge_family` fixes the half-scale Gamma at 1 so that Fig. 2 can
+    show the eta surfaces coinciding, which also makes every member share one
+    Gamma_p^*.  Here each member is given a different Gamma spanning a factor
+    16, so the six probe intensities differ by that factor between the first
+    model and the last, and the agreement of the counts is a result rather than
+    an identity.
+    """
+    probes = np.asarray(probes, float)
     reference = None
     out = []
-    for name, response in gauge_family().items():
-        star = response.gamma_star()
-        # Express the ladder in units of I_c, which removes Gamma_p* entirely.
-        ratios = np.array([1.05, 1.45, 1.55, 2.0, 3.7, 4.5])
-        counts = [multiplicity(kernel, 1.0 / r, window) for r in ratios]
+    for (name, response), gamma in zip(gauge_family().items(), half_scales):
+        model = replace(response, gamma=float(gamma))
+        star = model.gamma_star()
+        i_c = star / gamma_a_max
+        intensities = probes * i_c
+        counts = [multiplicity(kernel, i_c / intensity, window)
+                  for intensity in intensities]
         if reference is None:
             reference = counts
-        out.append({'name': name, 'gamma_star': star, 'counts': counts,
+        out.append({'name': name, 'gamma': float(gamma), 'gamma_star': star,
+                    'i_c': float(i_c),
+                    'intensities': [float(x) for x in intensities],
+                    'counts': counts,
                     'identical_to_reference': counts == reference})
     return out
 
@@ -398,10 +418,15 @@ def main():
         print(f"    {key:12s} {row['quantity']:22s} {verdict}")
 
     print('\n[G4] The ladder is invariant across the gauge plane')
-    for row in ladder_is_gauge_invariant(kernel):
-        print(f"    {row['name']:26s} Gamma_p* = {row['gamma_star']:.4f}   "
-              f"N = {row['counts']}   "
+    rows = ladder_is_gauge_invariant(kernel)
+    for row in rows:
+        print(f"    {row['name']:26s} Gamma = {row['gamma']:5.2f}   "
+              f"Gamma_p* = {row['gamma_star']:6.3f}   "
+              f"I_c = {row['i_c']:6.3f}   N = {row['counts']}   "
               f"{'identical' if row['identical_to_reference'] else 'DIFFERS'}")
+    span = rows[-1]['i_c'] / rows[0]['i_c']
+    print(f"    absolute probe intensities differ by x{span:.0f} across the "
+          f"family, yet every ladder is the same")
 
 
 if __name__ == '__main__':

@@ -55,7 +55,7 @@ so the exchange is read off the data rather than out of an interpolation.
    still monotone, so the crossing is still unique.  What does not survive is a
    single value for P*, because comparing a narrow line with a broad band is
    bandwidth dependent.  See ``figure_validation.py`` for the corrected
-   treatment and ``docs/theory_a3_branch_exchange.md`` for the write-up.
+   treatment and ``docs/theory/theory_a3_branch_exchange.md`` for the write-up.
 """
 from dataclasses import dataclass
 

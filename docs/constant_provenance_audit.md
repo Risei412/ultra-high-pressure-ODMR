@@ -1,5 +1,12 @@
 # 定数の出処監査 — なぜ v1 は壊れていたのか
 
+> 2026-10-01 統合注記: 本文の101.1 meV、87.9 meV、補正モデルのpooled 1.0%は
+> 旧ラスター抽出に基づく記録である。現在のベクトル抽出ではそれぞれ
+> 99.3 meV、86.5 meV、1.4%となる。入力CSVと回帰テストを同じ出所に統一した。
+> 主原稿は `paper/main.tex` の設計原稿で、alpha依存の条件付き最適波長を
+> 結果の前半に示す。凍結記録は `docs/theory/theory_freeze_v3_ho_integrated.md`。
+
+
 日付: 2026-08-28
 根拠: 正誤表 E4、`code/v1_diagnosis.py`、`code/kernel_sanity_checks.py`
 対象: `code/nv_model.py` の Physical anchors 全項目

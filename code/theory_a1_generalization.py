@@ -1,6 +1,7 @@
 """Numerical execution of Addendum A1 (coincidence/divergence theory).
 
-`theory_freeze_v3_ho_integrated.md` Addendum A1 and `docs/theory_optima_coincidence.md`
+`docs/theory/theory_freeze_v3_ho_integrated.md` Addendum A1 and
+`docs/theory/theory_optima_coincidence.md`
 state propositions P1-P7 analytically and quote numbers (kappa_A, the 2.5e3 nm^2
 conversion factor, the 32/60/83 nm doublet separations, the mechanism table)
 without an executable derivation.  This module executes them against the frozen
@@ -101,7 +102,7 @@ class Kernel:
         """Chord curvature: ln(a) = -kappa (lam - lam_abs)^2 / 2 through one point.
 
         This is the definition that reproduces the table in
-        `docs/theory_optima_coincidence.md` section 2.  It is a band-averaged
+        `docs/theory/theory_optima_coincidence.md` section 2.  It is a band-averaged
         quantity, not a local second derivative.
         """
         lam = np.asarray(lam, float)
@@ -533,19 +534,51 @@ def section7_hot_band():
     }
 
 
-def section8_kernel_provenance():
+V1_BAND = (402.0, 700.0)
+
+
+def v1_envelope_local_maxima(pressures=(0.0, 20.0, 40.0, 60.0, 80.0, 100.0,
+                                        120.0),
+                             window=V1_BAND, threshold=0.01, step=0.01):
+    """Interior local maxima of the v1 single-effective-mode envelope.
+
+    Counts the interior local maxima of A(lambda) = lambda * sigma_abs for the
+    single-mode Franck-Condon envelope of `nv_model.NVModel`, on the same grid,
+    with the same normalisation and the same threshold that
+    `Kernel.local_maxima` applies to the reconstructed kernel.  The manuscript
+    rests Theorem M's numerical content on the contrast between the one maximum
+    this returns at every pressure and the four the kernel carries at 120 GPa;
+    this function is what makes that contrast reproducible.  It supersedes the
+    absent `code/v1_diagnosis.py` cited by Erratum E4.3.
+
+    The default window is the full absorption band rather than DATA_WINDOW,
+    because the v1 envelope is analytic and carries no figure limit.  Over the
+    band the count is exactly one at every pressure and moves monotonically to
+    the blue. Over the
+    truncated analysis window (402-517 nm) the count is one above about
+    60 GPa and zero below it, where the envelope peak lies redward of the
+    window edge; it is never greater than one at any pressure in either window,
+    which is the property Theorem M uses.
+    """
     from nv_model import NVModel
     v1 = NVModel()
+    lam_min, lam_max = (float(x) for x in window)
+    grid = np.arange(lam_min, lam_max + 1e-9, step)
+    out = {}
+    for pressure in pressures:
+        raw = grid * v1.sigma_abs(HBARC / grid, float(pressure))
+        values = raw / float(np.max(raw))
+        rising = np.diff(values)
+        idx = np.where((rising[:-1] > 0.0) & (rising[1:] <= 0.0))[0] + 1
+        out[float(pressure)] = [(float(grid[i]), float(values[i]))
+                                for i in idx if values[i] > threshold]
+    return out
+
+
+def section8_kernel_provenance():
+    """Current Ho-kernel laser-line provenance; no legacy optimum ranking."""
     k = Kernel()
-    out = {'per_pressure': {}}
-    for pressure in (100.0, 120.0):
-        kernel = Kernel(pressure=pressure)
-        v1_opt = float(v1.lambda_opt(pressure))
-        out['per_pressure'][pressure] = {
-            'v1_franck_condon_nm': v1_opt,
-            'ho_kernel_nm': kernel.lam_abs,
-            'gap_nm': v1_opt - kernel.lam_abs,
-        }
+    out = {'ho_kernel_nm': k.lam_abs}
     out['ho_penalty'] = {lam: float(1.0 / np.sqrt(k.a(lam)))
                          for lam in (440.65, 445.0, 457.0, 473.0, 475.55,
                                      488.0, 514.46)}
@@ -697,10 +730,9 @@ def main():
           '-- between the two, derived from neither')
 
     prov = section8_kernel_provenance()
-    print('\n[S8] Kernel provenance: v1 Franck-Condon envelope vs Ho kernel')
-    for pressure, row in prov['per_pressure'].items():
-        print(f"  {pressure:5.0f} GPa: v1 = {row['v1_franck_condon_nm']:.2f} nm, "
-              f"Ho = {row['ho_kernel_nm']:.2f} nm, gap = {row['gap_nm']:+.2f} nm")
+    print('\n[S8] Current Ho-kernel provenance')
+    print(f"  hydrostatic interpolant maximum: {prov['ho_kernel_nm']:.2f} nm "
+          '(reported as approximately 441 nm)')
     print(f"  Ho kernel second local maximum: {prov['second_local_max'][0]:.2f} nm "
           f"(a = {prov['second_local_max'][1]:.4f})")
     print('  Ho-kernel optical-limit penalty of the candidate lines:')

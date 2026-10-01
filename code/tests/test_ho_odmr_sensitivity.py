@@ -8,7 +8,8 @@ from ho_odmr_sensitivity import (HoIntegratedODMRModel, ODMRResponse,
 
 def test_optical_limit_reproduces_published_curve_optimum():
     summary = optical_limit_summary(120.0)
-    assert summary['optimum_nm'] == pytest.approx(440.65, abs=0.1)
+    assert summary['optimum_nm'] == 441.0
+    assert summary['interpolant_optimum_nm'] == pytest.approx(441.0, abs=0.5)
     assert summary['penalty_457'] == pytest.approx(1.04494, rel=2e-4)
 
 

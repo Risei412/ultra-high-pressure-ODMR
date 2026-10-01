@@ -65,21 +65,40 @@ def test_kernel_zpl_area_validates_against_published_dwf_at_low_pressure(
         checks):
     for pressure, row in checks['zpl_area'].items():
         if pressure <= ZPL_TRUSTED_MAX_GPA:
-            assert row['ratio'] == pytest.approx(1.0, abs=0.05)
+            assert row['ratio'] == pytest.approx(0.90, abs=0.03)
 
 
-def test_kernel_overweights_the_zpl_above_the_trusted_range(checks):
+def test_kernel_zpl_sits_uniformly_low_against_the_published_dwf(checks):
+    """K3 against the corrected panel (c): a constant offset, not a trend.
+
+    Read from the old raster extraction of panel (c), this ratio climbed from
+    0.96 to 1.43 and was reported as the reconstruction over-weighting the
+    zero-phonon line at high pressure.  Against the vector extraction it is
+    0.88-0.91 at every pressure with no monotone trend, which is a calibration
+    constant rather than a pressure-dependent artefact.  Everything in the
+    manuscript that rests on a x1.43 over-weight rests on the old number.
+    """
     ratios = [checks['zpl_area'][p]['ratio'] for p in sorted(checks['zpl_area'])]
-    assert ratios == sorted(ratios)
-    assert checks['zpl_area'][120.0]['ratio'] == pytest.approx(1.43, abs=0.03)
+    assert max(ratios) - min(ratios) < 0.05
+    assert all(0.85 < ratio < 0.95 for ratio in ratios)
+    assert checks['zpl_area'][120.0]['ratio'] == pytest.approx(0.89, abs=0.03)
 
 
-def test_published_dwf_falls_faster_than_the_kernel_zpl(checks):
+def test_kernel_zpl_and_published_dwf_fall_together(checks):
+    """K3 against the corrected panel (c): the two collapses agree to 1.3 %.
+
+    The kernel's own zero-phonon area falls by x6.08 over 0-120 GPa and the
+    published Debye-Waller factor by x6.01.  Read from the old raster
+    extraction the published fall was x9.07 against the kernel's x6.3, a 44 %
+    discrepancy, and that is what the manuscript's "the reconstruction
+    over-weights the ZPL" passages were built on.
+    """
     area = checks['zpl_area']
     kernel = area[0.0]['kernel_dwf'] / area[120.0]['kernel_dwf']
     published = area[0.0]['published_dwf'] / area[120.0]['published_dwf']
-    assert published > kernel
-    assert published == pytest.approx(9.07, abs=0.1)
+    assert published == pytest.approx(6.01, abs=0.1)
+    assert kernel == pytest.approx(6.08, abs=0.1)
+    assert abs(kernel / published - 1.0) < 0.03
 
 
 # ---- K4 -------------------------------------------------------------------
@@ -100,5 +119,5 @@ def test_jahn_teller_remainder_is_smooth_and_monotone(checks):
 
 def test_total_coupling_endpoints(checks):
     jt = checks['jahn_teller']
-    assert jt[0.0]['S_total'] == pytest.approx(3.89, abs=0.01)
-    assert jt[120.0]['S_total'] == pytest.approx(6.09, abs=0.01)
+    assert jt[0.0]['S_total'] == pytest.approx(3.83, abs=0.01)
+    assert jt[120.0]['S_total'] == pytest.approx(5.62, abs=0.01)

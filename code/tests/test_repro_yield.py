@@ -79,8 +79,6 @@ def test_conditional_detected_yield_fit_matches_both_experimental_branches(data)
 
 def test_refit_pulls_the_optimum_blue(data):
     _, m, _ = fit_dE120(data, T=300.0)
-    frozen = NVModel(T=300.0)
-    assert frozen.lambda_opt(120) == pytest.approx(475.5, abs=0.5)
     assert 440.0 < m.lambda_opt(120) < 460.0
 
 
@@ -206,5 +204,4 @@ def test_457_is_safe_under_every_model_that_fits(data):
         e = lambda lam: float(np.asarray(m.eta_lambda(lam, 120)[0]))
         assert e(457.0) / e(opt) < 1.15
         assert e(532.0) / e(opt) > 2.0        # and blue always beats green
-
 

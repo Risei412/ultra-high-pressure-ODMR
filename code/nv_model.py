@@ -89,7 +89,22 @@ lambda_opt -- test_freeze.py asserts this -- but it makes the assumption visible
 and lets absolute contrast be quoted.  The condition under which it would fail
 (orbital-branch-selective excitation making the ISC rate wavelength dependent)
 is a stated limitation, not something this model covers.
+
+---------------------------------------------------------------------------
+C-8  EXTRAPOLATION ABOVE THE ANCHORS IS A NAMED POLICY
+---------------------------------------------------------------------------
+The Ho et al. anchors stop at 120 GPa.  The model used to continue past that
+edge silently, by clipping each anchor inline, which made every quantity
+except dZPL constant above 120 GPa; dZPL itself is 95 % saturated by 300 GPa.
+A call at 400 GPa therefore returned an asymptote that looked like a
+prediction.  The clip is now the DEFAULT VALUE of an explicit `extrapolate`
+argument ('clip' | 'linear' | 'error'), so the choice appears in the call.
+Every frozen number is unchanged, because 'clip' is what the model already
+did.  extrapolation_bounds.py quantifies the spread the choice implies:
+21 nm at 120 GPa, 134 nm at 400 GPa.
 """
+
+import warnings
 
 import numpy as np
 from scipy.special import gammaln, ive
@@ -102,6 +117,24 @@ def eV2nm(E):      return HBARC / np.asarray(E, float)
 
 E532 = nm2eV(532.0)                  # reference green photon energy
 HW   = 0.065                         # effective phonon energy (eV)
+
+# --- C-8: where the published anchors stop ---------------------------------
+# Every pressure-dependent optical quantity in this model -- S_abs, S_em,
+# IP(3A2), IP(3E) and both Debye-Waller factors -- is a linear interpolation
+# between the ambient and 120 GPa values of Ho et al. (2026).  Nothing in the
+# published record constrains any of them above 120 GPa.
+#
+# The model used to continue past that edge by writing np.clip(P, 0, 120)
+# inline, which FROZE each anchor silently: above 120 GPa only dZPL still
+# moved, and dZPL is itself a saturating form that is 95 % of the way to Emax
+# by 300 GPa.  The model therefore returned an asymptote, not a prediction,
+# and did so without saying that it had.
+#
+# The clip is retained as the DEFAULT so that every frozen number is
+# unchanged, but it is now a named, switchable policy.  See
+# extrapolation_bounds.py for what the alternatives do to lambda_opt.
+ANCHOR_MAX_P = 120.0                 # GPa, upper edge of the Ho et al. anchors
+EXTRAPOLATION_POLICIES = ('clip', 'linear', 'error')
 
 # Temperature below which the T=0 Pekarian is used verbatim (nbar < 1e-8).
 _T0_TOL = 1e-8
@@ -175,7 +208,12 @@ class NVModel:
                  C_amb=0.2469, C_floor=0.0,     # ISC contrast prefactor (C-3),
                  E_isc=0.1807, isc=True,        #   calibrated to Dai et al. 2022
                  det_band=(650.0, 800.0),       # detection passband, nm (C-7)
-                 collection=True):              # apply the collection efficiency
+                 collection=True,               # apply the collection efficiency
+                 extrapolate='clip'):           # anchor policy above 120 GPa (C-8)
+        if extrapolate not in EXTRAPOLATION_POLICIES:
+            raise ValueError('extrapolate must be one of '
+                             f'{EXTRAPOLATION_POLICIES}, got {extrapolate!r}')
+        self.extrapolate = extrapolate
         if Emax is not None or P0 is not None:
             # Legacy path: (Emax, P0) given directly.
             self.Emax = 0.758 if Emax is None else Emax
@@ -200,14 +238,42 @@ class NVModel:
         self._norm = self._sigma_raw(E532, 0.0)   # normalise sigma to green@ambient = 1
 
     # ---- pressure-dependent physical quantities (anchored to Ho et al.) ----
+    def _anchor_P(self, P):
+        """
+        Pressure to evaluate the Ho et al. anchors at, under the C-8 policy.
+
+        'clip'   : freeze every anchor at its 120 GPa value (the shipped
+                   default; reproduces every frozen number exactly).
+        'linear' : continue the fitted linear laws past 120 GPa.  This is an
+                   EXTRAPOLATION, unconstrained by any published measurement.
+        'error'  : refuse, the way HoPublishedSpectrumModel.sigma_abs does.
+
+        Note that dZPL, C0 and linewidth are NOT routed through here: dZPL is a
+        saturating form with its own asymptote, C0 follows dZPL, and linewidth
+        is phenomenological with its own 140 GPa clip.  The effective phonon
+        energy self.hw carries no pressure dependence at all.  Those four are
+        limitations of the model, not policies; extrapolation_bounds.py
+        quantifies what each of them does to lambda_opt.
+        """
+        P = np.asarray(P, float)
+        if self.extrapolate == 'error' and np.any(P > ANCHOR_MAX_P):
+            raise ValueError(
+                f'the Ho et al. anchors stop at {ANCHOR_MAX_P:g} GPa; '
+                f'got P up to {float(np.max(P)):g} GPa. Pass '
+                "extrapolate='clip' or 'linear' to continue past the data, "
+                'and see extrapolation_bounds.py for the spread that implies.')
+        if self.extrapolate == 'linear':
+            return np.clip(P, 0.0, None)
+        return np.clip(P, 0.0, ANCHOR_MAX_P)
+
     def dZPL(self, P):
         """ZPL blue shift at pressure P for this anvil geometry (C-2, C-4)."""
         return self._afac * self.Emax * (1.0 - np.exp(-np.asarray(P, float) / self.P0))
     def ZPL(self, P):    return 1.945 + self.dZPL(P)
-    def Sabs(self, P):   return 3.08 + self.S_slope * np.clip(P, 0, 120) / 120.0
-    def Sem(self, P):    return 3.39 + (5.25 - 3.39) * np.clip(P, 0, 120) / 120.0
-    def IP_A2(self, P):  return 2.68 + (3.06 - 2.68) * np.clip(P, 0, 120) / 120.0
-    def IP_E(self, P):   return 1.16 + (1.63 - 1.16) * np.clip(P, 0, 120) / 120.0
+    def Sabs(self, P):   return 3.08 + self.S_slope * self._anchor_P(P) / 120.0
+    def Sem(self, P):    return 3.39 + (5.25 - 3.39) * self._anchor_P(P) / 120.0
+    def IP_A2(self, P):  return 2.68 + (3.06 - 2.68) * self._anchor_P(P) / 120.0
+    def IP_E(self, P):   return 1.16 + (1.63 - 1.16) * self._anchor_P(P) / 120.0
 
     # ---- finite-temperature Franck-Condon envelope (C-1) ----
     def _fc(self, x, S):
@@ -254,7 +320,7 @@ class NVModel:
         S = self.Sabs(P)
         x = np.asarray(E, float) - z                 # detuning above ZPL
         psb = self._fc(x, S)                          # phonon sideband
-        dwf = 0.022 * np.exp(-(np.clip(P, 0, 120) / 120.0) * np.log(0.022 / 0.0036))
+        dwf = 0.022 * np.exp(-(self._anchor_P(P) / 120.0) * np.log(0.022 / 0.0036))
         zpl_line = dwf * np.exp(-x ** 2 / (2 * self.zpl_width ** 2))
         return psb + zpl_line
 
@@ -273,7 +339,7 @@ class NVModel:
         z = self.ZPL(P)
         x = z - np.asarray(E, float)                 # detuning BELOW the ZPL
         psb = self._fc(x, self.Sem(P))
-        dwf = 0.049 * np.exp(-(np.clip(P, 0, 120) / 120.0) * np.log(0.049 / 0.008))
+        dwf = 0.049 * np.exp(-(self._anchor_P(P) / 120.0) * np.log(0.049 / 0.008))
         return psb + dwf * np.exp(-x ** 2 / (2 * self.zpl_width ** 2))
 
     def eta_col(self, P, band=None):
@@ -382,6 +448,17 @@ class NVModel:
         lam = np.arange(lo, hi + step, step)
         e = np.asarray(self.eta_lambda(lam, P)[0])     # vectorised over lam
         i = int(e.argmin())
+        if i in (0, len(lam) - 1):
+            # The optimum is pinned to an end of the search window, so the
+            # returned value is the window edge and not a stationary point.
+            # The shipped window [402, 640] nm was chosen for the 0-120 GPa
+            # anchors; under extrapolate='linear' the optimum leaves it.
+            warnings.warn(
+                f'lambda_opt({P:g} GPa) = {lam[i]:g} nm is pinned to the '
+                f'{"lower" if i == 0 else "upper"} edge of the search window '
+                f'[{lo:g}, {hi:g}] nm, so it is a boundary value, not an '
+                'optimum. Widen the window.',
+                RuntimeWarning, stacklevel=2)
         if 0 < i < len(lam) - 1:                    # parabolic refinement
             y0, y1, y2 = e[i - 1], e[i], e[i + 1]
             d = y0 - 2 * y1 + y2

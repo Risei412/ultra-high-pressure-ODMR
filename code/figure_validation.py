@@ -23,12 +23,12 @@ the absorption Debye-Waller factor DWF_abs, both as theory curves with markers,
 both calibrated from their own axis ticks and neither clipped.  Those are in
 `data/ho_fig1_panels_bc.csv`.
 
-What the published panels give us:
+The current vector-path extraction of panels (b,c) gives:
 
-* S_abs rises 3.023 -> 4.554 over 0-120 GPa, +51 %, dS/dP = 12.7 milli/GPa,
+* S_abs rises 3.0812 -> 4.6131 over 0-120 GPa, +50 %, dS/dP = 12.7 milli/GPa,
   monotone.  **Theorem X's first driver is confirmed directly.**
-* DWF_abs falls 0.0205 -> 0.00226, a factor **9.09**, monotone.  The ZPL weight
-  really does collapse --- more steeply than the clipped spikes suggested.
+* DWF_abs falls 0.02180 -> 0.00363, a factor **6.01**, monotone.
+  These vector values supersede the raster extraction used in the old tests.
 
 But the comparison between a narrow line and a broad band is **bandwidth
 dependent**, which the clipped-peak version silently hid.  The sideband enters
@@ -39,7 +39,7 @@ laser linewidth, or the ZPL's own width, whichever is larger.  Writing
     r(P) = lambda_SB sigma_SB / (lambda_ZPL DWF_abs)      [1/eV]
 
 the branch ratio at excitation bandwidth W is A_SB/A_ZPL = r(P) W, so the
-exchange happens where r(P) = 1/W.  r is monotone increasing (x6.5 over
+exchange happens where r(P) = 1/W.  r is monotone increasing (x4.31 over
 0-120 GPa), so **the crossing is still unique** --- Theorem X survives intact.
 What does not survive is a single number for P*: it moves with W.
 """

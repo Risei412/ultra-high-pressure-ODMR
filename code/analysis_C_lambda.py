@@ -25,7 +25,7 @@ Three questions, answered in order:
 
 Inputs
   3E orbital-strain coupling  850 +/- 130 THz per unit strain
-      (Barfuss et al., Nat. Commun. 8, 14358 (2017); consistent with the
+      (MacQuarrie et al., Nat. Commun. 8, 14358 (2017); consistent with the
       ~THz/GPa scale quoted from Davies & Hamer 1976)
   stress anisotropy alpha     0.95 micropillar, 0.56 flat culet (Hilberer 2023)
   diamond elastic constants   E ~ 1100 GPa, C44 = 578 GPa

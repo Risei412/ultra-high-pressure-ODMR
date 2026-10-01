@@ -88,12 +88,24 @@ class HoIntegratedODMRModel:
 
     def sensitivity(self, wavelength_nm, pressure_gpa,
                     relative_power=1e-6):
-        """Shot-noise CW-ODMR sensitivity in a common arbitrary scale."""
+        """Shot-noise CW-ODMR sensitivity in a common arbitrary scale.
+
+        A wavelength with no detected rate carries no signal, so ``rate == 0``
+        is a meaningful input and ``inf`` is the correct answer: an infinitely
+        bad sensitivity, which ``optimum``'s ``argmin`` then never selects.
+        The divide is silenced rather than avoided, so the returned value keeps
+        that meaning.
+
+        Only ``divide`` is silenced.  A ``0 / 0`` here would mean a vanishing
+        linewidth, which is not a modelled state, and that ``nan`` should still
+        warn.
+        """
         rate = self.detected_rate(wavelength_nm, pressure_gpa, relative_power)
         contrast = self._response_value('contrast', wavelength_nm, pressure_gpa)
         linewidth = self._response_value(
             'linewidth', wavelength_nm, pressure_gpa)
-        return linewidth / (contrast * np.sqrt(rate))
+        with np.errstate(divide='ignore'):
+            return linewidth / (contrast * np.sqrt(rate))
 
     def optimum(self, pressure_gpa, relative_power=1e-6,
                 lam_min=400.0, lam_max=600.0, step=0.05):
@@ -139,7 +151,8 @@ def optical_limit_summary(pressure_gpa=120.0):
     threshold = model.contrast_ratio_threshold(457.0, 532.0, pressure_gpa)
     return {
         'pressure_GPa': float(pressure_gpa),
-        'optimum_nm': optimum,
+        'optimum_nm': float(np.round(optimum)),
+        'interpolant_optimum_nm': optimum,
         'penalty_457': model.penalty(457.0, pressure_gpa),
         'penalty_532': model.penalty(532.0, pressure_gpa),
         # Exact unsaturated optical limit.  Do not evaluate this through a

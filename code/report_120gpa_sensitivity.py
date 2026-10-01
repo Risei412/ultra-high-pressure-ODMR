@@ -6,7 +6,7 @@ import numpy as np
 from ho_odmr_sensitivity import HoIntegratedODMRModel
 
 
-LINES = (405.0, 440.65, 445.0, 457.0, 473.0, 488.0, 505.0, 532.0)
+LINES = (405.0, 441.0, 445.0, 457.0, 473.0, 488.0, 505.0, 532.0)
 
 
 def rows(pressure=120.0):

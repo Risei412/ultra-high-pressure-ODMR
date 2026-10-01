@@ -6,11 +6,11 @@ The main manuscript is:
 
 
 
-main\_pla.tex
+paper/main.tex
 
 
 
-After editing any manuscript-related `.tex` file, run:
+After editing any manuscript-related `.tex` file, run from `paper/`:
 
 
 

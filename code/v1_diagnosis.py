@@ -18,7 +18,7 @@ D1  Effective phonon energy.  In a single-mode Franck--Condon band the
 
     so that hw(P) = (E_sideband(P) - E_ZPL(P)) / p*(S_abs(P)), with
     E_sideband and E_ZPL read off Fig. 1(e) and S_abs off Fig. 1(b).  Ho's
-    spectra imply hw = 101.1 meV, roughly pressure independent.  v1 uses
+    spectra imply hw = 99.3 meV, roughly pressure independent.  v1 uses
     65 meV, the ambient-pressure value of Kehayias et al.  The deficit is
     what puts the 532 nm maximum at 38 GPa instead of 17: the fixed-energy
     absorption peaks when E_ZPL + p* hw sweeps through the laser line, so an
@@ -29,8 +29,12 @@ D1  Effective phonon energy.  In a single-mode Franck--Condon band the
     phonon below S -- S - p* = 0.51, near-constant over 3.0 < S < 4.6 -- and
     at ~100 meV per phonon that half quantum is a 50 meV error in the band
     maximum, which leaves a visible 7 GPa residual in the peak pressure.
-    Using p* = S gives hw = 87.9 meV and a model that still fails both
-    gates; using the correct p* gives 101.1 meV and one that passes.
+    Using p* = S gives hw = 86.5 meV and a model that still fails both
+    gates; using the correct p* gives 99.3 meV and one that passes.
+
+    These values use the published Fig. 1(b),(c) vector-path extraction in
+    ho_fig1_panels_bc.csv, superseding the original raster-derived
+    101.1 meV and 87.9 meV estimates and their 1.0% pooled-RMS snapshot.
 
 D2  ZPL shift at 120 GPa.  The reconstructed kernel puts the zero-phonon line
     at 1.946 eV at ambient and 2.410 eV at 120 GPa, a shift of 0.464 eV.  v1
@@ -38,22 +42,22 @@ D2  ZPL shift at 120 GPa.  The reconstructed kernel puts the zero-phonon line
     (">400 meV"), not as the value.
 
 D3  Applying both -- and nothing else, with no parameter fitted to Fig. 5(b)
-    -- moves v1 from pooled 39.5% to 1.0%, from r = -0.51 to r = +1.00 at
-    532 nm, and puts both peak pressures on Ho's (17/17 and 89/88 GPa).  It
-    passes both reproduction gates.  That is the same score the reconstructed
-    kernel achieves.  The failure was two wrong constants, not a wrong model.
+    -- moves v1 from pooled 39.5% to 1.4%, from r = -0.51 to r = +1.00 at
+    532 nm, and puts both peak pressures near Ho's (18/17 and 90/88 GPa).  It
+    passes both reproduction gates.  The original two-wavelength failure can
+    therefore be traced to these input constants.
 
 D4  This does not reinstate v1 as the optical kernel, and the reason is that
     Fig. 5(b) is a two-wavelength slice.  Scanned in WAVELENGTH at 120 GPa the
     corrected model has ONE local maximum where the kernel has FOUR, and the
-    fractional disagreement is 52% even though the correlation is +0.993: the
+    fractional disagreement is 53% even though the correlation is +0.992: the
     gross envelope is right and the structure is absent.  Every Addendum A2
     result -- the level sets, the ladder N = 2->4->6->4->3->5->3, the
     transition powers -- lives on those four maxima, and a single-mode
     Pekarian cannot produce them at any parameter value.
 
     One thing does survive the model change: the optical-limit optimum comes
-    out at 439.10 nm against the kernel's 440.60 nm, a 1.5 nm difference,
+    out at 440.20 nm against the kernel's 440.60 nm, a 0.4 nm difference,
     where uncorrected v1 gave 475.5 nm.  The frozen 440.65 nm is therefore
     robust to the choice of envelope once the constants are right.
 

@@ -26,7 +26,7 @@ jobs:
         run: python .github/scripts/report_env.py
 
       - name: Frozen-value regression tests
-        run: python -m pytest code/tests/test_freeze.py -q
+        run: python -m pytest code/tests/test_freeze.py code/tests/test_freeze_a4_handoff.py -q
 
   full-suite:
     name: full suite

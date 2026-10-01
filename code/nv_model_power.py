@@ -1,7 +1,8 @@
 """
 nv_model_power.py
 ------------------
-Intensity-explicit extension of nv_model.NVModel (Part B of PLAN.md).
+Intensity-explicit extension of nv_model.NVModel
+(Part B of docs/experiment/PLAN.md).
 
 The baseline NVModel (nv_model.py) fixes the excitation intensity at I=1 for
 every beam; all ionisation/recombination rates are then LINEAR in I, so the
@@ -28,7 +29,7 @@ blue wavelength can be studied as a genuine function of laser power:
 
 All new knobs (Gamma_d, Gamma_d0, a_es2, Gamma_c, Gamma_satC, u-scale of rbg)
 are PHENOMENOLOGICAL, exactly like the original a_gs/a_es/r0/rbg/w0, and are
-flagged as calibration targets in PLAN.md Part C. In the u -> u0 (moderate,
+flagged as calibration targets in docs/experiment/PLAN.md Part C. In the u -> u0 (moderate,
 order-1) regime the model is built to reproduce the fixed-power NVModel
 result (see `check_consistency()` at the bottom).
 """
@@ -145,7 +146,7 @@ def default_randomiser_power(rng):
 
 def check_consistency():
     """Sanity check: at a moderate reference power the power-explicit model
-    should reproduce a 475 nm-ish optimum at 120 GPa, and G_ion_ES should show
+    should reproduce the legacy model's low-power optimum, and G_ion_ES should show
     the expected u^2 (low power) -> u (saturated) crossover."""
     m = NVModelPower()
     lam = np.linspace(402, 560, 400)

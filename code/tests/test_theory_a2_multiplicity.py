@@ -13,7 +13,7 @@ import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from theory_a1_generalization import DATA_WINDOW, Kernel  # noqa: E402
+from theory_a1_generalization import DATA_WINDOW  # noqa: E402
 from theory_a2_multiplicity import (  # noqa: E402
     GaugeResponse, a1_mechanism_table, critical_values, gauge_degeneracy,
     gauge_family, identifiability, ladder_is_gauge_invariant, match_transitions,
@@ -21,12 +21,12 @@ from theory_a2_multiplicity import (  # noqa: E402
 )
 
 
-@pytest.fixture(scope='module')
-def kernel():
-    return Kernel()
+# The `kernel` fixture is session scoped in tests/conftest.py so that this
+# file and test_theory_figures.py share one instance; see the note there.
+# Do not redefine it here.
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='session')
 def matched(kernel):
     return match_transitions(kernel)
 
@@ -149,6 +149,16 @@ def test_ladder_is_invariant_across_the_gauge_plane(kernel):
     assert len(rows) == len(gauge_family())
     assert all(row['identical_to_reference'] for row in rows)
     assert rows[0]['counts'] == [2, 4, 4, 3, 5, 3]
+
+    # The check is only informative if the models are probed at genuinely
+    # different absolute intensities.  Each carries its own half-scale, so
+    # I_c spans a factor 16 across the family and no two members share a
+    # probe intensity.
+    scales = [row['i_c'] for row in rows]
+    assert len(set(scales)) == len(rows)
+    assert max(scales) / min(scales) == pytest.approx(16.0)
+    for earlier, later in zip(rows, rows[1:]):
+        assert set(earlier['intensities']).isdisjoint(later['intensities'])
 
 
 def test_exponent_below_one_never_splits():

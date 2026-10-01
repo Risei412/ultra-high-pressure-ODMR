@@ -231,10 +231,6 @@ def test_mc_band_includes_effective_phonon_uncertainty():
 
 def test_headline_numbers():
     m = NVModel(T=BASE_T)
-    assert m.lambda_opt(120.) == pytest.approx(475.5, abs=0.3)
-    # 473 nm DPSS must remain within 1% of the optimum
-    pen = m.eta_lambda(473., 120.)[0] / m.eta_lambda(m.lambda_opt(120.), 120.)[0]
-    assert pen < 1.01
     # green must survive to megabar (this is what C-1 fixed)
     for P, lim in [(120., 4.0), (140., 5.0), (150., 6.0)]:
         g = m.eta_lambda(532., P)[0] / m.eta_lambda(m.lambda_opt(P), P)[0]

@@ -1,140 +1,158 @@
-# NV high-pressure ODMR — lock-in sensitivity model
+# Numerical code
 
-Numerical code behind the excitation-wavelength / sensitivity analyses
-(green vs blue vs mix; blue-wavelength optimisation at 100 and 120 GPa).
+Numerical models, reconstructed spectral data, tests, and figure generators
+for the high-pressure NV ODMR manuscript.
 
-Physics anchored to: K. O. Ho, C. Dailledouze, V. Žalandauskas, *et al.*,
-"Optical Stability and Photophysics of NV Centers in Diamond up to 120 GPa",
-arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
-**phenomenological** and are the quantities to be calibrated from the
-`(I_405, I_457)` intensity sweep.
+The optical inputs are anchored to K. O. Ho et al., "Optical Stability and
+Photophysics of NV Centers in Diamond up to 120 GPa," arXiv:2606.02399 (2026).
+Phenomenological rate constants remain calibration targets rather than measured
+high-pressure inputs.
 
-## Directory layout
+## Main manuscript: optimum depends on stress geometry
 
-- Shared analysis modules: `code/*.py`
-- Figure generation scripts: `code/figures/`
-- Generated analysis figures: `code/outputs/figures/`
-- Weekly report figures: `WRN/image/`
-- Input data: `code/data/`
-- Regression tests: `code/tests/`
-- Historical calculation bundles: `archive/calculation_bundles/`
+`../paper/main.tex` uses the design manuscript from main and foregrounds the
+conditional stress-dependent optimum. The G/M/X theory manuscript is preserved
+in `../archive/manuscripts/main_theory_GMX_20260906.tex`.
 
-Run figure scripts from the repository root with `python code/figures/<script>.py`,
-or from `code/` with `python figures/<script>.py`. Analysis figures are always
-written to `code/outputs/figures/`, regardless of the working directory.
+`alpha = sigma_xx/sigma_zz = sigma_yy/sigma_zz`. At fixed `sigma_zz = 120 GPa`,
+changing alpha changes both mean and deviatoric stress. The Ho hydrostatic
+optimum is approximately 441 nm at alpha = 1. The differential phenomenological
+correction in `calc_alpha_corrected_optimum.py` gives 475.2–488.1 nm at alpha =
+0.60 and 444.7–446.1 nm at alpha = 0.95. These ranges describe the two stress
+normalisations; they are not statistical confidence intervals or measurements
+of an anisotropic absorption spectrum.
 
-## Files
-- `nv_model.py` — shared model: absorption cross section (low-T Franck–Condon /
-  Pekarian envelope), steady-state NV⁻ fraction `f_minus`, and lock-in
-  sensitivity `eta ∝ Δν/(C√R)`; also Monte-Carlo band helper.
-- `figures/fig1_green_blue_mix.py` — sensitivity of green(532)/blue(457)/mix vs pressure
-  → `outputs/figures/sensitivity_green_blue_mix.png`.
-- `figures/fig2_blue_wavelength_sweep.py` — blue-wavelength sweep at a chosen pressure
-  (optimum, mechanism, optimum-vs-pressure)
-  → `outputs/figures/blue_wavelength_sensitivity_<P>GPa.png`.
-- `ho_spectrum_model.py`, `ho_odmr_sensitivity.py`,
-  `report_120gpa_sensitivity.py` — the v3 external-kernel chain
-  (`σ_abs^Ho → R_det → η`) behind `theory_freeze_v3_ho_integrated.md`.
-- `theory_a1_generalization.py` — numerical execution of Addendum A1
-  (the coincidence/divergence propositions P1–P7 and tests T1–T4) against the
-  frozen Ho kernel.  Findings written up in
-  `docs/theory_a1_numerical_execution.md`.
-- `figures/fig5_a1_generalization.py` — figures for the above
-  → `outputs/figures/a1_generalization_120GPa.png`.
-- `theory_a2_multiplicity.py` — Addendum A2, the kernel-independent structural
-  layer: the multiplicity-ladder theorem (the optimal set is a level set of `A`,
-  whose size steps at the critical values of `A`, at power ratios needing no
-  absolute calibration) and the gauge-degeneracy theorem (η sees the response
-  only through `E = 2c + s + 2w`).  Write-up in `docs/theory_a2_multiplicity.md`.
-- `figures/fig6_a2_multiplicity.py` — figures for A2 → `outputs/figures/a2_multiplicity_120GPa.png`.
-- `theory_a3_branch_exchange.py` — Addendum A3, pressure-driven branch exchange:
-  the ZPL and phonon-sideband branches scale differently with the Huang-Rhys
-  factor, so pressure exchanges which one carries the global optimum.  Branches
-  are identified in the **raw extracted samples**, not in the pressure
-  interpolation.  Write-up in `docs/theory_a3_branch_exchange.md`.
-- `figures/fig7_a3_branch_exchange.py` — figures for A3 → `outputs/figures/a3_branch_exchange.png`.
-- `figure_validation.py` — pixel-level check of the extracted kernel against the
-  source figure.  The sideband branch reproduces it to better than 1 %; the
-  zero-phonon-line peaks turn out to be **clipped by the axis**, so A3's
-  ×6.04 collapse and P* = 87.9 GPa are withdrawn (erratum E3).  Supplies the
-  corrected, bandwidth-dependent treatment using the published Debye–Waller
-  factor from `data/ho_fig1_panels_bc.csv`.
-- `dreau_exponent.py` — reads A2's splitting exponent off the published CW-ODMR
-  model of Dréau et al., PRB 84, 195204 (2011): `E = 3`, pump nonlinearity
-  `n = 2`, so `E n = 6 > 1` and `rho* = 1/5`, independent of the microwave
-  setting.  A2's splitting antecedent is therefore measured, not assumed.
-  Audit in `docs/novelty_and_exponent_audit.md`.
-
-Note that the v1 Franck–Condon envelope (`nv_model.py`) and the v3 Ho kernel
-(`ho_spectrum_model.py`) do **not** agree on the optimum: 475.51 nm against
-440.64 nm at 120 GPa.  `theory_a1_generalization.py` section S8 quantifies the
-gap; do not mix numbers from the two chains without saying which one produced
-them.
-
-## Requirements
-Python ≥ 3.9 with `numpy`, `scipy`, `matplotlib` (see `requirements.txt`).
-
-```bash
-pip install -r requirements.txt
+```powershell
+# From the repository root:
+python code/calc_alpha_corrected_optimum.py
+python code/fig_alpha_optimum_tolerance.py
 ```
 
-## Reproduce the figures
-```bash
-python figures/fig1_green_blue_mix.py                     # green/blue/mix vs pressure
-python figures/fig2_blue_wavelength_sweep.py              # blue sweep @120 GPa (compare 100,140)
-python figures/fig2_blue_wavelength_sweep.py 100 75 125   # blue sweep @100 GPa (compare 75,125)
+The conditional optimum/tolerance figure is written to
+`../docs/experiment/figures/alpha_optimum_tolerance_120gpa.pdf` and its PNG
+preview. Its tolerance bands additionally assume a rigid wavelength shift of
+the hydrostatic sensitivity curve. Do not apply the 120-GPa additive anchor at
+other pressures. See `../docs/theory/erratum_E5_ho_kernel_geometry.md`.
+
+## Contents
+
+- `ho_spectrum_model.py` — reconstructed published absorption kernel.
+- `ho_odmr_sensitivity.py` — optical-limit ODMR sensitivity model.
+- `nv_model.py`, `nv_model_power.py` — legacy phenomenological and
+  intensity-explicit models.
+- `extrapolation_bounds.py` — what the published record leaves undetermined
+  above 120 GPa.
+- `theory_a1_generalization.py` — coincidence and divergence analysis.
+- `theory_a2_multiplicity.py` — level-set multiplicity and gauge degeneracy.
+- `theory_a3_branch_exchange.py` — pressure-driven branch exchange.
+- `data/` — digitized or reconstructed numerical inputs.
+- `tests/` — regression and figure tests.
+- `figures/` — legacy and weekly-report figure entry points.
+- `outputs/figures/` — generated analysis previews (some are tracked).
+
+## [111]-aligned anisotropic-stress calculation
+
+The literature-anchored extension is intentionally split into four parts:
+
+- `nv_model_111.py`: stress tensor, low-power optical model, and normalized
+  finite-power optimum sets.
+- `report_111_anisotropic.py`: command-line report for `sigma_zz > sigma_xx =
+  sigma_yy` with the DAC axis parallel to [111].
+- `fig_alpha_invariance.py`: experimental-handoff plot showing that the stress
+  tensor changes with `alpha` while the current hydrostatic optical baseline
+  remains approximately 441 nm.
+- `tests/test_nv_model_111.py`: tensor, approximately 441-nm hydrostatic
+  baseline, and power-split
+  regression tests.
+- `../docs/theory/nv111_literature_reconstruction.md`: literature provenance
+  and the boundary between reproduced and conditional claims.
+
+Run the standard 120-GPa report from `code/`:
+
+```powershell
+python report_111_anisotropic.py --pressure 120 --alpha 0.56
 ```
 
-## Key numbers
+`alpha = sigma_xx/sigma_zz = sigma_yy/sigma_zz`; the finite-power axis is
+reported as `I/Ic` because the absolute `Ic` requires calibration in the actual
+[111] DAC.
 
-**Two chains, two answers.**  Every number below is labelled with the chain that
-produced it.  Do not quote a v1 number as a v3 result -- they differ by 34.87 nm
-at 120 GPa, more than twice the half-width of the 5 % tolerance band.
+Shared analysis modules remain in `code/` because they import one another as
+flat modules. Figure entry points moved by main live in `figures/` and load
+those shared modules independently of the working directory.
 
-### v1 chain — phenomenological Franck–Condon envelope (`nv_model.py`)
+## Above 120 GPa
 
-Internally consistent, and pinned by `tests/test_freeze.py`, but **superseded as
-a statement about the physics**: this envelope is unimodal at every pressure, so
-it cannot represent the zero-phonon-line / sideband branch structure.
+Every optical anchor stops at 120 GPa. `ho_spectrum_model.py` refuses outright
+past that edge; `nv_model.py` does not, and used to continue by freezing each
+anchor inline, so a call at 400 GPa returned an asymptote that looked like a
+prediction. That clip is now the default value of an explicit policy (C-8):
 
-| Quantity | Value |
-|---|---|
-| green/blue crossover (457 nm fixed) | ~86 GPa |
-| optimal blue λ @100 GPa | 487 nm (η(457)/opt = 1.35) |
-| optimal blue λ @120 GPa | 475.5 nm (473 nm penalty = 0.2%) |
-| optimal blue λ tracking | ~0.6–0.7 nm/GPa |
-
-The ~86 GPa crossover is **not** the branch exchange of Addendum A3, despite
-the numerical proximity to 87.9 GPa.  It is the geometry of one unimodal peak
-sweeping past the midpoint of 457 and 532 nm (494.5 nm); the same test on the
-Ho kernel lands at 51.4 GPa.  See `docs/novelty_and_exponent_audit.md` §4.
-
-### v3 chain — Ho published kernel (`ho_spectrum_model.py`), frozen
-
-| Quantity | Value |
-|---|---|
-| optimal λ @120 GPa | **440.65 nm** |
-| 5 % tolerance band @120 GPa | **[426.43, 457.90] nm** (asymmetric) |
-| penalty at 457 nm | ×1.04494 |
-| penalty at 473 nm | ×1.2054 (**not** 0.2 %) |
-| penalty at 514.5 nm (ZPL) | ×1.2006 |
-| penalty at 532 nm | ×12.53 — but see erratum E1, it is an interpolation artefact |
-
-### Anchors taken from published measurements
-
-| Quantity | Value | Source |
-|---|---|---|
-| splitting exponent | E = 3, n = 2, ρ\* = 1/5 | Dréau et al., PRB 84, 195204 |
-| S_abs vs pressure | 3.023 → 4.554 (+51 %, monotone) | source Fig. 1(b) |
-| DWF_abs vs pressure | 0.0205 → 0.00226 (×9.07, monotone) | source Fig. 1(c) |
-
-## Model summary (v1 chain)
+```python
+NVModel(extrapolate='clip')    # default; freezes the anchors, as before
+NVModel(extrapolate='linear')  # continues the fitted laws -- an extrapolation
+NVModel(extrapolate='error')   # refuses, as ho_spectrum_model.py does
 ```
-eta ∝ Δν / (C √R)                      # lower = better
-  C = C0 · f₋/(f₋ + w0(1−f₋))          # contrast, diluted by NV0 background
-  R = f₋ · (I/Eγ) · σ_abs               # detected rate at fixed optical power
-  f₋ = G_rec/(G_rec+G_ion)             # steady-state NV⁻ fraction
-    G_ion = a_gs·ReLU(Eγ − IP(³A₂)) + a_es·σ_abs
-    G_rec = r0·σ_abs + rbg
-σ_abs : low-T Franck–Condon envelope with ZPL(P), S_abs(P) from the reference
+
+Every frozen number is unchanged, because `'clip'` is what the model already
+did. `NVModel.lambda_opt` now also warns when the optimum is pinned to an edge
+of its search window instead of returning the edge silently.
+
+`extrapolation_bounds.py` quantifies what the choice costs:
+
+```powershell
+python extrapolation_bounds.py
 ```
+
+The optimum is undetermined by 21 nm at 120 GPa, 58 nm at 200 GPa and 134 nm at
+400 GPa, and the spread at 120 GPa is not zero because the effective phonon
+energy carries no pressure dependence at all. One statement survives: the
+one-photon ionisation threshold is a one-sided bound,
+`lambda_opt >= hc/IP(3A2)`, insensitive to the uncalibrated `a_gs` over three
+decades — but only where the ZPL and `IP(3A2)` are continued under the same
+law. Do not quote a single optimal wavelength above 120 GPa.
+
+## Environment and tests
+
+Run from this directory:
+
+```powershell
+python -m pip install -r requirements.txt
+python -m pytest . -q
+```
+
+## Archived theory manuscript figures
+
+```powershell
+python fig_m_level_set_ladder.py
+python fig_g_gauge_degeneracy.py
+python fig_x_branch_exchange.py
+python esa_figv_kernel_sanity.py
+```
+
+The four scripts produce five figures: `esa_figv_kernel_sanity.py` draws the
+cross-figure check and the internal checks K1–K4 as two separate files.
+
+Vector PDFs are written to `../paper/figures/`; PNG previews are written to
+`outputs/figures/`.
+
+All five are full-width `figure*` floats, included at `\textwidth` ≈ 7.06 in,
+so each is drawn at that width and nothing is rescaled on the page. The shared
+style lives in `fig_style.py` — 8.5 pt axis labels, 8 pt ticks, 7 pt legends
+and in-axes text. **Set font sizes there, not in a figure script**: a figure
+drawn at some other canvas width is rescaled by the ratio, lettering included,
+which is how the kernel figure once reached the page at 4.6 pt.
+
+Numbers belong in the captions. Each script prints the numbers its caption
+quotes; none is rendered into the raster.
+
+## Legacy exploratory figures
+
+```powershell
+python figures/fig1_green_blue_mix.py
+python figures/fig2_blue_wavelength_sweep.py
+python figures/fig3_power_sweep.py
+```
+
+These scripts write PNG files to `outputs/figures/`. Their v1 numerical claims
+are historical and should not replace the frozen Ho-integrated results.

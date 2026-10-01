@@ -16,6 +16,17 @@ one to read for code and results.**
 
 Code-level notes are in [`code/README.md`](code/README.md).
 
+## Stress-dependent blue-laser selection
+
+The main design manuscript (`paper/main.tex`) treats the stress ratio
+`alpha = sigma_xx/sigma_zz = sigma_yy/sigma_zz` as part of laser selection.
+At fixed axial stress of 120 GPa, the conditional corrected optimum spans
+475.2–488.1 nm at alpha = 0.60 and 444.7–446.1 nm at alpha = 0.95; the
+hydrostatic reference is approximately 441 nm at alpha = 1. The ranges reflect
+two unresolved stress normalisations, rather than measurement confidence
+intervals. The calculation and assumptions are in
+[`code/README.md`](code/README.md#main-manuscript-optimum-depends-on-stress-geometry).
+
 ## What is pinned here
 
 The numerical model is frozen and checked against published work rather than against itself:

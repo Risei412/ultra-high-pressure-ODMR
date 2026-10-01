@@ -1,4 +1,10 @@
-"""Regression tests for the v1 failure diagnosis."""
+"""Regression tests for the v1 failure diagnosis.
+
+Snapshots use the published Fig. 1(b),(c) vector-path extraction in
+ho_fig1_panels_bc.csv.  It supersedes the original raster-derived
+101.1 meV phonon-energy and 1.0% pooled-RMS snapshots; tolerances and
+the independent reproduction gates are unchanged.
+"""
 import os
 import sys
 
@@ -23,7 +29,7 @@ def test_phonon_energy_is_derived_not_fitted():
     """hw comes from Fig. 1(b),(e) alone -- no Fig. 5(b) quantity enters."""
     pressure, curve, mean = phonon_energy()
     assert np.array_equal(pressure, np.arange(0.0, 121.0, 20.0))
-    assert mean == pytest.approx(0.1011, abs=5e-4)
+    assert mean == pytest.approx(0.0993402567477506, abs=5e-4)
 
 
 def test_phonon_energy_is_roughly_pressure_independent():
@@ -35,7 +41,7 @@ def test_phonon_energy_is_roughly_pressure_independent():
 
 def test_v1_undersizes_the_phonon_energy():
     _, _, mean = phonon_energy()
-    assert mean / V1_HW_EV == pytest.approx(1.56, abs=0.02)
+    assert mean / V1_HW_EV == pytest.approx(1.528311642273086, abs=0.02)
 
 
 def test_pekarian_maximum_sits_half_a_phonon_below_S():
@@ -47,7 +53,7 @@ def test_pekarian_maximum_sits_half_a_phonon_below_S():
 def test_the_continuum_shortcut_costs_the_gates(summary):
     shortcut = summary['results']['continuum shortcut p*=S']
     assert shortcut['pooled_fractional_rms'] > 0.10
-    assert summary['hw_continuum'] == pytest.approx(0.0879, abs=5e-4)
+    assert summary['hw_continuum'] == pytest.approx(0.08651650512177861, abs=5e-4)
 
 
 def test_kernel_zpl_shift_exceeds_the_v1_anchor():
@@ -70,9 +76,10 @@ def test_both_corrections_remove_the_anticorrelation(summary):
 
 
 def test_corrected_model_matches_the_reconstruction(summary):
-    """1.0% pooled is what the reconstructed kernel scores on this test."""
+    """The panel-derived correction scores 1.36% pooled on this test."""
     corrected = summary['results']['both, from Ho panels']
-    assert corrected['pooled_fractional_rms'] == pytest.approx(0.010, abs=2e-3)
+    assert corrected['pooled_fractional_rms'] == pytest.approx(
+        0.013609924241594245, abs=2e-3)
 
 
 def test_the_phonon_energy_carries_the_correction(summary):

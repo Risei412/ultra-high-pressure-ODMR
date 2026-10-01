@@ -16,7 +16,7 @@
 %  STATUS
 %    I    Introduction ............... FROZEN.  Do not restructure without
 %                                     re-deciding the argument chain in
-%                                     docs/introduction_rationale.md
+%                                     docs/manuscript/introduction_rationale.md
 %    II   Model ...................... complete
 %    III  Numerical methods .......... complete
 %    IV   Optimum at low intensity ... complete
@@ -24,7 +24,7 @@
 %    VI   Literature validation ...... complete; 22 published observations,
 %                                     21 reproduced, 1 recorded as open
 %    VII  Experimental programme ..... complete as a staged plan, following
-%                                     docs/next_step_power_dependence_experiment.md
+%                                     docs/experiment/next_step_power_dependence_experiment.md
 %    VIII Discussion ................. complete
 %    IX   Summary .................... complete
 %    App. A  Reproduction ............ complete
@@ -56,8 +56,8 @@
 
 \begin{document}
 
-\title{Optimal blue excitation wavelength for nitrogen-vacancy optically
-detected magnetic resonance at 120~GPa}
+\title{Stress dependence of optimal blue excitation for nitrogen-vacancy
+optically detected magnetic resonance at 120~GPa}
 
 \author{R.~Abe}
 \affiliation{Institute of Science Tokyo, Tokyo, Japan}
@@ -75,7 +75,8 @@ model the lock-in ODMR sensitivity $\eta \propto \Delta\nu/(C\sqrt{R})$ with all
 optical inputs anchored to the measured and calculated photophysics of the NV
 center up to \SI{120}{\giga\pascal}, and with the Franck-Condon envelope
 evaluated at the temperature of the experiment. At \SI{120}{\giga\pascal} the
-optimum lies at $\lopt = \SI{475.5}{\nano\meter}$, while the ground-state
+legacy single-mode baseline at stress anisotropy $\alpha=0.95$ gives
+$\lopt = \SI{475.5}{\nano\meter}$, while the ground-state
 photoionization threshold imposes a hard blue boundary at
 \SI{405}{\nano\meter}. Both conventional lines fall outside the $5\%$ tolerance
 window \SIrange{462}{486}{\nano\meter}: \SI{532}{\nano\meter} by a factor
@@ -88,7 +89,18 @@ cancel from the \NVm{} fraction---so the optimum coincides with the maximum of
 the photon-absorption rate $\lambda\sabs$ and is insensitive to every
 phenomenological charge-transfer constant in the model. The commercial
 \SI{473}{\nano\meter} line lies \SI{2.5}{\nano\meter} away at a cost of $0.2\%$
-and is the practical recommendation. Two bounds are part of the result. Below
+and is the practical recommendation within that baseline. A separate,
+hydrostatically anchored calculation uses the published Ho absorption kernel,
+whose optimum is approximately \SI{441}{\nano\meter}, and adds only the
+phenomenological change with stress anisotropy. At fixed axial stress
+\SI{120}{\giga\pascal}, its conditional optimum spans
+\SIrange{478.9}{493.4}{\nano\meter} at $\alpha=0.56$ and
+\SIrange{444.7}{446.1}{\nano\meter} at $\alpha=0.95$, returning to
+\SI{440.65}{\nano\meter} at $\alpha=1$. These intervals describe two stress
+normalizations, not confidence intervals; the anisotropic predictions remain
+unvalidated. The wavelength recommendation therefore requires a specified
+stress state and absorption model. Two further bounds apply to the legacy
+baseline. Below
 \SI{73}{\giga\pascal} the same model returns green as the better choice,
 reproducing a published null comparison at \SI{50}{\giga\pascal}; the resulting
 sign change is the prediction a single-pressure measurement cannot fake, and is
@@ -100,8 +112,8 @@ the gain being claimed. Because the emission band shifts with the zero-phonon
 line as well, an inherited passband collects only $26\%$ of the \NVm{} light at
 \SI{120}{\giga\pascal}; blue excitation is what makes it possible to move the
 detection cut-on with it, and the two gains compound to a factor $\simeq 4$.
-The model reproduces, without further adjustment, twenty-two published
-high-pressure observations spanning \SIrange{0}{150}{\giga\pascal} and four
+The validation checks twenty-two published high-pressure observations,
+reproduces twenty-one, and records one as unreproduced, spanning \SIrange{0}{150}{\giga\pascal} and four
 excitation wavelengths.
 \end{abstract}
 
@@ -110,7 +122,7 @@ excitation wavelengths.
 % =====================================================================
 \section{Introduction}
 % ---------------------------------------------------------------------
-% FROZEN. Argument chain (see docs/introduction_rationale.md):
+% FROZEN. Argument chain (see docs/manuscript/introduction_rationale.md):
 %   (i)   hydride superconductivity needs LOCAL magnetic evidence
 %   (ii)  NV-in-anvil is the only probe that delivers it
 %   (iii) the relevant pressures cluster around 100-140 GPa
@@ -224,7 +236,12 @@ and the electron-phonon parameters are taken from the \SI{120}{\giga\pascal}
 photophysics of Ref.~\cite{Ho2026}, and only the charge-transfer rate constants
 and the \NVz{} background weight remain phenomenological. Minimizing $\eta$ over
 the blue excitation window at \SI{120}{\giga\pascal} yields an optimum at
-$\lopt = \SI{475.5}{\nano\meter}$. The balance turns out to be resolved in a
+$\lopt = \SI{475.5}{\nano\meter}$ in the legacy single-mode baseline with
+$\alpha=0.95$. This is conditional on its envelope, rather than a universal
+blue-laser recommendation. Section~\ref{sec:results:alpha} separately anchors
+the hydrostatic limit to the published Ho kernel and shows how a differential
+phenomenological stress correction changes that limit with $\alpha$.
+The balance in the legacy baseline turns out to be resolved in a
 specific and testable way: within the blue window the two intensity-linear charge
 channels---excited-state ionization and recombination---both scale with $\sabs$
 and cancel from $\fm$ to better than $0.2\%$, so at fixed optical power the
@@ -670,10 +687,95 @@ are listed in Appendix~\ref{app:repro}.
   \label{fig:sweep}
 \end{figure}
 
-\subsection{Result and mechanism}
+\subsection{Stress anisotropy changes the conditional optimum}
+\label{sec:results:alpha}
+
+We use compressive stress magnitudes and the axisymmetric convention
+\begin{equation}
+  \alpha=\frac{\sigma_{xx}}{\sigma_{zz}}
+         =\frac{\sigma_{yy}}{\sigma_{zz}},\qquad
+  \overline{\sigma}=\frac{1+2\alpha}{3}\sigma_{zz},\qquad
+  q=(1-\alpha)\sigma_{zz}.
+  \label{eq:alpha:stress}
+\end{equation}
+Thus changing $\alpha$ at fixed $\sigma_{zz}=\SI{120}{\giga\pascal}$ changes
+both mean compression and deviatoric stress. Hydrostatic compression has
+$\alpha=1$. The micropillar value $\alpha\simeq0.95$ measured by
+Ref.~\cite{Hilberer2023} characterizes that validation geometry; it is not the
+stress assigned to the hydrostatic absorption calculation of
+Ref.~\cite{Ho2026}.
+
+The reconstructed hydrostatic Ho kernel supplies the interpolant optimum
+$\lambda_{\mathrm{Ho}}=\SI{440.65}{\nano\meter}$ (reported as approximately
+\SI{441}{\nano\meter}). To explore anisotropy without replacing that anchor
+by the single-mode envelope, we retain only the latter model's differential
+shift, at the same axial stress and $T=\SI{300}{\kelvin}$:
+\begin{equation}
+  \lambda_{\mathrm{corr}}(\alpha;k)=\lambda_{\mathrm{Ho}}
+  +\lambda_{\mathrm{FC}}(\alpha;k)-\lambda_{\mathrm{FC}}(1;k).
+  \label{eq:alpha:correction}
+\end{equation}
+Here $\lambda_{\mathrm{FC}}$ is the phenomenological Franck--Condon model
+optimum, and its stress shift uses a factor
+$(1+2\alpha)/3+k(1-\alpha)$. Equation~\eqref{eq:alpha:correction} is anchored
+to the Ho value at $\alpha=1$ for either normalization. It is a conditional
+hypothesis, not an anisotropic absorption spectrum measured or calculated by
+Ho et al.
+
+The two ZPL slopes reported by Ref.~\cite{Hilberer2023}, $-434$ and
+$-769\,\mathrm{meV}/(\mathrm{cm^3\,mol^{-1}})$, constrain the sign of the
+deviatoric correction but leave its normalization unresolved. Equal compressed
+volume (equal mean compression) gives $k=-0.734$; equal axial stress gives
+$k=-0.39211$. Table~\ref{tab:alpha:corrected} carries both readings. The range
+is an interval over model normalizations, not a statistical confidence interval.
+
+\begin{table}[t]
+  \caption{Conditional optimum at fixed
+  $\sigma_{zz}=\SI{120}{\giga\pascal}$ and $T=\SI{300}{\kelvin}$, from
+  Eq.~\eqref{eq:alpha:correction}. The endpoints span the equal-axial-stress
+  and equal-compression normalizations. The anisotropic predictions are
+  unvalidated; the hydrostatic anchor is common to both.}
+  \label{tab:alpha:corrected}
+  \begin{ruledtabular}
+  \begin{tabular}{cc}
+    $\alpha$ & $\lambda_{\mathrm{corr}}$ (nm) \\ \colrule
+    0.56 & 478.9--493.4 \\
+    0.60 & 475.2--488.1 \\
+    0.70 & 466.1--475.4 \\
+    0.95 & 444.7--446.1 \\
+    1.00 & 440.7 \\
+  \end{tabular}
+  \end{ruledtabular}
+\end{table}
+
+\begin{figure*}[t]
+  \includegraphics[width=\textwidth]{../docs/experiment/figures/alpha_optimum_tolerance_120gpa.pdf}
+  \caption{Dependence on $\alpha$ at fixed axial stress
+  \SI{120}{\giga\pascal}: the differential phenomenological correction is
+  anchored to the hydrostatic Ho optimum of \SI{440.65}{\nano\meter}.
+  The two normalizations are $k=-0.734$ and $k=-0.39211$; their spread is not
+  a confidence interval. The $5\%$ tolerance bands use a rigid shift of the
+  hydrostatic sensitivity shape. The stress coefficient is unknown, and
+  these anisotropic predictions and shape shifts are unvalidated.}
+  \label{fig:alpha:corrected}
+\end{figure*}
+
+Lowering $\alpha$ shifts this conditional blue optimum toward longer
+wavelengths. In particular, a \SI{473}{\nano\meter} source cannot be selected
+for every geometry from the legacy \SI{475.5}{\nano\meter} result. The static
+hydrostatic-kernel alternative, which holds \SI{440.65}{\nano\meter} fixed for
+all $\alpha$, is also untested away from hydrostatic stress. An absorption or
+excitation sweep at known stress anisotropy is required to distinguish these
+hypotheses. The following subsections retain the legacy baseline's numerical
+results for comparison and reproducibility; its tolerance windows, pressure
+crossovers, and intensity shifts do not transfer automatically to the
+hydrostatically anchored correction.
+
+\subsection{Legacy baseline: result and mechanism}
 \label{sec:results:opt}
 
-At \SI{120}{\giga\pascal} the anchored inputs give $E_{\mathrm{ZPL}} =
+In the legacy $\alpha=0.95$ single-mode baseline, at
+\SI{120}{\giga\pascal} the anchored inputs give $E_{\mathrm{ZPL}} =
 \SI{2.345}{\electronvolt}$ (\SI{528.7}{\nano\meter}), $S_{\mathrm{abs}} = 4.61$,
 and $\mathrm{IP}(\gsA) = \SI{3.060}{\electronvolt}$ (\SI{405.2}{\nano\meter}).
 Minimizing Eq.~\eqref{eq:eta} over $\lambda$ yields
@@ -779,7 +881,8 @@ the blue also makes the choice forgiving once there.
 \subsection{Uncertainty of the optimum}
 \label{sec:results:mc}
 
-Propagating the randomizable inputs of Table~\ref{tab:knobs} through $400$ Monte
+For the legacy $\alpha=0.95$ baseline, propagating the randomizable inputs of
+Table~\ref{tab:knobs} through $400$ Monte
 Carlo draws gives
 \begin{equation}
   \lopt = 475.5^{\,+5.5}_{\,-5.4}\ \si{\nano\meter}
@@ -789,7 +892,10 @@ with a standard deviation of about \SI{5.4}{\nano\meter}. The band spans about
 half the $5\%$ tolerance window, so at this level of input uncertainty the
 correct statement is not ``\SI{475.5}{\nano\meter}'' but ``inside the
 \SIrange{462}{486}{\nano\meter} window, with \SI{473}{\nano\meter} a safe
-commercial choice.'' The band includes a $\pm 15\%$ model-form range on the
+commercial choice within this baseline.'' This Monte Carlo band does not
+include the difference between absorption-model anchors or the two stress
+normalizations of Table~\ref{tab:alpha:corrected}.
+The band includes a $\pm 15\%$ model-form range on the
 single effective phonon energy, which prevents the numerical precision of the
 grid search from being mistaken for physical precision. It is also, by
 construction, a propagation of \emph{measurement} uncertainty: parameterizing
@@ -907,18 +1013,20 @@ matters for absolute sensitivity, and it matters for interpreting published
 count rates (Sec.~\ref{sec:discussion:counts}).
 
 % =====================================================================
-\section{Two bounds on the recommendation}
+\section{Pressure and intensity bounds of the legacy baseline}
 \label{sec:bounds}
 
 A wavelength quoted without its domain of validity is not a usable
 recommendation. The answer of Eq.~\eqref{eq:answer} is bounded on two sides, and
-both bounds are part of the result: one in pressure, one in intensity.
+both bounds are part of that baseline result: one in pressure, one in intensity.
+Neither bound is recomputed here for Eq.~\eqref{eq:alpha:correction}.
 
 \subsection{In pressure: a threshold at 73 GPa}
 \label{sec:bounds:pressure}
 
 \begin{table}[t]
-  \caption{The recommendation reverses below \SI{73}{\giga\pascal}. Ratio of
+  \caption{The legacy baseline recommendation reverses below
+  \SI{73}{\giga\pascal}. Ratio of
   the sensitivity of the two lines at the same pressure and the same optical
   power; values below unity mean green is the better choice. The
   \SI{50}{\giga\pascal} row is the pressure at which
@@ -1151,11 +1259,15 @@ discrepancy is discussed in Sec.~\ref{sec:discussion:counts}.
 \section{Experimental programme}
 \label{sec:programme}
 
-The analysis above freezes one claim and leaves two open. The frozen claim is
-the low-intensity optimum: under quasi-hydrostatic stress, at room temperature,
-in the unsaturated regime, and at equal incident optical power, the model
-centre value is \SI{475.5}{\nano\meter} and the commercial
-\SI{473}{\nano\meter} line is within $0.2\%$ of it. What is not fixed is the
+The analysis above specifies two absorption-model hypotheses and leaves their
+anisotropic comparison open. For the legacy low-intensity baseline, under
+quasi-hydrostatic stress, at room temperature,
+in the unsaturated regime, and at equal incident optical power, the
+model centre value is \SI{475.5}{\nano\meter} and the commercial
+\SI{473}{\nano\meter} line is within $0.2\%$ of it. The hydrostatically
+anchored correction instead gives the $\alpha$-dependent candidates of
+Table~\ref{tab:alpha:corrected}. A measured stress state and an excitation
+sweep should therefore precede a final wavelength choice. What is not fixed is the
 \emph{experimental} power that ``unsaturated'' corresponds to, and the
 magnitude of the shift beyond it. The programme below is staged so that each
 stage is useful on its own and determines whether the next is necessary.
@@ -1167,9 +1279,10 @@ The measurements are planned in a DAC with a near-surface, high-density NV layer
 implanted in the culet of the lower anvil. Micropillars machined on a
 (100)-oriented culet~\cite{Hilberer2023} reduce the non-hydrostatic stress on
 the NV layer to $\alpha \simeq 0.95$ and keep all four NV orientations usable,
-which is the condition under which the anchors of Table~\ref{tab:anchors} apply
-directly---and, as Sec.~\ref{sec:discussion:alpha} shows, a precondition rather
-than a refinement. A (111)-oriented anvil~\cite{Bhattacharyya2024} instead
+which provides a near-hydrostatic validation geometry. The hydrostatic
+absorption anchor still requires the conditional correction, or an experimental
+test of it, described in Sec.~\ref{sec:results:alpha}.
+A (111)-oriented anvil~\cite{Bhattacharyya2024} instead
 selects a single NV orientation aligned with the compression axis; it reaches
 higher pressure but the ZPL splitting and the modified intersystem
 crossing~\cite{Huang2025ISC} would require the anchors to be re-derived.
@@ -1184,7 +1297,8 @@ layer must be implanted into a low-nitrogen anvil rather than bulk type Ib
 \subsection{Stage 1: fix the intensity scale}
 \label{sec:programme:stage1}
 
-A single-wavelength power sweep at \SI{473}{\nano\meter} and the target
+A single-wavelength power sweep at the legacy comparison line
+\SI{473}{\nano\meter} and the target
 pressure, recording at each incident power the power density at the sample, the
 PL rate $R(I)$, the ODMR contrast $C(I)$, the linewidth $\Delta\nu(I)$, and an
 indicator of sample temperature. From these, $\eta(I) \propto
@@ -1198,16 +1312,22 @@ converts the condition $u \lesssim 0.1$ of Sec.~\ref{sec:bounds:power} into an
 experimental number. This is the cheapest measurement in the programme and
 everything else depends on it: if $R \propto I$ with $C$ and $\Delta\nu$
 constant across the intended operating range, the low-intensity
-\SI{473}{\nano\meter} recommendation applies as written; if saturation, contrast
-loss, or broadening is reached within that range, Stage~2 becomes mandatory.
+comparison at \SI{473}{\nano\meter} can be made in the unsaturated regime;
+the wavelength choice still requires Stage~2 to distinguish the absorption
+anchors and their stress dependence. Saturation, contrast loss, or broadening
+within that range additionally requires a finite-power comparison.
 
 \subsection{Stage 2: the multi-wavelength comparison}
 \label{sec:programme:stage2}
 
-If Stage~1 shows the experiment operating at finite $u$, the wavelength ordering
-must be measured rather than assumed. We recommend \SI{457}{}, \SI{473}{} and
+The wavelength ordering must be measured both to test the stress correction
+and, if Stage~1 finds finite $u$, to quantify the intensity shift. We retain
+\SI{457}{}, \SI{473}{} and
 \SI{488}{\nano\meter}, with \SI{405}{\nano\meter} added if available to probe
-the ground-state ionization edge at high power. The conditions that must be held
+the ground-state ionization edge at high power. A tunable sweep or an additional
+line near \SIrange{441}{446}{\nano\meter} is needed to test the hydrostatic
+and micropillar corrected optima; the legacy three-line comparison alone does
+not bracket them. The conditions that must be held
 fixed are the pressure, the sample position, the focusing, the microwave drive,
 and the detection bandwidth; the incident power must be equalized \emph{at the
 sample}, calibrated rather than read from the laser head, and the spot size,
@@ -1272,9 +1392,11 @@ modification.
 \subsection{What the programme tests}
 \label{sec:programme:tests}
 
-Because $\lopt$ at low intensity is insensitive to every parameter this
+Within the legacy baseline, $\lopt$ at low intensity is insensitive to every parameter this
 calibration determines (Table~\ref{tab:tornado}), the calibration is not a check
-on the \SI{475.5}{\nano\meter} result. It tests four other things. Stage~1 fixes
+on the \SI{475.5}{\nano\meter} result. The added stress-resolved excitation
+sweep directly tests that baseline against the corrected Ho-anchor hypothesis.
+The remaining calibration tests four other things. Stage~1 fixes
 the regime, converting $u \lesssim 0.1$ into milliwatts. Stage~2 tests the
 predicted direction of the finite-power shift. Stage~3 fixes the absolute
 sensitivity scale, converting $\eta$ into \si{\nano\tesla\per\sqrt{\hertz}}, and
@@ -1289,9 +1411,10 @@ Sec.~\ref{sec:bounds:pressure} argues, the pressure at which the ordering of
 green and blue reverses is the only prediction here that a pressure-independent
 systematic cannot fake.
 
-\begin{table}[t]
-  \caption{Predictions to be compared against measurement. All entries are at
-  \SI{120}{\giga\pascal}, room temperature, quasi-hydrostatic stress and
+\begin{table*}[t]
+  \caption{Legacy single-mode baseline predictions to be compared against
+  measurement, distinct from Table~\ref{tab:alpha:corrected}. All entries are at
+  \SI{120}{\giga\pascal}, room temperature, $\alpha=0.95$ and
   $u \lesssim 0.1$ unless stated.}
   \label{tab:predictions}
   \begin{ruledtabular}
@@ -1310,25 +1433,23 @@ systematic cannot fake.
     green/blue crossover (473 nm) & \SI{73}{\giga\pascal} \\
   \end{tabular}
   \end{ruledtabular}
-\end{table}
+\end{table*}
 
 % =====================================================================
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{Scope: quasi-hydrostatic stress is a precondition}
+\subsection{Scope and tests of the stress correction}
 \label{sec:discussion:alpha}
 
-The result is a statement about relative sensitivity between excitation
-wavelengths, at low excitation intensity, for NV centers held in a
-quasi-hydrostatic stress environment, with the optical response described by a
-single-mode Franck-Condon envelope evaluated at the experiment's temperature. It
-is not a prediction of absolute sensitivity, which requires Stage~3 of
-Sec.~\ref{sec:programme}.
+Section~\ref{sec:results:alpha} makes the stress dependence explicit before
+presenting the legacy baseline. The two calculations share a phenomenological
+description of the differential stress shift but have different absorption
+anchors: the single-mode envelope and the published hydrostatic Ho kernel.
+The optical predictions concern relative sensitivity at low intensity;
+absolute sensitivity still requires Stage~3 of Sec.~\ref{sec:programme}.
 
-The stress condition deserves to be stated first rather than last, because it is
-the strongest of the three. At an anvil tip the normal stress equals the chamber
-pressure while the tangential component is reduced by a factor $\alpha$, and
+In the axial-stress convention of Eq.~\eqref{eq:alpha:stress},
 Ref.~\cite{Hilberer2023} measured $\alpha$ directly from the ODMR field
 response: $\alpha = 0.56$ for a standard flat culet, $\alpha = 0.95$ for a
 FIB-machined micropillar. The same work measured the ZPL shift per unit
@@ -1337,19 +1458,25 @@ mol^{-1}})$ on the micropillar against $-434$ on the flat culet---so at equal
 compression the deviatorically stressed culet shifts the ZPL by only $0.56$ of
 the quasi-hydrostatic value. Deviatoric stress red-shifts the \esE{} manifold
 and thereby opposes the hydrostatic blue shift, as Davies and
-Hamer~\cite{DaviesHamer1976} established at low stress. We propagate that
-measured ratio through the model by writing the shift as a sum of mean and
-deviatoric contributions whose relative weight is fixed by the two measured
-geometries, so that the micropillar value is unchanged by construction.
+Hamer~\cite{DaviesHamer1976} established at low stress. The differential
+calculation propagates two readings of this ratio rather than treating the
+stress coefficient as uniquely known. Its limits and rigid-shape assumption
+are stated in Fig.~\ref{fig:alpha:corrected}.
 
-The result is Table~\ref{tab:alpha}. The recommendation is not merely weakened
-by deviatoric stress---it inverts. In a standard flat culet at
-\SI{120}{\giga\pascal} the optimum returns to \SI{510}{\nano\meter} and
-\SI{532}{\nano\meter} outperforms \SI{473}{\nano\meter}.
+For auditability, Table~\ref{tab:alpha} retains the earlier single-mode
+calibration, which held the micropillar value unchanged by construction.
+Its flat-culet result, \SI{510}{\nano\meter} with green outperforming
+\SI{473}{\nano\meter}, is a legacy model result. It is distinct from the
+\SIrange{478.9}{493.4}{\nano\meter} conditional range at $\alpha=0.56$ in
+Table~\ref{tab:alpha:corrected}; the latter uses the Ho hydrostatic anchor and
+only a differential envelope shift. Neither is an experimentally validated
+flat-culet optimum.
 
-\begin{table}[t]
-  \caption{Dependence of the optimum on the stress anisotropy $\alpha =
-  \sigma_{\parallel}/\sigma_{\perp}$ at the culet, at \SI{120}{\giga\pascal} and
+\begin{table*}[t]
+  \caption{Legacy single-mode calibration retained for comparison, not the
+  hydrostatically anchored correction of Table~\ref{tab:alpha:corrected}.
+  Dependence of its optimum on the stress anisotropy $\alpha =
+  \sigma_{xx}/\sigma_{zz}=\sigma_{yy}/\sigma_{zz}$ at the culet, at \SI{120}{\giga\pascal} and
   room temperature, calibrated to the two geometries measured in
   Ref.~\cite{Hilberer2023}. The $\alpha = 0.56$ row is not a straightforward
   operating point: a flat culet drives the ODMR contrast through zero near
@@ -1366,10 +1493,10 @@ by deviatoric stress---it inverts. In a standard flat culet at
     standard flat culet~\cite{Hilberer2023} & 0.56 & \SI{226}{\milli\electronvolt} & \SI{510}{\nano\meter} & $0.82$ \\
   \end{tabular}
   \end{ruledtabular}
-\end{table}
+\end{table*}
 
-This does not undermine the result; it supplies its precondition. The same
-deviatoric stress that pulls $\lopt$ back to the green also disrupts the ODMR
+The optical correction alone does not predict whether a usable ODMR signal
+exists. Deviatoric stress also disrupts the ODMR
 contrast: Ref.~\cite{Hilberer2023} reports that a flat culet loses practical
 magnetic sensitivity above \SIrange{40}{50}{\giga\pascal}, with the contrast
 first vanishing near \SI{40}{\giga\pascal} and then inverting sign, while the
@@ -1384,9 +1511,10 @@ contrast---rather than merely suppressing it. No sensitivity has been computed
 for that inverted-contrast regime, so Table~\ref{tab:alpha} does not use it;
 ``not an operating point'' here means ``not modelled,'' not ``physically dead.''
 
-A quasi-hydrostatic geometry is thus the entry ticket to a $\lopt$ set by the
-anchors of Table~\ref{tab:anchors}, since it is the geometry in which they were
-measured~\cite{Ho2026}. The alternative route to the same end---a (111)-cut
+A quasi-hydrostatic geometry provides a useful validation setting, but the
+Ho absorption kernel is anchored at $\alpha=1$, not at the measured
+micropillar $\alpha=0.95$. The candidate correction at the latter is already
+\SIrange{444.7}{446.1}{\nano\meter}. A further route---a (111)-cut
 culet, in which the \esE{} of the axial NV group red-shifts and the intersystem
 crossing is preserved~\cite{Bhattacharyya2022}---is expected to behave
 similarly, and Ref.~\cite{Huang2025ISC} finds \emph{ab initio} that
@@ -1398,11 +1526,11 @@ Table~\ref{tab:anchors}, so we do not extrapolate Table~\ref{tab:alpha} to it.
 \subsection{Is the contrast wavelength independent?}
 \label{sec:discussion:clambda}
 
-Everything in Sec.~\ref{sec:results} rests on one assumption: that $C$ does not
+The optical wavelength comparisons in Sec.~\ref{sec:results} assume that $C$ does not
 depend on the excitation wavelength, so that minimizing $\eta$ is maximizing
 $\lambda\sabs$. The assumption has a specific way to fail. Under stress the
 \esE{} orbital doublet splits, with an orbital-strain coupling of $850 \pm
-\SI{130}{\tera\hertz}$ per unit strain~\cite{Barfuss2017}; if the two branches
+\SI{130}{\tera\hertz}$ per unit strain~\cite{MacQuarrie2017}; if the two branches
 had different intersystem-crossing rates, and if the excitation wavelength
 selected between them, then $C = C(\lambda)$ and the optimum would move. This is
 the mechanism suggested in Ref.~\cite{Bhattacharyya2022} as a way to measure ISC
@@ -1586,11 +1714,11 @@ charge-transfer phenomenology, and the two bounds of Sec.~\ref{sec:bounds}.
 Reference~\cite{Hilberer2023} already stepped its excitation down through
 \SI{532}{}, \SI{488}{}, \SI{457}{} and \SI{405}{\nano\meter} with rising
 pressure; the present model reproduces the direction and the ordering of that
-sequence and identifies where it should stop. The practical recommendation is
-narrow enough to act on and cheap enough to adopt: a \SI{473}{\nano\meter} DPSS
-source in place of the \SI{532}{\nano\meter} default, with the detection cut-on
-moved to \SI{600}{\nano\meter}, in an anvil whose NV layer sits in a
-quasi-hydrostatic stress environment.
+sequence. A \SI{473}{\nano\meter} DPSS source and a detection cut-on moved to
+\SI{600}{\nano\meter} are the practical legacy baseline. A final source choice
+requires the stress-dependent comparison of Sec.~\ref{sec:results:alpha},
+which predicts shorter wavelengths near the hydrostatic limit when anchored
+to the Ho kernel.
 
 % =====================================================================
 \section{Summary and outlook}
@@ -1600,7 +1728,8 @@ The pressure-induced reorganization of NV photophysics at
 \SI{120}{\giga\pascal}---a ZPL blue shift beyond \SI{0.4}{\electronvolt}, a
 $50\%$ increase of the absorption Huang-Rhys factor, and a rise of the
 ground-state photoionization threshold to \SI{3.06}{\electronvolt}---places the
-optimal ODMR excitation in a window centered at \SI{475.5}{\nano\meter}. Both
+legacy single-mode ODMR optimum in a window centered at
+\SI{475.5}{\nano\meter}, for $\alpha=0.95$. Both
 conventional choices lie outside it, for opposite reasons:
 \SI{532}{\nano\meter} because the absorption onset has moved past it,
 \SI{405}{\nano\meter} because it lies on the far blue flank with the ionization
@@ -1612,22 +1741,34 @@ $\sabs$ dependence and cancel from $\fm$. At equal optical power the optimum is
 therefore the maximum of $\lambda\sabs$, and---as the anchor analysis
 shows---it is determined entirely by the ZPL position and the electron-phonon
 coupling, with no sensitivity to any of the phenomenological charge-transfer
-constants. The practical consequence is immediate: a \SI{473}{\nano\meter}
+constants. Within that legacy baseline, a \SI{473}{\nano\meter}
 source recovers essentially the full optimum, buying back a factor $2.5$ in
 sensitivity relative to green excitation, equivalently a factor $\simeq 6$ in
 the acquisition time of a magnetic map, with a further factor $1.6$ available
 because blue excitation is what permits the detection band to be moved with the
 emission.
 
-The answer is bounded on two sides, and both bounds are part of the result. It
+The hydrostatically anchored alternative changes the design target:
+Eq.~\eqref{eq:alpha:correction} fixes \SI{440.65}{\nano\meter} at $\alpha=1$
+and predicts \SIrange{444.7}{446.1}{\nano\meter} at $\alpha=0.95$,
+\SIrange{466.1}{475.4}{\nano\meter} at $\alpha=0.70$, and
+\SIrange{478.9}{493.4}{\nano\meter} at $\alpha=0.56$, at fixed axial stress
+\SI{120}{\giga\pascal}. The ranges span two model normalizations and are
+unvalidated. The stress coefficient and the anisotropic absorption shape must
+be measured before turning these candidate wavelengths into a source
+recommendation.
+
+The legacy answer also has pressure and intensity bounds. It
 is bounded in pressure: below \SI{73}{\giga\pascal} green is the better choice,
 which is why a comparison at \SI{50}{\giga\pascal} found no advantage for blue,
 and the crossing between the two regimes is the prediction that a
 single-pressure measurement cannot fake. It is bounded in intensity: the optimum
 moves into the blue as the transition saturates, so \SI{473}{\nano\meter} is the
-answer for $u \lesssim 0.1$ and not a property of the technique.
+baseline answer for $u \lesssim 0.1$. These bounds have not been recalculated
+for the hydrostatically anchored stress correction.
 
-Three measurements follow, in order of cost. A saturation curve at the target
+The stress state and the low-intensity excitation spectrum should be measured
+alongside the following programme. A saturation curve at the target
 pressure fixes the intensity scale and therefore decides which of the two power
 regimes an experiment is in; everything else depends on it. A multi-wavelength
 comparison at that pressure tests the predicted direction of the finite-power
@@ -1647,9 +1788,13 @@ control.
 \section{Reproducing the numbers}
 \label{app:repro}
 
-All figures and quoted values are generated by the code in \texttt{code/}:
+The legacy baseline figures and quoted values are generated by the code in
+\texttt{code/}; the differential stress correction is reproduced separately:
 
 \begin{itemize}
+  \item \texttt{calc\_alpha\_corrected\_optimum.py} --- the Ho-anchored
+    differential stress correction and both normalizations of
+    Table~\ref{tab:alpha:corrected}.
   \item \texttt{nv\_model.py} --- anchored optical inputs, $\sabs$, the emission
     envelope and collection factor, $\fm$, and $\eta$ at fixed power; Monte
     Carlo helper.
@@ -1669,8 +1814,11 @@ All figures and quoted values are generated by the code in \texttt{code/}:
     limit.
 \end{itemize}
 
+\begin{widetext}
 \begin{verbatim}
 cd code
+# alpha dependence, hydrostatic anchor at 120 GPa
+python calc_alpha_corrected_optimum.py
 # green/blue crossover
 python figures/fig1_green_blue_mix.py
 # 120 GPa (vs 100, 140)
@@ -1682,8 +1830,10 @@ python repro_literature.py              # the validation suite
 python analysis_C_lambda.py             # the C(lambda) analysis
 python -m pytest tests/ -q              # the freeze tests
 \end{verbatim}
+\end{widetext}
 
-Regression values pinned by the tests: $\lopt = \SI{485.6}{\nano\meter}$ at
+Legacy baseline regression values pinned by the tests:
+$\lopt = \SI{485.6}{\nano\meter}$ at
 \SI{100}{\giga\pascal} and \SI{475.5}{\nano\meter} at \SI{120}{\giga\pascal};
 the \SIlist{473;457;450}{\nano\meter} crossovers against \SI{532}{\nano\meter}
 at \SIlist{73;84;89}{\giga\pascal}; $\eta(\SI{457}{\nano\meter})/\eta(\lopt) =

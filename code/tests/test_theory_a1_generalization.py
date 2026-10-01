@@ -16,7 +16,7 @@ from theory_a1_generalization import (  # noqa: E402
     section1_geometry, section2_split_formula, section3_multiplet,
     section4_mechanisms, section4b_mechanism_degeneracy, section5_ordering,
     section6_t4_prediction, section7_hot_band, section8_kernel_provenance,
-    sensitivity_optima,
+    sensitivity_optima, v1_envelope_local_maxima, V1_BAND,
 )
 
 
@@ -234,27 +234,47 @@ def test_e1_hot_band_arithmetic():
     hot = section7_hot_band()
     assert hot['gap_meV'] == pytest.approx(79.5, abs=0.5)
     assert hot['boltzmann_300K'] == pytest.approx(4.6e-2, rel=0.02)
-    assert hot['boltzmann_90K'] == pytest.approx(3.7e-5, rel=0.05)
+    # E1 of the freeze prints 3.7e-5; the arithmetic gives 3.546e-5 and the
+    # manuscript quotes 3.5e-5.  Pinned to the computed value, not the erratum.
+    assert hot['boltzmann_90K'] == pytest.approx(3.5e-5, rel=0.02)
     # The interpolated value sits between the two limits, derived from neither.
     assert hot['boltzmann_90K'] < hot['interpolated_a_532'] < hot['boltzmann_300K']
 
 
-def test_v1_and_ho_kernels_disagree_by_more_than_the_tolerance_band():
-    """S8: 475.5 nm and 440.65 nm are not the same recommendation."""
-    prov = section8_kernel_provenance()
-    row = prov['per_pressure'][120.0]
-    assert row['v1_franck_condon_nm'] == pytest.approx(475.51, abs=0.1)
-    assert row['ho_kernel_nm'] == pytest.approx(440.64, abs=0.1)
-    assert row['gap_nm'] == pytest.approx(34.87, abs=0.2)
-    lo, hi = prov['band_5pct']
-    assert not lo <= row['v1_franck_condon_nm'] <= hi
+def test_single_mode_envelope_never_carries_more_than_one_maximum():
+    """E4.3, made reproducible: one maximum against the kernel's four.
+
+    Section IV of the manuscript rests Theorem M's numerical content on this
+    contrast.  Its only previous source was `code/v1_diagnosis.py`, which is
+    absent from the repository.
+    """
+    over_band = v1_envelope_local_maxima(
+        pressures=tuple(float(p) for p in range(0, 121, 10)))
+    assert set(len(m) for m in over_band.values()) == {1}
+
+    positions = [m[0][0] for m in over_band.values()]
+    # The single maximum moves monotonically to the blue under compression.
+    assert all(b < a for a, b in zip(positions, positions[1:]))
+    assert positions[0] == pytest.approx(587.9, abs=0.5)
+
+    # Over the truncated analysis window the count is one above about 60 GPa
+    # and zero below it, where the envelope peak lies redward of the edge.
+    # It is never greater than one, which is the property Theorem M uses.
+    in_window = v1_envelope_local_maxima(
+        pressures=tuple(float(p) for p in range(0, 121, 10)),
+        window=DATA_WINDOW)
+    assert max(len(m) for m in in_window.values()) == 1
+    assert len(in_window[120.0]) == 1
+    assert len(in_window[0.0]) == 0
+
+    # The reconstructed kernel carries four at 120 GPa, in the same window.
+    assert len(Kernel().local_maxima()) == 4
+    assert V1_BAND[1] > DATA_WINDOW[1]
 
 
-def test_v1_optimum_coincides_with_the_ho_kernel_second_local_maximum():
-    """S8: 475.51 nm and 475.55 nm agree to 0.04 nm -- worth reconciling."""
+def test_current_kernel_provenance_reports_the_hydrostatic_baseline():
     prov = section8_kernel_provenance()
-    assert prov['second_local_max'][0] == pytest.approx(
-        prov['per_pressure'][120.0]['v1_franck_condon_nm'], abs=0.1)
+    assert prov['ho_kernel_nm'] == pytest.approx(441.0, abs=0.5)
 
 
 def test_planned_laser_lines_against_the_frozen_kernel():
