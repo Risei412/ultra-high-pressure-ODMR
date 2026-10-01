@@ -2,7 +2,7 @@
 
 日付: 2026-08-27
 対象: `theory_freeze_v3_ho_integrated.md` Addendum A1 の一般化
-コード: `code/theory_a2_multiplicity.py` / 図: `code/a2_multiplicity_120GPa.png`
+コード: `code/theory_a2_multiplicity.py` / 図: `code/outputs/figures/a2_multiplicity_120GPa.png`
 テスト: `code/tests/test_theory_a2_multiplicity.py`(15件)
 
 ---
@@ -318,6 +318,6 @@ T6 は \(N\) 個すべてを比較する。(M) の下で縮退は厳密なので
 ```bash
 cd code
 python theory_a2_multiplicity.py      # M1-M3, G0-G4
-python fig6_a2_multiplicity.py        # a2_multiplicity_120GPa.png
+python figures/fig6_a2_multiplicity.py        # a2_multiplicity_120GPa.png
 python -m pytest tests/test_theory_a2_multiplicity.py -q
 ```

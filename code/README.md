@@ -9,15 +9,29 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
 **phenomenological** and are the quantities to be calibrated from the
 `(I_405, I_457)` intensity sweep.
 
+## Directory layout
+
+- Shared analysis modules: `code/*.py`
+- Figure generation scripts: `code/figures/`
+- Generated analysis figures: `code/outputs/figures/`
+- Weekly report figures: `WRN/image/`
+- Input data: `code/data/`
+- Regression tests: `code/tests/`
+- Historical calculation bundles: `archive/calculation_bundles/`
+
+Run figure scripts from the repository root with `python code/figures/<script>.py`,
+or from `code/` with `python figures/<script>.py`. Analysis figures are always
+written to `code/outputs/figures/`, regardless of the working directory.
+
 ## Files
 - `nv_model.py` — shared model: absorption cross section (low-T Franck–Condon /
   Pekarian envelope), steady-state NV⁻ fraction `f_minus`, and lock-in
   sensitivity `eta ∝ Δν/(C√R)`; also Monte-Carlo band helper.
-- `fig1_green_blue_mix.py` — sensitivity of green(532)/blue(457)/mix vs pressure
-  → `sensitivity_green_blue_mix.png`.
-- `fig2_blue_wavelength_sweep.py` — blue-wavelength sweep at a chosen pressure
+- `figures/fig1_green_blue_mix.py` — sensitivity of green(532)/blue(457)/mix vs pressure
+  → `outputs/figures/sensitivity_green_blue_mix.png`.
+- `figures/fig2_blue_wavelength_sweep.py` — blue-wavelength sweep at a chosen pressure
   (optimum, mechanism, optimum-vs-pressure)
-  → `blue_wavelength_sensitivity_<P>GPa.png`.
+  → `outputs/figures/blue_wavelength_sensitivity_<P>GPa.png`.
 - `ho_spectrum_model.py`, `ho_odmr_sensitivity.py`,
   `report_120gpa_sensitivity.py` — the v3 external-kernel chain
   (`σ_abs^Ho → R_det → η`) behind `theory_freeze_v3_ho_integrated.md`.
@@ -25,20 +39,20 @@ arXiv:2606.02399 (2026). Rate constants (`a_gs, a_es, r0, rbg, w0`) are
   (the coincidence/divergence propositions P1–P7 and tests T1–T4) against the
   frozen Ho kernel.  Findings written up in
   `docs/theory_a1_numerical_execution.md`.
-- `fig5_a1_generalization.py` — figures for the above
-  → `a1_generalization_120GPa.png`.
+- `figures/fig5_a1_generalization.py` — figures for the above
+  → `outputs/figures/a1_generalization_120GPa.png`.
 - `theory_a2_multiplicity.py` — Addendum A2, the kernel-independent structural
   layer: the multiplicity-ladder theorem (the optimal set is a level set of `A`,
   whose size steps at the critical values of `A`, at power ratios needing no
   absolute calibration) and the gauge-degeneracy theorem (η sees the response
   only through `E = 2c + s + 2w`).  Write-up in `docs/theory_a2_multiplicity.md`.
-- `fig6_a2_multiplicity.py` — figures for A2 → `a2_multiplicity_120GPa.png`.
+- `figures/fig6_a2_multiplicity.py` — figures for A2 → `outputs/figures/a2_multiplicity_120GPa.png`.
 - `theory_a3_branch_exchange.py` — Addendum A3, pressure-driven branch exchange:
   the ZPL and phonon-sideband branches scale differently with the Huang-Rhys
   factor, so pressure exchanges which one carries the global optimum.  Branches
   are identified in the **raw extracted samples**, not in the pressure
   interpolation.  Write-up in `docs/theory_a3_branch_exchange.md`.
-- `fig7_a3_branch_exchange.py` — figures for A3 → `a3_branch_exchange.png`.
+- `figures/fig7_a3_branch_exchange.py` — figures for A3 → `outputs/figures/a3_branch_exchange.png`.
 - `figure_validation.py` — pixel-level check of the extracted kernel against the
   source figure.  The sideband branch reproduces it to better than 1 %; the
   zero-phonon-line peaks turn out to be **clipped by the axis**, so A3's
@@ -66,9 +80,9 @@ pip install -r requirements.txt
 
 ## Reproduce the figures
 ```bash
-python fig1_green_blue_mix.py                     # green/blue/mix vs pressure
-python fig2_blue_wavelength_sweep.py              # blue sweep @120 GPa (compare 100,140)
-python fig2_blue_wavelength_sweep.py 100 75 125   # blue sweep @100 GPa (compare 75,125)
+python figures/fig1_green_blue_mix.py                     # green/blue/mix vs pressure
+python figures/fig2_blue_wavelength_sweep.py              # blue sweep @120 GPa (compare 100,140)
+python figures/fig2_blue_wavelength_sweep.py 100 75 125   # blue sweep @100 GPa (compare 75,125)
 ```
 
 ## Key numbers

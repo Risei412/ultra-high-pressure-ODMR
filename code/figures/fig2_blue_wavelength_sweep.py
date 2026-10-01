@@ -6,12 +6,18 @@ Blue-excitation-wavelength sweep of the lock-in sensitivity at a fixed pressure:
   (c) optimal blue wavelength vs pressure (tracks ZPL / sideband edge)
 
 Run:
-  python fig2_blue_wavelength_sweep.py            # 120 GPa (compare 100, 140)
-  python fig2_blue_wavelength_sweep.py 100 75 125 # 100 GPa (compare 75, 125)
+  python figures/fig2_blue_wavelength_sweep.py            # 120 GPa (compare 100, 140)
+  python figures/fig2_blue_wavelength_sweep.py 100 75 125 # 100 GPa (compare 75, 125)
 Out:
-  blue_wavelength_sensitivity_<P>GPa.png
+  outputs/figures/blue_wavelength_sensitivity_<P>GPa.png
 """
+
+from pathlib import Path
 import sys
+
+# Keep the shared analysis modules importable from this script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from figures._paths import figure_output
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
@@ -116,7 +122,7 @@ ax.set_title('(c)  Optimal blue $\\lambda$ shifts with $P$', loc='left', weight=
 ax.legend(frameon=False, fontsize=9, loc='upper right'); ax.grid(True, alpha=0.18)
 
 plt.tight_layout()
-out = f'blue_wavelength_sensitivity_{Pi}GPa.png'
+out = figure_output(f'blue_wavelength_sensitivity_{Pi}GPa.png')
 plt.savefig(out, dpi=185, bbox_inches='tight')
 print(f'saved {out} ; optimum@{Pi} = {lam_opt:.0f} nm ; '
       f'eta(487)/opt={np.interp(487,lam,cM):.2f} ; eta(457)/opt={np.interp(457,lam,cM):.2f}')

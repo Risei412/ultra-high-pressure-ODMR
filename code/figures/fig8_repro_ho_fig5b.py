@@ -70,9 +70,15 @@ Every curve in Fig. 5(b) is separately normalised in the source, so only the
 shape of each is meaningful.  Each model curve therefore carries the single
 least-squares multiplicative scale the audit allows, and nothing else.
 
-Writes `repro_ho_fig5b.png`.
+Writes `outputs/figures/repro_ho_fig5b.png`.
 """
-import os
+
+from pathlib import Path
+import sys
+
+# Keep the shared analysis modules importable from this script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from figures._paths import figure_output
 
 import matplotlib
 matplotlib.use('Agg')
@@ -88,8 +94,7 @@ from repro_yield import (
     compare_experiment, compare_ho_theory, load, predict_absorption,
 )
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   'repro_ho_fig5b.png')
+OUT = figure_output('repro_ho_fig5b.png')
 
 COLOUR = {532.0: 'tab:green', 457.0: 'tab:blue'}
 REF_COLOUR = '0.35'

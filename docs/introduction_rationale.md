@@ -114,7 +114,7 @@ Ho *et al.* 2026 が定量化した 3 点。**これが Introduction の物理�
 ## 数値の出所(すべて `code/` で再現可能)
 
 ```
-python code/fig2_blue_wavelength_sweep.py      # λ_opt=475, η(487)/opt=1.06, η(457)/opt=1.12
+python code/figures/fig2_blue_wavelength_sweep.py      # λ_opt=475, η(487)/opt=1.06, η(457)/opt=1.12
 ```
 
 | 量 | 値 @120 GPa |

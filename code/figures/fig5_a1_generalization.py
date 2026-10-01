@@ -7,9 +7,15 @@
 (c) P2 tested against exact argmax, including the jump to the ZPL;
 (d) the P4 mechanism decomposition.
 
-Writes `a1_generalization_120GPa.png`.
+Writes `outputs/figures/a1_generalization_120GPa.png`.
 """
-import os
+
+from pathlib import Path
+import sys
+
+# Keep the shared analysis modules importable from this script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from figures._paths import figure_output
 
 import matplotlib
 matplotlib.use('Agg')
@@ -21,8 +27,7 @@ from theory_a1_generalization import (
     section2_split_formula, sensitivity_optima,
 )
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   'a1_generalization_120GPa.png')
+OUT = figure_output('a1_generalization_120GPa.png')
 PLANNED = {457.0: 'tab:green', 473.0: 'tab:orange', 488.0: 'tab:red'}
 
 

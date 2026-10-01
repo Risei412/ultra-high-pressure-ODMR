@@ -5,9 +5,15 @@
 (c) the gauge plane 2c + s + 2w = E, and the E > 1 splitting criterion;
 (d) gauge-equivalent models: identical eta, different C, R and dnu.
 
-Writes `a2_multiplicity_120GPa.png`.
+Writes `outputs/figures/a2_multiplicity_120GPa.png`.
 """
-import os
+
+from pathlib import Path
+import sys
+
+# Keep the shared analysis modules importable from this script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from figures._paths import figure_output
 
 import matplotlib
 matplotlib.use('Agg')
@@ -19,8 +25,7 @@ from theory_a2_multiplicity import (
     GaugeResponse, critical_values, gauge_family, match_transitions,
 )
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   'a2_multiplicity_120GPa.png')
+OUT = figure_output('a2_multiplicity_120GPa.png')
 
 
 def panel_levels(ax, kernel):

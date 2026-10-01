@@ -901,3 +901,12 @@ Rule 4 of S1.6 ("never describe the v1 failure as structural; it is 65 vs
 7. **New.** When quoting \(\hbar\omega\) from an observed sideband maximum,
    use \(\psi(p^*+1)=\ln S\), never \(p^*=S\). The shortcut costs half a
    phonon, ~50 meV here, and it is enough to fail a gate.
+
+## Repository layout update (2026-10-01)
+
+Figure generation scripts now live in `code/figures/`, and generated analysis
+figures in `code/outputs/figures/`. Earlier file paths in this record describe
+the layout at the time of each entry. The historical bundle
+`ho_integrated_odmr_v3_20260827.zip` has moved to
+`archive/calculation_bundles/ho_integrated_odmr_v3_20260827.zip`.
+This update changes file locations only.

@@ -2,9 +2,9 @@
 
 日付: 2026-08-27
 対象: `theory_freeze_v3_ho_integrated.md` Addendum A1 / `docs/theory_optima_coincidence.md`
-コード: `code/theory_a1_generalization.py`, `code/fig5_a1_generalization.py`
+コード: `code/theory_a1_generalization.py`, `code/figures/fig5_a1_generalization.py`
 テスト: `code/tests/test_theory_a1_generalization.py`(23件)
-図: `code/a1_generalization_120GPa.png`
+図: `code/outputs/figures/a1_generalization_120GPa.png`
 
 本ノートは v3 の凍結値を一切変更しない。A1 が解析的に述べた命題 P1–P7 と
 検定 T1–T4 を、凍結された Ho カーネルに対して**実際に数値実行**し、
@@ -17,7 +17,7 @@
 v3 の `## Reproduction` が指定するコマンドを実行した。ただし
 `code/ho_odmr_sensitivity.py`、`code/report_120gpa_sensitivity.py`、
 `code/tests/test_ho_odmr_sensitivity.py`、`code/data/ho_120gpa_wavelength_scan.csv`
-は**リポジトリ本体に存在せず**、`ho_integrated_odmr_v3_20260827.zip` の中にのみ
+は**リポジトリ本体に存在せず**、`archive/calculation_bundles/ho_integrated_odmr_v3_20260827.zip` の中にのみ
 あった。zip から復元して実行(共有ファイルの差分は末尾改行のみ)。
 
 | 凍結値 | v3 記載 | 再現値 | 判定 |
@@ -321,6 +321,6 @@ v3 の `## Reproduction` はリポジトリ本体では実行できないため�
 ```bash
 cd code
 python theory_a1_generalization.py     # S1-S8 の全数値
-python fig5_a1_generalization.py       # a1_generalization_120GPa.png
+python figures/fig5_a1_generalization.py       # a1_generalization_120GPa.png
 python -m pytest tests/ -q             # 129 passed
 ```

@@ -21,9 +21,15 @@ clipped zero-phonon line of the real reconstruction out of a diagram whose job
 is to show a mechanism.  For the real kernel see `fig5_a1_generalization.py`
 (panel b) and `fig6_a2_multiplicity.py`.
 
-Writes `esa_fig0_split_concept.png`.
+Writes `outputs/figures/esa_fig0_split_concept.png`.
 """
-import os
+
+from pathlib import Path
+import sys
+
+# Keep the shared analysis modules importable from this script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from figures._paths import figure_output
 
 import matplotlib
 matplotlib.use('Agg')
@@ -34,8 +40,7 @@ from scipy.optimize import brentq
 matplotlib.rcParams['font.family'] = 'IPAGothic'
 matplotlib.rcParams['axes.unicode_minus'] = False
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   'esa_fig0_split_concept.png')
+OUT = figure_output('esa_fig0_split_concept.png')
 
 LAMBDA_ABS = 440.65      # nm, the frozen optical-limit optimum
 KAPPA = 8.0e-4           # nm^-2, the article's Table 2 low-power curvature

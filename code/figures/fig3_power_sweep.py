@@ -8,12 +8,18 @@ Power-explicit blue-wavelength optimisation at a fixed pressure (Part B of PLAN.
       power (which line is best) is visible directly
 
 Run:
-  python fig3_power_sweep.py            # 120 GPa
-  python fig3_power_sweep.py 100        # any other pressure
+  python figures/fig3_power_sweep.py            # 120 GPa
+  python figures/fig3_power_sweep.py 100        # any other pressure
 Out:
-  power_wavelength_sensitivity_<P>GPa.png
+  outputs/figures/power_wavelength_sensitivity_<P>GPa.png
 """
+
+from pathlib import Path
 import sys
+
+# Keep the shared analysis modules importable from this script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from figures._paths import figure_output
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
@@ -88,7 +94,7 @@ ax.set_title(f'(c)  $\\eta(u)$ for candidate lines @ {Pi} GPa', loc='left', weig
 ax.legend(frameon=False, fontsize=8.5, ncol=2); ax.grid(True, which='both', alpha=0.18)
 
 plt.tight_layout()
-out = f'power_wavelength_sensitivity_{Pi}GPa.png'
+out = figure_output(f'power_wavelength_sensitivity_{Pi}GPa.png')
 plt.savefig(out, dpi=185, bbox_inches='tight')
 
 # ---- text summary ----

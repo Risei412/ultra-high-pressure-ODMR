@@ -5,9 +5,15 @@
 (c) the driver: the Franck-Condon displacement and the asymmetric decay;
 (d) the resulting optimal wavelength, discontinuous at P*.
 
-Writes `a3_branch_exchange.png`.
+Writes `outputs/figures/a3_branch_exchange.png`.
 """
-import os
+
+from pathlib import Path
+import sys
+
+# Keep the shared analysis modules importable from this script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from figures._paths import figure_output
 
 import matplotlib
 matplotlib.use('Agg')
@@ -19,8 +25,7 @@ from theory_a3_branch_exchange import (
     coupling_growth, exchange_pressure, identify_branches, monotonicity,
 )
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   'a3_branch_exchange.png')
+OUT = figure_output('a3_branch_exchange.png')
 ZPL_COLOUR, SB_COLOUR = 'tab:red', 'tab:blue'
 
 

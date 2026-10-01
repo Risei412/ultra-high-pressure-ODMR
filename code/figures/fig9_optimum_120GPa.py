@@ -25,9 +25,15 @@ and each is load bearing:
 * the 402 nm edge is where Ho's figure stops, not where the band stops (K1),
   so nothing here licences a claim about the deeper blue.
 
-Writes `optimum_wavelength_120GPa.png`.
+Writes `outputs/figures/optimum_wavelength_120GPa.png`.
 """
-import os
+
+from pathlib import Path
+import sys
+
+# Keep the shared analysis modules importable from this script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from figures._paths import figure_output
 
 import matplotlib
 matplotlib.use('Agg')
@@ -40,8 +46,7 @@ from theory_a1_generalization import (
 )
 from v1_diagnosis import phonon_energy, wavelength_structure, zpl_shift
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   'optimum_wavelength_120GPa.png')
+OUT = figure_output('optimum_wavelength_120GPa.png')
 
 # Lines a high-pressure ODMR bench can actually produce, and the ZPL, which is
 # not a laser line but is where the kernel's fourth maximum sits.

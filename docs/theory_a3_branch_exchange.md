@@ -2,7 +2,7 @@
 
 日付: 2026-08-27(**正誤表 E3 により §2.3 と §8-6 を改訂**)
 コード: `code/theory_a3_branch_exchange.py`, `code/figure_validation.py`
-図: `code/a3_branch_exchange.png`
+図: `code/outputs/figures/a3_branch_exchange.png`
 テスト: `code/tests/test_theory_a3_branch_exchange.py`(12件)、
 `code/tests/test_figure_validation.py`(12件)
 
@@ -291,7 +291,7 @@ T11 は**最も安価で最も決定的**である。分岐間隔は2つのピ�
 cd code
 python theory_a3_branch_exchange.py   # X1-X8  (ZPL-derived values superseded by E3)
 python figure_validation.py           # V1-V5  source-figure check + corrected P*
-python fig7_a3_branch_exchange.py     # a3_branch_exchange.png
+python figures/fig7_a3_branch_exchange.py     # a3_branch_exchange.png
 python -m pytest tests/test_theory_a3_branch_exchange.py \
                 tests/test_figure_validation.py -q
 ```

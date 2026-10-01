@@ -6,6 +6,13 @@ Midnight Ink #101426 on Optic White.
 
 The kernel figures read the frozen v3 kernel; nothing here fits anything.
 """
+
+from pathlib import Path
+import sys
+
+# Keep the shared analysis modules importable from this script directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from figures._paths import CODE_DIR
 import os
 
 import matplotlib
@@ -21,8 +28,7 @@ ACCENT = '#4B0082'
 PALE = '#E8EAF1'
 DARK = '#101426'
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   '..', 'WRN', 'image')
+OUT = str(CODE_DIR.parent / 'WRN' / 'image')
 
 plt.rcParams.update({
     'font.size': 9,
